@@ -1,11 +1,48 @@
-# SOLID Principles
+# CancellationToken demo (ConsoleApp)
 
-SOLID principles are design principles that help us address many software design problems. The term SOLID is an acronym for five design principles intended to make software designs more understandable, flexible, and maintainable.
+This repo contains a small .NET 8 console app that demonstrates how to **cancel an async operation** using `CancellationToken` and `CancellationTokenSource`.
 
-## The SOLID acronym
+## Program overview (simple explanation)
 
-- **S**: Single Responsibility Principle (SRP)
-- **O**: Open/Closed Principle (OCP)
-- **L**: Liskov Substitution Principle (LSP)
-- **I**: Interface Segregation Principle (ISP)
-- **D**: Dependency Inversion Principle (DIP)
+The app runs two things at the same time:
+
+1. A long-running async method (`LongRunningOperationAsync`) that simulates work.
+2. A background task that waits ~2 seconds and then requests cancellation.
+
+Inside `LongRunningOperationAsync`, the code:
+
+- Loops up to 5 times
+- Checks if cancellation was requested (`cancellationToken.ThrowIfCancellationRequested()`)
+- Waits 1 second (`Task.Delay`) to simulate work
+- Prints `Working...`
+
+When cancellation is requested, `ThrowIfCancellationRequested()` throws an `OperationCanceledException`. `Main` catches it and prints `Operation was canceled.`
+
+## Expected output (example)
+
+Exact output can vary slightly due to timing, but it typically looks like:
+
+```
+Working...
+Working...
+Operation was canceled.
+```
+
+## Key types used
+
+- `CancellationTokenSource`: creates and controls cancellation (`Cancel()`).
+- `CancellationToken`: passed into async work so it can stop cooperatively.
+- `OperationCanceledException`: the standard exception used to end work when cancellation happens.
+
+## Build and run
+
+From the folder that contains the project file (`ConsoleApp.csproj`):
+
+```bash
+dotnet build
+dotnet run
+```
+
+## Files
+
+- `ConsoleApp/Program.cs`: the full demo.

@@ -1,29 +1,35 @@
 ﻿using System;
-using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 class Program
 {
     static async Task Main(string[] args)
     {
-        var tasks = new[]
+        var cancellationTokenSource = new CancellationTokenSource();
+        Task.Run(() =>
         {
-            GetDataAsync("https://jsonplaceholder.typicode.com/posts/1"),
-            GetDataAsync("https://jsonplaceholder.typicode.com/users/1")
-        };
+            Thread.Sleep(2000); // Simulate delay before cancellation
+            cancellationTokenSource.Cancel();
+        });
 
-        var results = await Task.WhenAll(tasks);
-        foreach (var result in results)
+        try
         {
-            Console.WriteLine(result);
+            await LongRunningOperationAsync(cancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("Operation was canceled.");
         }
     }
 
-    static async Task<string> GetDataAsync(string url)
+    static async Task LongRunningOperationAsync(CancellationToken cancellationToken)
     {
-        using (HttpClient client = new HttpClient())
+        for (int i = 0; i < 5; i++)
         {
-            return await client.GetStringAsync(url);
+            cancellationToken.ThrowIfCancellationRequested();
+            await Task.Delay(1000); // Simulates work
+            Console.WriteLine("Working...");
         }
     }
 }

@@ -15,6 +15,8 @@ class Program
         Console.WriteLine($"User Data: {userData}");
 
         Console.WriteLine("All data fetched.");
+
+        SyncMethod();
     }
 
     static async Task<string> GetPostDataAsync(int postId)
@@ -33,5 +35,12 @@ class Program
             var response = await client.GetStringAsync($"https://jsonplaceholder.typicode.com/users/{userId}");
             return response;
         }
+    }
+
+    public static void SyncMethod()
+    {
+        Console.WriteLine("Start Sync");
+        Thread.Sleep(2000); // Simulate a delay
+        Console.WriteLine("End Sync");
     }
 }

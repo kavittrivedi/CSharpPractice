@@ -1,9 +1,37 @@
-﻿
-using ConsoleApp.LSP;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
-var car = new Car();
-var motorcycle = new Motorcycle();
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        Console.WriteLine("Starting data fetch...");
 
-var operator1 = new VehicleOperator();
-operator1.OperateVehicle(car);          // Outputs car-specific messages
-operator1.OperateVehicle(motorcycle);    // Outputs motorcycle-specific messages
+        var postData = await GetPostDataAsync(1);
+        Console.WriteLine($"Post Data: {postData}");
+
+        var userData = await GetUserDataAsync(1);
+        Console.WriteLine($"User Data: {userData}");
+
+        Console.WriteLine("All data fetched.");
+    }
+
+    static async Task<string> GetPostDataAsync(int postId)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            var response = await client.GetStringAsync($"https://jsonplaceholder.typicode.com/posts/{postId}");
+            return response;
+        }
+    }
+
+    static async Task<string> GetUserDataAsync(int userId)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            var response = await client.GetStringAsync($"https://jsonplaceholder.typicode.com/users/{userId}");
+            return response;
+        }
+    }
+}

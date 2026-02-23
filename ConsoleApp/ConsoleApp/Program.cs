@@ -4,15 +4,25 @@ using System.Collections.Generic;
 
 class Program
 {
+    class Person
+    {
+        public string Name { get; set; }
+    }
+
     static void Main()
     {
-        List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+        List<Person> people = new List<Person>
+        {
+            new Person { Name = "Alice" },
+            new Person { Name = "Bob" },
+            new Person { Name = "Charlie" }
+        };
 
         // Using First
         try
         {
-            int first = numbers.First(x => x > 10); // Throws InvalidOperationException
-            Console.WriteLine($"First: {first}");
+            Person first = people.First(p => p.Name == "David"); // Throws InvalidOperationException
+            Console.WriteLine($"First: {first.Name}");
         }
         catch (Exception ex)
         {
@@ -20,7 +30,14 @@ class Program
         }
 
         // Using FirstOrDefault
-        int firstOrDefault = numbers.FirstOrDefault(x => x > 10); // Returns default value (0)
-        Console.WriteLine($"FirstOrDefault: {firstOrDefault}");
+        Person firstOrDefault = people.FirstOrDefault(p => p.Name == "David"); // Returns null
+        if (firstOrDefault == null)
+        {
+            Console.WriteLine("FirstOrDefault: No match found");
+        }
+        else
+        {
+            Console.WriteLine($"FirstOrDefault: {firstOrDefault.Name}");
+        }
     }
 }

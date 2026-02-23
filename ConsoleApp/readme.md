@@ -1,52 +1,34 @@
-# `First` vs `FirstOrDefault` (LINQ)
+# `First` vs `FirstOrDefault` in simple language (LINQ)
 
-This repo contains a small .NET 8 console app that demonstrates the difference between LINQ's `First` and `FirstOrDefault` when searching a sequence.
+This repo contains a small .NET 8 console app that shows the difference between LINQ's `First` and `FirstOrDefault` when you try to find an item in a list.
 
-## What the sample does
+## The idea
 
-Given a list:
+In `ConsoleApp/Program.cs`, we have a list of `Person` objects and we search for a person named "David".
 
-```csharp
-var numbers = new List<int> { 1, 2, 3, 4, 5 };
-```
+- If "David" exists, **both** methods return that person.
+- If "David" does **not** exist, they behave differently.
 
-It tries to find the first number that matches a predicate (`x > 10`). Since **no elements match**, the two methods behave differently.
+## `First(...)`
 
-## Behavior difference
+`First` means: **"Give me the first match. If there is no match, throw an error."**
 
-### `First(predicate)`
+- Match found => returns the item.
+- No match => throws `InvalidOperationException`.
 
-- Returns the first element that matches the predicate.
-- If **no element matches**, it throws an `InvalidOperationException` ("Sequence contains no matching element").
+## `FirstOrDefault(...)`
 
-Use `First` when “no match” should be treated as an error.
+`FirstOrDefault` means: **"Give me the first match. If there is no match, return a default value."**
 
-### `FirstOrDefault(predicate)`
+- Match found => returns the item.
+- No match => returns the default value.
 
-- Returns the first element that matches the predicate.
-- If **no element matches**, it returns the *default value* of the element type.
-  - For `int`, default is `0`
-  - For reference types, default is `null`
+For reference types (like `Person`), the default value is `null`. That’s why the sample checks for `null` and prints "No match found".
 
-Use `FirstOrDefault` when “no match” is expected and you want to handle it without exceptions.
+## Quick rule
 
-## Example output
-
-With the current predicate (`x > 10`), typical output looks like:
-
-```
-First Exception: Sequence contains no matching element
-FirstOrDefault: 0
-```
-
-## Important note about defaults
-
-For value types (like `int`), `FirstOrDefault` returning `0` can be ambiguous because `0` might also be a valid value.
-
-Common alternatives:
-
-- Use `Any(...)` first to check whether a match exists.
-- Use `Where(...).Select(...).Cast<int?>().FirstOrDefault()` (or similar) to return a nullable type.
+- Use `First` when not finding a match should be treated as a problem.
+- Use `FirstOrDefault` when not finding a match is normal and you want to handle it yourself.
 
 ## Build and run
 

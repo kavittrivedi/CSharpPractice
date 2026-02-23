@@ -6,41 +6,24 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        Console.WriteLine("Starting data fetch...");
-
-        var postData = await GetPostDataAsync(1);
-        Console.WriteLine($"Post Data: {postData}");
-
-        var userData = await GetUserDataAsync(1);
-        Console.WriteLine($"User Data: {userData}");
-
-        Console.WriteLine("All data fetched.");
-
-        SyncMethod();
-    }
-
-    static async Task<string> GetPostDataAsync(int postId)
-    {
-        using (HttpClient client = new HttpClient())
+        var tasks = new[]
         {
-            var response = await client.GetStringAsync($"https://jsonplaceholder.typicode.com/posts/{postId}");
-            return response;
+            GetDataAsync("https://jsonplaceholder.typicode.com/posts/1"),
+            GetDataAsync("https://jsonplaceholder.typicode.com/users/1")
+        };
+
+        var results = await Task.WhenAll(tasks);
+        foreach (var result in results)
+        {
+            Console.WriteLine(result);
         }
     }
 
-    static async Task<string> GetUserDataAsync(int userId)
+    static async Task<string> GetDataAsync(string url)
     {
         using (HttpClient client = new HttpClient())
         {
-            var response = await client.GetStringAsync($"https://jsonplaceholder.typicode.com/users/{userId}");
-            return response;
+            return await client.GetStringAsync(url);
         }
-    }
-
-    public static void SyncMethod()
-    {
-        Console.WriteLine("Start Sync");
-        Thread.Sleep(2000); // Simulate a delay
-        Console.WriteLine("End Sync");
     }
 }

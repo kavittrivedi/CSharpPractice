@@ -1,38 +1,52 @@
-# CancellationToken demo (ConsoleApp)
+# `First` vs `FirstOrDefault` (LINQ)
 
-This repo contains a small .NET 8 console app that demonstrates how to **cancel an async operation** using `CancellationToken` and `CancellationTokenSource`.
+This repo contains a small .NET 8 console app that demonstrates the difference between LINQ's `First` and `FirstOrDefault` when searching a sequence.
 
-## Program overview (simple explanation)
+## What the sample does
 
-The app runs two things at the same time:
+Given a list:
 
-1. A long-running async method (`LongRunningOperationAsync`) that simulates work.
-2. A background task that waits ~2 seconds and then requests cancellation.
-
-Inside `LongRunningOperationAsync`, the code:
-
-- Loops up to 5 times
-- Checks if cancellation was requested (`cancellationToken.ThrowIfCancellationRequested()`)
-- Waits 1 second (`Task.Delay`) to simulate work
-- Prints `Working...`
-
-When cancellation is requested, `ThrowIfCancellationRequested()` throws an `OperationCanceledException`. `Main` catches it and prints `Operation was canceled.`
-
-## Expected output (example)
-
-Exact output can vary slightly due to timing, but it typically looks like:
-
-```
-Working...
-Working...
-Operation was canceled.
+```csharp
+var numbers = new List<int> { 1, 2, 3, 4, 5 };
 ```
 
-## Key types used
+It tries to find the first number that matches a predicate (`x > 10`). Since **no elements match**, the two methods behave differently.
 
-- `CancellationTokenSource`: creates and controls cancellation (`Cancel()`).
-- `CancellationToken`: passed into async work so it can stop cooperatively.
-- `OperationCanceledException`: the standard exception used to end work when cancellation happens.
+## Behavior difference
+
+### `First(predicate)`
+
+- Returns the first element that matches the predicate.
+- If **no element matches**, it throws an `InvalidOperationException` ("Sequence contains no matching element").
+
+Use `First` when “no match” should be treated as an error.
+
+### `FirstOrDefault(predicate)`
+
+- Returns the first element that matches the predicate.
+- If **no element matches**, it returns the *default value* of the element type.
+  - For `int`, default is `0`
+  - For reference types, default is `null`
+
+Use `FirstOrDefault` when “no match” is expected and you want to handle it without exceptions.
+
+## Example output
+
+With the current predicate (`x > 10`), typical output looks like:
+
+```
+First Exception: Sequence contains no matching element
+FirstOrDefault: 0
+```
+
+## Important note about defaults
+
+For value types (like `int`), `FirstOrDefault` returning `0` can be ambiguous because `0` might also be a valid value.
+
+Common alternatives:
+
+- Use `Any(...)` first to check whether a match exists.
+- Use `Where(...).Select(...).Cast<int?>().FirstOrDefault()` (or similar) to return a nullable type.
 
 ## Build and run
 
@@ -45,4 +59,4 @@ dotnet run
 
 ## Files
 
-- `ConsoleApp/Program.cs`: the full demo.
+- `ConsoleApp/Program.cs`: the demo comparing `First` and `FirstOrDefault`.

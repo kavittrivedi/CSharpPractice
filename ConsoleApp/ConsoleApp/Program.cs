@@ -1,35 +1,26 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
 
 class Program
 {
-    static async Task Main(string[] args)
+    static void Main()
     {
-        var cancellationTokenSource = new CancellationTokenSource();
-        Task.Run(() =>
-        {
-            Thread.Sleep(2000); // Simulate delay before cancellation
-            cancellationTokenSource.Cancel();
-        });
+        List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
 
+        // Using First
         try
         {
-            await LongRunningOperationAsync(cancellationTokenSource.Token);
+            int first = numbers.First(x => x > 10); // Throws InvalidOperationException
+            Console.WriteLine($"First: {first}");
         }
-        catch (OperationCanceledException)
+        catch (Exception ex)
         {
-            Console.WriteLine("Operation was canceled.");
+            Console.WriteLine($"First Exception: {ex.Message}");
         }
-    }
 
-    static async Task LongRunningOperationAsync(CancellationToken cancellationToken)
-    {
-        for (int i = 0; i < 5; i++)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            await Task.Delay(1000); // Simulates work
-            Console.WriteLine("Working...");
-        }
+        // Using FirstOrDefault
+        int firstOrDefault = numbers.FirstOrDefault(x => x > 10); // Returns default value (0)
+        Console.WriteLine($"FirstOrDefault: {firstOrDefault}");
     }
 }

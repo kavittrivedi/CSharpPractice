@@ -1,10 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿
+using ConsoleApp.LSP;
 
-var sum = MathHelpers.Add(2, 3);
-var pi = MathHelpers.Pi;
+var car = new Car();
+var motorcycle = new Motorcycle();
 
-Console.WriteLine(Person.GetName());
-Person.name = "kavit";
-Console.WriteLine(Person.GetName());
-Console.WriteLine(Person.GetName());
+var operator1 = new VehicleOperator();
+operator1.OperateVehicle(car);          // Outputs car-specific messages
+operator1.OperateVehicle(motorcycle);    // Outputs motorcycle-specific messages

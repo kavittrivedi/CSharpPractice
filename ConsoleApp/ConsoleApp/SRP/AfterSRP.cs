@@ -13,8 +13,8 @@ namespace ConsoleApp.SRP.AfterSRP
         public decimal Salary { get; set; }
     }
 
-    class SalaryCalculator
-    {
-        public decimal CalculateSalary(Employee employee) { /*... */ }
-    }
+    //class SalaryCalculator
+    //{
+    //    public decimal CalculateSalary(Employee employee) { /*... */ }
+    //}
 }

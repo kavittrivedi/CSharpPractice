@@ -1,43 +1,20 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
 
 class Program
 {
-    class Person
-    {
-        public string Name { get; set; }
-    }
-
     static void Main()
     {
-        List<Person> people = new List<Person>
-        {
-            new Person { Name = "Alice" },
-            new Person { Name = "Bob" },
-            new Person { Name = "Charlie" }
-        };
+        int i = 5;
 
-        // Using First
-        try
-        {
-            Person first = people.First(p => p.Name == "David"); // Throws InvalidOperationException
-            Console.WriteLine($"First: {first.Name}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"First Exception: {ex.Message}");
-        }
+        // Pre-increment (++i): Increment happens first, then the value is used
+        int preIncrement = ++i; // i becomes 6, and 6 is assigned to preIncrement
+        Console.WriteLine($"Pre-Increment: i = {i}, preIncrement = {preIncrement}");
 
-        // Using FirstOrDefault
-        Person firstOrDefault = people.FirstOrDefault(p => p.Name == "David"); // Returns null
-        if (firstOrDefault == null)
-        {
-            Console.WriteLine("FirstOrDefault: No match found");
-        }
-        else
-        {
-            Console.WriteLine($"FirstOrDefault: {firstOrDefault.Name}");
-        }
+        // Reset i
+        i = 5;
+
+        // Post-increment (i++): Value is used first, then the increment happens
+        int postIncrement = i++; // 5 is assigned to postIncrement, then i becomes 6
+        Console.WriteLine($"Post-Increment: i = {i}, postIncrement = {postIncrement}");
     }
 }

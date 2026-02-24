@@ -1,44 +1,38 @@
-# `First` vs `FirstOrDefault` in simple language (LINQ)
+# `++i` vs `i++` in C# (pre-increment vs post-increment)
 
-This repo contains a small .NET 8 console app that shows the difference between LINQ's `First` and `FirstOrDefault` when you try to find an item in a list.
+Both `++i` and `i++` increase `i` by 1. The difference is **when the increment happens** relative to using the value in an expression.
 
-## The idea
+## `++i` (pre-increment)
 
-In `ConsoleApp/Program.cs`, we have a list of `Person` objects and we search for a person named "David".
+- Increments `i` first
+- Then returns the new value
 
-- If "David" exists, **both** methods return that person.
-- If "David" does **not** exist, they behave differently.
+## `i++` (post-increment)
 
-## `First(...)`
+- Returns the current value first
+- Then increments `i`
 
-`First` means: **"Give me the first match. If there is no match, throw an error."**
+## Simple example
 
-- Match found => returns the item.
-- No match => throws `InvalidOperationException`.
+```csharp
+int i = 5;
 
-## `FirstOrDefault(...)`
+int a = ++i; // i becomes 6, then a gets 6
+Console.WriteLine($"i={i}, a={a}");
 
-`FirstOrDefault` means: **"Give me the first match. If there is no match, return a default value."**
+i = 5;
+int b = i++; // b gets 5, then i becomes 6
+Console.WriteLine($"i={i}, b={b}");
+```
 
-- Match found => returns the item.
-- No match => returns the default value.
+Expected output:
 
-For reference types (like `Person`), the default value is `null`. That’s why the sample checks for `null` and prints "No match found".
+```
+i=6, a=6
+i=6, b=5
+```
 
 ## Quick rule
 
-- Use `First` when not finding a match should be treated as a problem.
-- Use `FirstOrDefault` when not finding a match is normal and you want to handle it yourself.
-
-## Build and run
-
-From the folder that contains the project file (`ConsoleApp.csproj`):
-
-```bash
-dotnet build
-dotnet run
-```
-
-## Files
-
-- `ConsoleApp/Program.cs`: the demo comparing `First` and `FirstOrDefault`.
+- Use `++i` when you need the **incremented value** right away.
+- Use `i++` when you need the **current value** first, and the increment can happen after.

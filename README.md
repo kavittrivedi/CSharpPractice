@@ -309,6 +309,63 @@ When a class has an int property, memory allocation depends on whether the class
 - A value type inside a reference type (like int inside a class) is stored on the heap as part of the reference type object.
 - The reference to the class object is stored on the stack.
 
+## Additional Details on Memory Allocation
+
+1. **Object Layout on the Heap**  
+   When a class contains a value type property (e.g., int), the value is stored inline within the object on the heap.  
+   The exact memory layout of an object depends on factors like the runtime environment (CLR) and alignment rules. For example:  
+   ```csharp
+   class MyClass
+   {
+       public int MyProperty { get; set; }
+       public string Name { get; set; }
+   }
+   MyClass obj = new MyClass { MyProperty = 42, Name = "John" };
+   ```  
+   The MyProperty (an int) is directly stored in the memory allocated for obj on the heap.  
+   The Name (a string) is a reference type, so only a reference is stored inline within obj, and the actual string data is in a separate location on the heap.
+
+2. **Garbage Collection**  
+   Since the class instance resides on the heap, it is subject to garbage collection.  
+   The int property, being part of the object, is managed by the garbage collector as part of the object lifecycle.
+
+3. **Boxing and Unboxing**  
+   If the int property is assigned to an object or dynamic, it undergoes boxing, which allocates additional memory on the heap to store the value type.  
+   Example:  
+   ```csharp
+   object boxedValue = obj.MyProperty; // Boxing: int (value type) is wrapped in an object.
+   int unboxedValue = (int)boxedValue; // Unboxing: Extracting the value back.
+   ```  
+   Boxing adds overhead, so avoid unnecessary boxing/unboxing for better performance.
+
+4. **Thread Safety**  
+   If multiple threads access and modify the int property, memory contention issues can arise.  
+   Use locking or Interlocked methods for thread-safe access to properties in a class.  
+   Example:  
+   ```csharp
+   class MyClass
+   {
+       private int _myProperty;
+       public int MyProperty
+       {
+           get => _myProperty;
+           set => Interlocked.Exchange(ref _myProperty, value);
+       }
+   }
+   ```
+
+5. **Structs vs. Classes**  
+   If the same property were part of a struct instead of a class:  
+   The int property would be allocated on the stack when the struct is used as a local variable.  
+   No reference is involved unless the struct is boxed.  
+   Example:  
+   ```csharp
+   struct MyStruct
+   {
+       public int MyProperty { get; set; }
+   }
+   ```
+
 ## What is .NET Core?
 
 .NET Core is an open-source, cross-platform framework developed by Microsoft for building modern applications. It allows developers to create web apps, APIs, microservices, and console applications using languages like C#, F#, and VB.NET. Unlike the older .NET Framework, .NET Core runs on Windows, Linux, and macOS, making it more flexible for different environments.

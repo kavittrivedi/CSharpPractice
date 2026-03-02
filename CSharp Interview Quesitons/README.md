@@ -367,3 +367,70 @@ When a class has an int property, memory allocation depends on whether the class
        public int MyProperty { get; set; }
    }
    ```
+
+## Async/Await vs TPL
+
+Async await vs TPL. Both async/await and the Task Parallel Library (TPL) are used for handling asynchronous operations and parallelism in C#. Here's a simple comparison:
+
+### 1. Async/Await
+
+**What is it?**  
+Async/Await is a syntax used for writing asynchronous code in a readable, linear way.  
+It simplifies the handling of tasks that take time to complete (e.g., I/O operations, HTTP requests).
+
+**How it works?**  
+- `async` is used to mark a method as asynchronous, allowing it to run non-blocking operations.  
+- `await` is used to pause the execution of the method until the task completes.
+
+**Usage Example:**  
+```csharp
+public async Task<string> GetDataAsync()
+{
+    var result = await HttpClient.GetStringAsync("https://example.com");
+    return result;
+}
+```  
+Here, `GetDataAsync()` doesn't block the thread while it waits for the HTTP request to finish. Instead, the thread is free to do other work.
+
+**When to use:**  
+Ideal for I/O-bound operations (e.g., reading files, web requests).  
+It improves performance by freeing up threads during waiting time.
+
+### 2. TPL (Task Parallel Library)
+
+**What is it?**  
+TPL is a library that allows parallel and asynchronous execution of tasks, usually for CPU-bound operations (e.g., processing data in parallel).
+
+**How it works?**  
+TPL provides constructs like `Task`, `Parallel.For`, `Task.WhenAll`, etc., to run tasks concurrently, either in parallel or asynchronously.
+
+**Usage Example:**  
+```csharp
+public void ProcessData()
+{
+    Task task1 = Task.Run(() => { /* CPU-bound task */ });
+    Task task2 = Task.Run(() => { /* CPU-bound task */ });
+    
+    Task.WhenAll(task1, task2).Wait();
+}
+```  
+In this case, `Task.Run()` executes both tasks concurrently, potentially using multiple threads for CPU-bound work.
+
+**When to use:**  
+Ideal for CPU-bound operations (e.g., performing calculations, data processing).  
+You can parallelize work to make the best use of multi-core processors.
+
+### Comparison Summary
+
+| **Aspect**           | **Async/Await**                                     | **TPL (Task Parallel Library)**                   |
+| -------------------- | --------------------------------------------------- | ------------------------------------------------- |
+| **Primary Focus**    | I/O-bound operations (e.g., web requests, file I/O) | CPU-bound parallel tasks (e.g., data processing)  |
+| **Syntax**           | Easy-to-read, sequential syntax for async code      | More complex, using `Task` and `Parallel` classes |
+| **Concurrency Type** | Asynchronous, without blocking the thread           | Concurrent or parallel execution of tasks         |
+| **Performance**      | Improves performance for I/O-bound operations       | Improves performance for CPU-bound operations     |
+
+### Key Takeaway
+
+- Use async/await for non-blocking, asynchronous operations (I/O-bound).
+- Use TPL for concurrent execution and parallelism, especially for CPU-bound operations.
+

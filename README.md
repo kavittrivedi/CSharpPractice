@@ -115,7 +115,9 @@ class Program
 
 ## Explain IQueryable with Simple Example
 
-Explain me IQueryable with simple example. IQueryable is an interface in C# used for querying data from a remote source like a database. Unlike IEnumerable, IQueryable supports deferred execution and query translation into the query language of the underlying data source (e.g., SQL for a database).
+Explain me IQueryable with simple example. In which situation we can use IEnumerator?
+
+IQueryable is an interface in C# used for querying data from a remote source like a database. Unlike IEnumerable, IQueryable supports deferred execution and query translation into the query language of the underlying data source (e.g., SQL for a database).
 
 ### Key Features of IQueryable:
 
@@ -183,6 +185,20 @@ Ideal for working with large datasets where filtering should happen on the serve
 
 **Deferred Execution:**  
 When you want to construct a query dynamically and execute it later.
+
+### When to Use IEnumerator
+
+**Working with Databases:**  
+
+Use IEnumerator in scenarios where you need manual control over iteration. Examples:
+
+Custom Iteration: Define how a custom collection is traversed.
+
+Lazy Loading: Generate items one at a time (e.g., generating Fibonacci numbers).
+
+Coroutines: In game development, IEnumerator is used to pause/resume code execution.
+
+IEnumerator is not typically used for querying data. Instead, use it for iterating collections or custom workflows, while IQueryable is used for data querying.
 
 ## What is .NET Core?
 

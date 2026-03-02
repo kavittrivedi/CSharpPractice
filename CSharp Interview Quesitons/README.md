@@ -733,3 +733,107 @@ Used when you have a value that must remain unchanged throughout the entire prog
 - **`readonly`**: Can be set at runtime (usually in constructor), but can't be changed after the object is created.
 - **`const`**: Must be set at compile-time and cannot be changed during the program's execution.
 
+## What's New in C# 12
+
+C# 12 introduces several new features that make coding simpler, more expressive, and efficient. Here are some key features explained in simple language with examples:
+
+### 1. Primary Constructors
+
+**What it is:**  
+Primary constructors allow you to define constructors directly in the class or struct declaration, reducing boilerplate code.
+
+**Simple Example:**  
+```csharp
+public class Person(string name, int age)
+{
+    public string Name { get; } = name;
+    public int Age { get; } = age;
+}
+
+// Usage
+var person = new Person("Alice", 30);
+Console.WriteLine($"{person.Name} is {person.Age} years old.");
+```
+
+**Why useful:**  
+It simplifies class definitions by combining constructor parameters with property initialization.
+
+### 2. Collection Expressions
+
+**What it is:**  
+A new syntax for creating collections like arrays, lists, or spans in a more readable way.
+
+**Simple Example:**  
+```csharp
+// Old way
+int[] numbers = new int[] { 1, 2, 3 };
+
+// New way
+int[] numbers = [1, 2, 3];
+
+// For lists
+List<string> names = ["Alice", "Bob", "Charlie"];
+```
+
+**Why useful:**  
+Makes creating collections shorter and more intuitive.
+
+### 3. Inline Arrays
+
+**What it is:**  
+Allows defining fixed-size arrays directly in structs for better performance.
+
+**Simple Example:**  
+```csharp
+[System.Runtime.CompilerServices.InlineArray(10)]
+public struct Buffer
+{
+    private int _element0;
+}
+
+// Usage
+var buffer = new Buffer();
+buffer[0] = 42;  // Access like an array
+```
+
+**Why useful:**  
+Improves performance for low-level code by avoiding heap allocations.
+
+### 4. Default Lambda Parameters
+
+**What it is:**  
+Lambda expressions can now have default parameter values.
+
+**Simple Example:**  
+```csharp
+var greet = (string name = "World") => $"Hello, {name}!";
+
+Console.WriteLine(greet());        // Output: Hello, World!
+Console.WriteLine(greet("Alice")); // Output: Hello, Alice!
+```
+
+**Why useful:**  
+Makes lambdas more flexible, similar to methods.
+
+### 5. Alias Any Type
+
+**What it is:**  
+You can create aliases for any type, not just simple ones.
+
+**Simple Example:**  
+```csharp
+using MyList = System.Collections.Generic.List<int>;
+using Point = (int X, int Y);
+
+// Usage
+MyList numbers = new MyList { 1, 2, 3 };
+Point p = (10, 20);
+```
+
+**Why useful:**  
+Simplifies complex type names and improves code readability.
+
+### Key Takeaway
+
+C# 12 focuses on reducing code verbosity and improving performance. Features like primary constructors and collection expressions make everyday coding easier, while inline arrays and other features help with high-performance scenarios. For interviews, mention that C# 12 builds on previous versions to make C# more modern and efficient.
+

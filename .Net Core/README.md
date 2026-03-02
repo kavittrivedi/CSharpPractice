@@ -269,7 +269,11 @@ Purpose: This method is used to define how the HTTP request pipeline should be c
 
 Where it's used: It’s called after ConfigureServices and defines how the application handles HTTP requests.
 
-What it does: This is where you configure things like middleware (e.g., routing, authentication, authorization, static files, etc.) and how requests should be processed. Example: public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+What it does: This is where you configure things like middleware (e.g., routing, authentication, authorization, static files, etc.) and how requests should be processed. 
+
+Example: 
+```C#
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 {
     if (env.IsDevelopment())
     {
@@ -291,7 +295,9 @@ What it does: This is where you configure things like middleware (e.g., routing,
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
     });
-} What happens here: We configure middleware for exception handling, static files, HTTPS redirection, and routing. This determines how incoming requests will be processed.
+} 
+```
+What happens here: We configure middleware for exception handling, static files, HTTPS redirection, and routing. This determines how incoming requests will be processed.
 
 In Summary:
 
@@ -322,7 +328,9 @@ How It Works:
 Imagine you have a class that needs to send an email. Instead of the class creating an email service itself, you inject the email service from the outside. This way, if you need to change the email service (e.g., from SMTP to a third-party service), you only need to change it in one place.
 
 Example in Simple Terms:
-Without Dependency Injection: public class UserService
+Without Dependency Injection: 
+```C#
+public class UserService
 {
     private EmailService _emailService;
 
@@ -335,9 +343,13 @@ Without Dependency Injection: public class UserService
     {
         _emailService.SendEmail(userEmail, "Welcome to our service!");
     }
-} In this case, UserService directly creates an instance of EmailService. If you want to change the way emails are sent (e.g., using a different service), you need to modify UserService.
+} 
+```
+In this case, UserService directly creates an instance of EmailService. If you want to change the way emails are sent (e.g., using a different service), you need to modify UserService.
 
-With Dependency Injection: public class UserService
+With Dependency Injection: 
+```C#
+public class UserService
 {
     private IEmailService _emailService;
 
@@ -351,7 +363,10 @@ With Dependency Injection: public class UserService
     {
         _emailService.SendEmail(userEmail, "Welcome to our service!");
     }
-} In this case, UserService doesn’t create IEmailService. Instead, the IEmailService (which could be any implementation like SmtpEmailService or ThirdPartyEmailService) is injected into the UserService via the constructor.
+}
+```
+
+In this case, UserService doesn’t create IEmailService. Instead, the IEmailService (which could be any implementation like SmtpEmailService or ThirdPartyEmailService) is injected into the UserService via the constructor.
 
 Benefits of Dependency Injection:
 
@@ -373,11 +388,15 @@ Method Injection: The dependency is provided through a method.
 
 Example in .NET Core:
 
-In .NET Core, you typically configure Dependency Injection in the Startup.cs file. Here’s an example: public void ConfigureServices(IServiceCollection services)
+In .NET Core, you typically configure Dependency Injection in the Startup.cs file. Here’s an example: 
+```C#
+public void ConfigureServices(IServiceCollection services)
 {
     services.AddTransient<IEmailService, SmtpEmailService>(); // Registering dependency
     services.AddTransient<UserService>(); // Registering the class that needs the dependency
-} In this example, we register IEmailService and its implementation SmtpEmailService with the DI container. When the UserService is needed, the DI container will automatically inject the IEmailService dependency into it.
+} 
+```
+In this example, we register IEmailService and its implementation SmtpEmailService with the DI container. When the UserService is needed, the DI container will automatically inject the IEmailService dependency into it.
 
 In Summary:
 
@@ -405,10 +424,15 @@ What happens when a request comes in:
 
 A new instance of the service is created each time it is requested, even within the same HTTP request (e.g., within different methods of a controller).
 
-Example in code: public void ConfigureServices(IServiceCollection services)
+Example in code: 
+```C#
+public void ConfigureServices(IServiceCollection services)
 {
     services.AddTransient<IEmailService, SmtpEmailService>();
-} Behavior:
+}
+``` 
+
+Behavior:
 
 If you have two different controllers requesting the IEmailService, each will receive a new instance.
 
@@ -426,10 +450,15 @@ What happens when a request comes in:
 
 The DI container creates a new instance of the service once per HTTP request and shares that instance across all components (controllers, middlewares, etc.) that need it during the same request.
 
-Example in code: public void ConfigureServices(IServiceCollection services)
+Example in code: 
+
+```C#
+public void ConfigureServices(IServiceCollection services)
 {
     services.AddScoped<IUserService, UserService>();
-} Behavior:
+} 
+```
+Behavior:
 
 If two controllers request IUserService during the same HTTP request, they will both receive the same instance of UserService.
 
@@ -447,12 +476,19 @@ What happens when a request comes in:
 
 The DI container creates a single instance of the service when it is first requested, and that same instance is reused for all subsequent requests throughout the application's lifetime.
 
-Example in code: public void ConfigureServices(IServiceCollection services)
+Example in code: 
+```C#
+public void ConfigureServices(IServiceCollection services)
 {
     services.AddSingleton<ICacheService, CacheService>();
-} Behavior:
+} 
+```
+Behavior:
 
-If the ICacheService is requested from different controllers or services throughout the application's lifetime, all will share the same instance of CacheService. Summary of Behavior: | Method           | Lifetime                           | Instance Creation                                                                           | When to Use                                                                                              |
+If the ICacheService is requested from different controllers or services throughout the application's lifetime, all will share the same instance of CacheService. 
+
+Summary of Behavior: 
+| Method           | Lifetime                           | Instance Creation                                                                           | When to Use                                                                                              |
 | ---------------- | ---------------------------------- | ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | **AddTransient** | Per request                        | A new instance is created every time it is requested.                                       | For lightweight, stateless services.                                                                     |
 | **AddScoped**    | Per request (per HTTP request)     | A new instance is created once per HTTP request and reused within that request.             | For services that maintain state during a request, like a database context.                              |

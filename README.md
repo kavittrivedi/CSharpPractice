@@ -59,3 +59,20 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 ```
 
 In this example, the CustomMiddleware logs the time when the request is received and when the response is sent. You can extend this middleware to include other tasks as per your requirements.
+
+## Purposes for Custom Middleware
+
+For what purpose we can implement custom middleware? 
+
+You can implement custom middleware for various purposes in your application. Here are some common use cases:
+
+- **Logging**: Track when requests come in, what the user is requesting, and when responses are sent back. This helps in debugging and monitoring.
+- **Authentication and Authorization**: Check if the user is logged in and has the right permissions before allowing them to access certain resources.
+- **Error Handling**: Catch errors and send a proper response (like a custom error page) to the user instead of crashing the application.
+- **Request Modification**: Modify or add information to the incoming request, like adding headers or processing data before passing it to the next part of the application.
+- **Performance Monitoring**: Track how long a request takes to process and log performance metrics for optimization.
+- **Caching**: Serve cached responses for frequently requested resources to improve performance and reduce load.
+- **Custom Headers**: Add or modify headers in the response for security or other purposes, like CORS (Cross-Origin Resource Sharing).
+
+Custom middleware allows you to insert these tasks in the request-response pipeline, helping you handle cross-cutting concerns in a clean and modular way.
+

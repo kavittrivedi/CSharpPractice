@@ -572,3 +572,135 @@ Used when you want the method to modify the original variable. This is typically
 - **Call by Value**: Only a copy of the value is passed. Changes don't affect the original variable.
 - **Call by Reference**: The reference (address) is passed, so changes affect the original variable.
 
+## Throw vs throw ex
+
+Explain Throw vs throw ex.  
+
+### Throw vs throw ex
+
+#### 1. throw
+
+**What it is:**  
+The `throw` keyword is used to raise an exception in C#. It can be used to rethrow the current exception or throw a new one.
+
+**How it works:**  
+When `throw` is used alone, it rethrows the current exception without losing its original stack trace.
+
+**Example:**  
+```csharp
+try
+{
+    throw new InvalidOperationException("An error occurred.");
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Caught exception: " + ex.Message);
+    throw;  // Rethrows the current exception
+}
+```
+
+**Use case:**  
+It's useful when you want to rethrow the exception to propagate it further up the call stack without changing its details.
+
+#### 2. throw ex
+
+**What it is:**  
+The `throw ex` expression rethrows the exception object explicitly. However, this causes the original stack trace to be lost and replaced by a new one.
+
+**How it works:**  
+When `throw ex` is used, the exception is rethrown, but it loses the original stack trace and the new stack trace starts from the `throw ex` statement.
+
+**Example:**  
+```csharp
+try
+{
+    throw new InvalidOperationException("An error occurred.");
+}
+catch (Exception ex)
+{
+    Console.WriteLine("Caught exception: " + ex.Message);
+    throw ex;  // Rethrows the exception, but stack trace is reset
+}
+```
+
+**Use case:**  
+Avoid using `throw ex`, as it causes loss of stack trace information, making debugging harder.
+
+### Key Difference
+
+- **throw**: Retains the original stack trace and allows rethrowing the exception without modifying it.
+- **throw ex**: Rethrows the exception but loses the original stack trace, which can make it harder to trace the source of the error.
+
+### Summary
+
+- Use `throw` to preserve the stack trace when rethrowing exceptions.
+- Avoid `throw ex` because it loses the stack trace and makes it difficult to diagnose the issue.
+
+## Readonly vs Constant
+
+What is different between readonly and constant.  
+
+### Readonly vs Constant
+
+#### 1. readonly
+
+**What it is:**  
+A `readonly` field is a field that can only be assigned a value at the time of its declaration or in the constructor of the class. Its value can change during the object's lifetime, but only during object construction.
+
+**Key Point:**  
+The value can be set dynamically (but only once during object construction).
+
+**Example:**  
+```csharp
+class MyClass
+{
+    public readonly int x;
+    
+    public MyClass(int value)
+    {
+        x = value;  // The value can be set in the constructor
+    }
+}
+
+var obj = new MyClass(10);
+Console.WriteLine(obj.x);  // Output: 10
+```
+
+**Use case:**  
+Used when you want a field to be initialized once but based on a value passed at runtime (e.g., constructor).
+
+#### 2. const
+
+**What it is:**  
+A `const` field is a constant value that is assigned at the time of declaration and cannot be changed. It must be initialized with a fixed value at compile time and remains constant throughout the program.
+
+**Key Point:**  
+The value is constant and cannot change during the program's execution.
+
+**Example:**  
+```csharp
+class MyClass
+{
+    public const int x = 10;  // The value is set at compile time and cannot be changed
+}
+
+Console.WriteLine(MyClass.x);  // Output: 10
+```
+
+**Use case:**  
+Used when you have a value that must remain unchanged throughout the entire program, like mathematical constants (e.g., Math.PI).
+
+### Key Differences
+
+| **Aspect**     | **`readonly`**                                  | **`const`**                                 |
+| -------------- | ----------------------------------------------- | ------------------------------------------- |
+| **Assignment** | Can be assigned at runtime (e.g., constructor). | Must be assigned at compile-time.           |
+| **Changeable** | Can change in the constructor, but not later.   | Cannot be changed once set.                 |
+| **Scope**      | Can be instance-level or static.                | Must be static and accessed via class type. |
+| **Value type** | Can be any type (primitive or object).          | Must be a primitive type or string.         |
+
+### Summary
+
+- **`readonly`**: Can be set at runtime (usually in constructor), but can't be changed after the object is created.
+- **`const`**: Must be set at compile-time and cannot be changed during the program's execution.
+

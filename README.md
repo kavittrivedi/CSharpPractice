@@ -257,7 +257,9 @@ Explain Value type and reference type? Memory allocation for both.
 
 ## Memory Allocation for int Property in a Class
 
-If we have a class with an int property, then how is memory allocated for the int property? When a class has an int property, memory allocation depends on whether the class instance is created (reference type) and where it resides. Let’s break it down:
+If we have a class with an int property, then how is memory allocated for the int property? 
+
+When a class has an int property, memory allocation depends on whether the class instance is created (reference type) and where it resides. Let’s break it down:
 
 ### Memory Allocation for a Class with an int Property
 

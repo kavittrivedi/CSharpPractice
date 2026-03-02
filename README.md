@@ -255,6 +255,58 @@ Explain Value type and reference type? Memory allocation for both.
 - Use value types for small, simple data (e.g., numbers, structs).
 - Use reference types for complex objects (e.g., arrays, classes).
 
+## Memory Allocation for int Property in a Class
+
+If we have a class with an int property, then how is memory allocated for the int property? When a class has an int property, memory allocation depends on whether the class instance is created (reference type) and where it resides. Let’s break it down:
+
+### Memory Allocation for a Class with an int Property
+
+1. **Class Definition**  
+   Classes are reference types, meaning their objects are stored on the heap, and a reference to the object is stored on the stack.  
+   ```csharp
+   class MyClass
+   {
+       public int MyProperty { get; set; }
+   }
+   ```  
+   Here:  
+   - MyClass is a reference type.  
+   - MyProperty is a value type (int).
+
+2. **When an Instance of the Class is Created**  
+   ```csharp
+   MyClass obj = new MyClass();
+   obj.MyProperty = 42;
+   ```  
+   - **Heap**: The actual memory for the MyClass object, including its MyProperty field (value type int), is allocated on the heap.  
+   - **Stack**: A reference to the obj instance is stored on the stack.  
+
+   So:  
+   - The int property (MyProperty) is stored within the object on the heap.  
+   - The object reference (obj) is stored on the stack.
+
+### Memory Breakdown
+
+| **Aspect**            | **Location** | **Details**                                |
+| --------------------- | ------------ | ------------------------------------------ |
+| **Class Instance**    | Heap         | Contains memory for `MyProperty`.          |
+| **Property Value**    | Heap         | Stored as part of the object memory.       |
+| **Reference (`obj`)** | Stack        | Points to the memory location on the heap. |
+
+### Illustration
+
+**Stack:**  
+  obj -> Reference to the object on the heap  
+
+**Heap:**  
+  MyClass object:  
+    MyProperty = 42
+
+### Key Points
+
+- A value type inside a reference type (like int inside a class) is stored on the heap as part of the reference type object.
+- The reference to the class object is stored on the stack.
+
 ## What is .NET Core?
 
 .NET Core is an open-source, cross-platform framework developed by Microsoft for building modern applications. It allows developers to create web apps, APIs, microservices, and console applications using languages like C#, F#, and VB.NET. Unlike the older .NET Framework, .NET Core runs on Windows, Linux, and macOS, making it more flexible for different environments.

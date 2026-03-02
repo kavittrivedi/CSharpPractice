@@ -495,9 +495,13 @@ Summary of Behavior:
 | **AddSingleton** | Single instance throughout the app | A single instance is created once and shared across all requests during the app's lifetime. | For services that should be reused throughout the application's lifetime, like logging or configuration. |
 Example Scenario to Clarify:
 
-Assume you have a service MyService registered in all three ways, and you make multiple requests. services.AddTransient<IMyService, MyService>();  // Transient
+Assume you have a service MyService registered in all three ways, and you make multiple requests. 
+```C#
+services.AddTransient<IMyService, MyService>();  // Transient
 services.AddScoped<IMyService, MyService>();     // Scoped
-services.AddSingleton<IMyService, MyService>();  // Singleton For Transient: If you call IMyService from multiple places in the same HTTP request, each place gets a new instance.
+services.AddSingleton<IMyService, MyService>();  // Singleton 
+```
+For Transient: If you call IMyService from multiple places in the same HTTP request, each place gets a new instance.
 
 For Scoped: All calls to IMyService within the same HTTP request will get the same instance.
 

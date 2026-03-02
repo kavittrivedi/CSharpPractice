@@ -2,7 +2,9 @@
 
 ## How foreach Loop Works
 
-how foreach loop works. explain technically. The foreach loop in C# works by leveraging the IEnumerable and IEnumerator interfaces. Here's a technical explanation of how it functions:
+how foreach loop works. explain technically. 
+
+The foreach loop in C# works by leveraging the IEnumerable and IEnumerator interfaces. Here's a technical explanation of how it functions:
 
 ### Step-by-Step Execution of foreach
 

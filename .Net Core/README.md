@@ -272,7 +272,7 @@ Where it's used: It’s called after ConfigureServices and defines how the appli
 What it does: This is where you configure things like middleware (e.g., routing, authentication, authorization, static files, etc.) and how requests should be processed. 
 
 Example: 
-```C#
+```csharp
 public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 {
     if (env.IsDevelopment())
@@ -329,7 +329,7 @@ Imagine you have a class that needs to send an email. Instead of the class creat
 
 Example in Simple Terms:
 Without Dependency Injection: 
-```C#
+```csharp
 public class UserService
 {
     private EmailService _emailService;
@@ -348,7 +348,7 @@ public class UserService
 In this case, UserService directly creates an instance of EmailService. If you want to change the way emails are sent (e.g., using a different service), you need to modify UserService.
 
 With Dependency Injection: 
-```C#
+```csharp
 public class UserService
 {
     private IEmailService _emailService;
@@ -389,7 +389,7 @@ Method Injection: The dependency is provided through a method.
 Example in .NET Core:
 
 In .NET Core, you typically configure Dependency Injection in the Startup.cs file. Here’s an example: 
-```C#
+```csharp
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddTransient<IEmailService, SmtpEmailService>(); // Registering dependency
@@ -425,7 +425,7 @@ What happens when a request comes in:
 A new instance of the service is created each time it is requested, even within the same HTTP request (e.g., within different methods of a controller).
 
 Example in code: 
-```C#
+```csharp
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddTransient<IEmailService, SmtpEmailService>();
@@ -452,7 +452,7 @@ The DI container creates a new instance of the service once per HTTP request and
 
 Example in code: 
 
-```C#
+```csharp
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddScoped<IUserService, UserService>();
@@ -477,7 +477,7 @@ What happens when a request comes in:
 The DI container creates a single instance of the service when it is first requested, and that same instance is reused for all subsequent requests throughout the application's lifetime.
 
 Example in code: 
-```C#
+```csharp
 public void ConfigureServices(IServiceCollection services)
 {
     services.AddSingleton<ICacheService, CacheService>();
@@ -496,7 +496,7 @@ Summary of Behavior:
 Example Scenario to Clarify:
 
 Assume you have a service MyService registered in all three ways, and you make multiple requests. 
-```C#
+```csharp
 services.AddTransient<IMyService, MyService>();  // Transient
 services.AddScoped<IMyService, MyService>();     // Scoped
 services.AddSingleton<IMyService, MyService>();  // Singleton 
@@ -627,7 +627,7 @@ In a .NET Core application:
 
 Write Side:
 
-```C#
+```csharp
 public class CreateOrderCommand
 {
     public int ProductId { get; set; }
@@ -645,7 +645,7 @@ public class OrderCommandHandler
 ```
  Read Side: 
 
-```C# 
+```csharp 
 public class OrderQuery
 {
     public int OrderId { get; set; }
@@ -723,7 +723,7 @@ Query: Get a list of all products (read operation).
 
 Step-by-Step Example:
 1. Define the Models: 
-```C#
+```csharp
 public class Product
 {
     public int Id { get; set; }
@@ -735,7 +735,7 @@ public class Product
 2. Create Command to Add a Product:
 
 Command: 
-```C#
+```csharp
 public class AddProductCommand
 {
     public string Name { get; set; }
@@ -744,7 +744,7 @@ public class AddProductCommand
 ```
 Command Handler: 
 
-```C#
+```csharp
 public class AddProductCommandHandler
 
 {
@@ -771,13 +771,13 @@ public class AddProductCommandHandler
  3. Create Query to Get Products:
 
 Query:  
-```C#
+```csharp
 public class GetProductsQuery
 {
 }
 ```
 Query Handler: 
-```C#
+```csharp
 public class GetProductsQueryHandler
 {
     private readonly ApplicationDbContext _context;
@@ -794,7 +794,7 @@ public class GetProductsQueryHandler
 }
 ```
 4. Set Up the Database Context: 
-```C#
+```csharp
 public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
@@ -803,7 +803,7 @@ public class ApplicationDbContext : DbContext
 }
 ```
 5. Register Services in Startup.cs or Program.cs: 
-```C#
+```csharp
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -811,7 +811,7 @@ builder.Services.AddScoped<AddProductCommandHandler>();
 builder.Services.AddScoped<GetProductsQueryHandler>(); 
 ```
 6. Create the API Controller: 
-```C#
+```csharp
 [ApiController]
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
@@ -850,4 +850,152 @@ Separate handlers for each operation ensure separation of concerns.
 
 This structure makes the application more maintainable, scalable, and adaptable to changes.
 
+## Explain extension method with example of registering dependency for layers in .net core 3 layer application
 
+An extension method in C# allows you to add new methods to existing classes without modifying the original class. In a .NET Core three-layer application (Presentation, Business, Data), you can use extension methods to simplify the registration of dependencies for each layer in the Dependency Injection (DI) container.
+
+### Scenario:
+
+Let's assume we have the following layers:
+
+- **Presentation Layer**: Handles user interactions (e.g., API or MVC controllers).
+- **Business Layer**: Contains business logic.
+- **Data Access Layer**: Handles data storage and retrieval.
+
+We will create an extension method to register the services from the Business and Data layers.
+
+### Steps:
+
+1. **Create Extension Methods for Dependency Registration:**
+
+   In each layer (e.g., Business and Data), create a static class with an extension method to register its dependencies.
+
+   **Business Layer:**
+   ```csharp
+   namespace MyApp.Business
+   {
+       public static class ServiceRegistration
+       {
+           public static IServiceCollection AddBusinessServices(this IServiceCollection services)
+           {
+               // Register business services
+               services.AddScoped<IProductService, ProductService>();
+               return services;
+           }
+       }
+   }
+   ```
+
+   **Data Access Layer:**
+   ```csharp
+   namespace MyApp.Data
+   {
+       public static class ServiceRegistration
+       {
+           public static IServiceCollection AddDataServices(this IServiceCollection services)
+           {
+               // Register data access services
+               services.AddScoped<IProductRepository, ProductRepository>();
+               services.AddDbContext<ApplicationDbContext>(options =>
+                   options.UseSqlServer("YourConnectionString")); // Example for DbContext
+               return services;
+           }
+       }
+   }
+   ```
+
+2. **Register Dependencies in the Presentation Layer (Startup.cs or Program.cs):**
+
+   In the presentation layer, call these extension methods during the application startup to register the services.
+
+   **Program.cs (for .NET Core 6 or higher):**
+   ```csharp
+   using MyApp.Business;
+   using MyApp.Data;
+
+   var builder = WebApplication.CreateBuilder(args);
+
+   // Add services to the container.
+   builder.Services.AddControllers();
+
+   // Register dependencies from Business and Data layers
+   builder.Services.AddBusinessServices();
+   builder.Services.AddDataServices();
+
+   var app = builder.Build();
+
+   // Configure the HTTP request pipeline.
+   app.UseAuthorization();
+   app.MapControllers();
+
+   app.Run();
+   ```
+
+### Example Classes for Layers:
+
+**Business Layer:**
+```csharp
+public interface IProductService
+{
+    void ProcessProduct(int productId);
+}
+
+public class ProductService : IProductService
+{
+    private readonly IProductRepository _repository;
+
+    public ProductService(IProductRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public void ProcessProduct(int productId)
+    {
+        // Business logic
+        var product = _repository.GetProduct(productId);
+        // Additional processing
+    }
+}
+```
+
+**Data Layer:**
+```csharp
+public interface IProductRepository
+{
+    Product GetProduct(int productId);
+}
+
+public class ProductRepository : IProductRepository
+{
+    private readonly ApplicationDbContext _context;
+
+    public ProductRepository(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public Product GetProduct(int productId)
+    {
+        return _context.Products.FirstOrDefault(p => p.Id == productId);
+    }
+}
+```
+
+**Data Context:**
+```csharp
+public class ApplicationDbContext : DbContext
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
+    public DbSet<Product> Products { get; set; }
+}
+```
+
+### Benefits of Using Extension Methods for Dependency Registration:
+
+- **Separation of Concerns**: Keeps the dependency registration logic for each layer in its own namespace.
+- **Reusability**: The registration logic is reusable across multiple projects.
+- **Simplifies Startup Code**: Reduces clutter in the Startup.cs or Program.cs file.
+- **Maintainability**: Makes it easier to modify dependencies for a specific layer without affecting other parts of the application.
+
+This approach is highly recommended for organizing dependencies in large-scale, layered applications.

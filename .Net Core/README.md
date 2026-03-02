@@ -1198,3 +1198,109 @@ YourApp.sln
 - **Domain Layer:** POCO classes and interfaces.
 
 This structure keeps your code organized, scalable, and easier to maintain.
+
+## A 3-Tier Architecture in a .NET Core project
+
+A 3-Tier Architecture in a .NET Core project consists of three layers: Presentation, Business Logic, and Data Access. Each layer is implemented as a separate project in the solution, ensuring a clean separation of concerns.
+
+### 1. Presentation Layer
+
+**Purpose:** Manages user interaction and acts as the front-end for the application.
+
+**Project Name:** YourApp.Presentation or YourApp.Web
+
+**Project Type:**
+
+- ASP.NET Core MVC
+- Razor Pages
+- Blazor
+- Angular/React (with API integration)
+
+**Responsibilities:**
+
+- Receives user input and sends it to the Business Logic Layer via APIs or services.
+- Displays data received from the Business Logic Layer.
+
+### 2. Business Logic Layer (BLL)
+
+**Purpose:** Contains the core business logic of the application.
+
+**Project Name:** YourApp.Business
+
+**Project Type:** Class Library.
+
+**Responsibilities:**
+
+- Implements business rules, validations, and calculations.
+- Acts as a bridge between the Presentation Layer and Data Access Layer.
+- Calls the Data Access Layer for database operations.
+
+### 3. Data Access Layer (DAL)
+
+**Purpose:** Handles all database-related operations.
+
+**Project Name:** YourApp.Data
+
+**Project Type:** Class Library.
+
+**Responsibilities:**
+
+- Contains repository classes to interact with the database.
+- Manages database contexts if using Entity Framework Core.
+- Provides CRUD operations for business entities.
+
+### Project Solution Structure
+
+Here's how the projects should look in your solution:
+
+```
+YourApp.sln
+│
+├── YourApp.Presentation (Presentation Layer)
+│   └── ASP.NET Core MVC or Razor Pages
+│
+├── YourApp.Business (Business Logic Layer)
+│   └── Class Library
+│
+└── YourApp.Data (Data Access Layer)
+    └── Class Library
+```
+
+### Dependencies Between Layers
+
+- Presentation Layer depends on Business Logic Layer.
+- Business Logic Layer depends on Data Access Layer.
+- Data Access Layer communicates directly with the database.
+
+### Example of Dependencies in Startup.cs
+
+Add the dependency registrations in your Presentation project (Startup.cs):
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    // Register services from other layers
+    services.AddScoped<IBusinessService, BusinessService>();
+    services.AddScoped<IRepository, Repository>();
+    services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+}
+```
+
+In the Business project:
+
+- Implement the core logic in service classes (e.g., BusinessService).
+
+In the Data project:
+
+- Create repository classes (e.g., Repository) to perform CRUD operations.
+
+### Why Use 3-Tier Architecture?
+
+- **Separation of Concerns:** Each layer has a specific responsibility.
+- **Scalability:** Layers can be modified or replaced independently.
+- **Maintainability:** Easier to debug and test each layer separately.
+
+This structure is ideal for medium to large-scale projects where clear separation of concerns and reusability are important.
+
+

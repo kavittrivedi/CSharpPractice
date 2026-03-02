@@ -709,7 +709,9 @@ Key Point:
 
 Commands and queries can even use different databases: one for fast reads and another for safe writes.
 
-## Now give me proper example of CQRS pattern in .net core. Here’s a proper example of implementing the CQRS Pattern in a .NET Core application. We'll use separate handlers for commands (write operations) and queries (read operations).
+## Now give me proper example of CQRS pattern in .net core. 
+
+Here’s a proper example of implementing the CQRS Pattern in a .NET Core application. We'll use separate handlers for commands (write operations) and queries (read operations).
 
 Scenario:
 

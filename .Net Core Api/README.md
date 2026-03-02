@@ -138,5 +138,51 @@ GET is for fetching data, typically returns 200 OK.
 
 POST is for sending data to be processed, often returns 201 Created or 200 OK.
 
+How to persist state/how to sync two web API communications?  To persist state or sync communications between two web APIs, you need to store and manage the data (state) in a way that both APIs can access and update it when needed.
+
+Here are common approaches to achieve this:
+
+1. Using a Database:
+
+Persisting State: Store the necessary information in a database (like SQL, NoSQL, etc.) that both APIs can access.
+
+Syncing: Each API reads from and writes to the same database. Whenever one API updates the data, the other API can read the latest state.
+
+Example: API 1 adds or updates a user in the database, and API 2 fetches the user data from the same database to perform further actions.
+
+2. Using Shared Caching:
+
+Persisting State: Use an in-memory cache (like Redis or Memcached) to temporarily store state that needs to be accessed by both APIs.
+
+Syncing: Both APIs can read from and write to the cache. This allows faster access to frequently used data.
+
+Example: API 1 writes data (e.g., session info) to the cache, and API 2 fetches that data from the cache to continue the session or process.
+
+3. Using Message Queues:
+
+Syncing: Use a message queue (like RabbitMQ, Kafka, or Azure Service Bus) to send messages between APIs. When one API finishes a task, it sends a message (event) to the queue, which the other API listens to and reacts to.
+
+Example: API 1 processes an order and sends a message to a queue. API 2 listens to the queue and processes the payment once it gets the order info.
+
+4. Using Tokens or JWT:
+
+Persisting State: Use tokens (like JWT) to carry information about the current session or user between the two APIs.
+
+Syncing: When API 1 sends a request to API 2, it includes the token. API 2 verifies the token and uses the information in it to continue processing.
+
+Example: API 1 sends a user’s authentication token, and API 2 uses that token to authorize the user and process their request.
+
+5. Using Webhooks:
+
+Syncing: A webhook is a way one API can notify another API about events. When something happens in API 1, it sends an HTTP request to API 2 (the webhook) to notify it.
+
+Example: API 1 processes a new order and sends a webhook to API 2 to start shipping the product.
+
+In Short:
+
+To persist state, store data in a shared location like a database or cache.
+
+To sync communications, you can use mechanisms like shared databases, message queues, tokens, or webhooks to make sure both APIs stay in sync and can access the latest state.
+
 
 

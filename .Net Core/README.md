@@ -672,3 +672,180 @@ Applications that benefit from different data models for reads and writes, such 
 In Summary:
 
 CQRS is a powerful pattern for separating read and write operations to optimize scalability, performance, and flexibility, especially in complex or high-traffic applications. However, it adds complexity and should be used only when the benefits outweigh the challenges.
+
+## What is CQRS pattern? Explain in short and simple language with simple example. 
+
+The CQRS (Command Query Responsibility Segregation) pattern separates write operations (commands) from read operations (queries).
+
+Key Idea:
+
+Command: Modifies data (e.g., adding an item to a database).
+
+Query: Reads data without changing it (e.g., fetching an item's details).
+
+Simple Example:
+
+Imagine an online shopping app:
+
+Command:
+
+When a user places an order, it updates the system (e.g., saves the order to the database).
+
+Action: PlaceOrder(orderDetails) updates the database.
+
+Query:
+
+When the user checks their order status, it reads the order details.
+
+Action: GetOrder(orderId) retrieves the status.
+
+Why Use CQRS?
+
+Better performance by optimizing separately for reads and writes.
+
+Flexibility to scale reading and writing independently.
+
+Key Point:
+
+Commands and queries can even use different databases: one for fast reads and another for safe writes.
+
+## Now give me proper example of CQRS pattern in .net core. Here’s a proper example of implementing the CQRS Pattern in a .NET Core application. We'll use separate handlers for commands (write operations) and queries (read operations).
+
+Scenario:
+
+Let’s manage products in an inventory system:
+
+Command: Add a new product (write operation).
+
+Query: Get a list of all products (read operation).
+
+Step-by-Step Example:
+1. Define the Models: 
+```C#
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+}
+``` 
+
+2. Create Command to Add a Product:
+
+Command: 
+```C#
+public class AddProductCommand
+{
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+} 
+```
+Command Handler: 
+
+```C#
+public class AddProductCommandHandler
+
+{
+    private readonly ApplicationDbContext _context;
+
+    public AddProductCommandHandler(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task Handle(AddProductCommand command)
+    {
+        var product = new Product
+        {
+            Name = command.Name,
+            Price = command.Price
+        };
+
+        _context.Products.Add(product);
+        await _context.SaveChangesAsync();
+    }
+}
+```
+ 3. Create Query to Get Products:
+
+Query:  
+```C#
+public class GetProductsQuery
+{
+}
+```
+Query Handler: 
+```C#
+public class GetProductsQueryHandler
+{
+    private readonly ApplicationDbContext _context;
+
+    public GetProductsQueryHandler(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<List<Product>> Handle(GetProductsQuery query)
+    {
+        return await _context.Products.ToListAsync();
+    }
+}
+```
+4. Set Up the Database Context: 
+```C#
+public class ApplicationDbContext : DbContext
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
+    public DbSet<Product> Products { get; set; }
+}
+```
+5. Register Services in Startup.cs or Program.cs: 
+```C#
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<AddProductCommandHandler>();
+builder.Services.AddScoped<GetProductsQueryHandler>(); 
+```
+6. Create the API Controller: 
+```C#
+[ApiController]
+[Route("api/[controller]")]
+public class ProductsController : ControllerBase
+{
+    private readonly AddProductCommandHandler _addProductHandler;
+    private readonly GetProductsQueryHandler _getProductsHandler;
+
+    public ProductsController(AddProductCommandHandler addProductHandler, GetProductsQueryHandler getProductsHandler)
+    {
+        _addProductHandler = addProductHandler;
+        _getProductsHandler = getProductsHandler;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddProduct([FromBody] AddProductCommand command)
+    {
+        await _addProductHandler.Handle(command);
+        return Ok("Product added successfully.");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetProducts()
+    {
+        var products = await _getProductsHandler.Handle(new GetProductsQuery());
+        return Ok(products);
+    }
+} 
+```
+Summary:
+
+Command (Write): Add a product.
+
+Query (Read): Get the list of products.
+
+Separate handlers for each operation ensure separation of concerns.
+
+This structure makes the application more maintainable, scalable, and adaptable to changes.
+
+

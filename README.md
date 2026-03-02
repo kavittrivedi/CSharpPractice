@@ -190,7 +190,9 @@ When you want to construct a query dynamically and execute it later.
 
 **Working with Databases:**  
 
-Use IEnumerator in scenarios where you need manual control over iteration. Examples:
+Use IEnumerator in scenarios where you need manual control over iteration. 
+
+Examples:
 
 Custom Iteration: Define how a custom collection is traversed.
 

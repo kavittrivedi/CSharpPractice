@@ -115,6 +115,35 @@ class Program
 - **Safe**: Automatically handles resource cleanup with Dispose().
 - **Readable**: Cleaner and less error-prone compared to while loops with enumerators.
 
+## Difference Between for and foreach Loop
+
+Difference between for and foreach loop.  
+
+| **Aspect**                             | **`for` Loop**                                                        | **`foreach` Loop**                                                        |
+| -------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Purpose**                            | Iterates using an **index** or **counter**.                           | Iterates through each element of a collection directly.                   |
+| **Collection Type**                    | Works with **indexed collections** like arrays or lists.              | Works with any collection that implements `IEnumerable` or `IEnumerator`. |
+| **Control**                            | Provides more **control** over iteration (e.g., skipping, reversing). | Simplifies iteration without needing an index or counter.                 |
+| **Modification**                       | Allows modifying the collection during iteration.                     | Does **not allow modification** of the collection directly.               |
+| **Readability**                        | Requires manual management of the index.                              | Easier to read and write.                                                 |
+| **Example**                            |                                                                       |                                                                           |
+| **Example with `for`**                 |                                                                       | **Example with `foreach`**                                                |
+| ```csharp                              | ```csharp                                                             | ```csharp                                                                 |
+| for (int i = 0; i < array.Length; i++) | foreach (var item in array)                                           |                                                                           |
+| {                                      | {                                                                     |                                                                           |
+| Console.WriteLine(array[i]);           | Console.WriteLine(item);                                              |                                                                           |
+| }                                      | }                                                                     |                                                                           |
+
+### When to Use
+
+**Use `for`:**  
+- When you need an index or specific iteration logic (e.g., skip elements).  
+- When you want to iterate backwards or access specific elements.
+
+**Use `foreach`:**  
+- When you just want to access all elements in a collection.  
+- For better readability and less error-prone code.
+
 ## Explain IQueryable with Simple Example
 
 Explain me IQueryable with simple example. In which situation we can use IEnumerator?

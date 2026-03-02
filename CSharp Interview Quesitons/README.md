@@ -507,3 +507,68 @@ MyClass obj = new MyClass();  // obj is stored on the heap, reference on the sta
 - **Stack**: Fast, small, used for local variables and method calls.
 - **Heap**: Slower, large, used for objects and dynamic memory.
 
+## Call by Value vs Call by Reference
+
+Call by value vs Call by ref.  
+
+### Call by Value vs Call by Reference
+
+#### 1. Call by Value
+
+**What it is:**  
+In Call by Value, a copy of the variable's value is passed to the method.
+
+**How it works:**  
+Changes made to the parameter inside the method do not affect the original variable outside the method because only a copy of the value is passed.
+
+**Example:**  
+```csharp
+void ModifyValue(int x)
+{
+    x = 10;  // This change doesn't affect the original variable
+}
+
+int number = 5;
+ModifyValue(number);
+Console.WriteLine(number);  // Output: 5
+```
+
+**Use case:**  
+Used for primitive data types (like int, float, etc.), where the value of the variable should not change outside the method.
+
+#### 2. Call by Reference
+
+**What it is:**  
+In Call by Reference, the memory address (reference) of the variable is passed to the method. This means the method can directly modify the original variable.
+
+**How it works:**  
+Any changes made to the parameter inside the method will affect the original variable because both the original and the parameter refer to the same memory location.
+
+**Example:**  
+```csharp
+void ModifyValue(ref int x)
+{
+    x = 10;  // This changes the original variable
+}
+
+int number = 5;
+ModifyValue(ref number);
+Console.WriteLine(number);  // Output: 10
+```
+
+**Use case:**  
+Used when you want the method to modify the original variable. This is typically used with reference types or when you want the method to update multiple variables.
+
+### Key Differences
+
+| **Aspect**                      | **Call by Value**                          | **Call by Reference**                                   |
+| ------------------------------- | ------------------------------------------ | ------------------------------------------------------- |
+| **What is passed**              | A **copy** of the value                    | The **reference** (memory address) of the variable      |
+| **Effect on original variable** | No effect (original variable is unchanged) | Changes the original variable                           |
+| **Use case**                    | Primitive types, data integrity            | Reference types or when changes need to reflect outside |
+
+### Summary
+
+- **Call by Value**: Only a copy of the value is passed. Changes don't affect the original variable.
+- **Call by Reference**: The reference (address) is passed, so changes affect the original variable.
+

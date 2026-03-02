@@ -90,5 +90,53 @@ Here’s how it works:
 
 So, the server is responsible for checking if the JWT's signature is correct, ensuring that the token is authentic and trustworthy.
 
+Explain difference between GET and POST GET vs POST:
+
+GET:
+
+Purpose: Used to retrieve data from a server.
+
+Data Transmission: The data (parameters) is sent in the URL (query string). For example: /api/users?id=1.
+
+Idempotent: GET requests should not change any data on the server.
+
+Caching: GET requests can be cached by browsers and servers.
+
+Use Case: When you need to fetch data (like viewing a webpage or getting information about a user).
+
+POST:
+
+Purpose: Used to send data to the server to create or update resources.
+
+Data Transmission: The data is sent in the body of the request (not visible in the URL).
+
+Non-Idempotent: POST requests can change the state on the server (e.g., creating a new user or submitting a form).
+
+Caching: POST requests are typically not cached.
+
+Use Case: When you need to send data to be processed (like submitting a form or creating a new record).
+
+HTTP Status Codes:
+
+GET:
+
+Typically uses 200 OK if the request is successful and data is returned.
+
+If the resource is not found, it may return 404 Not Found.
+
+POST:
+
+Typically uses 201 Created if a new resource is successfully created.
+
+It can also return 200 OK if the action is successful but doesn't create new data.
+
+If there is an issue with the request, it might return 400 Bad Request.
+
+In summary:
+
+GET is for fetching data, typically returns 200 OK.
+
+POST is for sending data to be processed, often returns 201 Created or 200 OK.
+
 
 

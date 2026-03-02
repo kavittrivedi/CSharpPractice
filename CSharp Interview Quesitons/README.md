@@ -434,3 +434,76 @@ You can parallelize work to make the best use of multi-core processors.
 - Use async/await for non-blocking, asynchronous operations (I/O-bound).
 - Use TPL for concurrent execution and parallelism, especially for CPU-bound operations.
 
+## Heap vs Stack Memory
+
+Heap vs stack memory.  
+
+### Heap vs Stack Memory: A Simple Comparison
+
+#### 1. Stack Memory
+
+**What is it?**  
+The stack is used for storing local variables and method calls (function call stack).
+
+**Where is it stored?**  
+It is stored in a region of memory that works in a Last In, First Out (LIFO) manner.
+
+**Memory Allocation**  
+When a method is called, its local variables are pushed onto the stack. When the method finishes, those variables are popped off the stack.
+
+**Size**  
+Stack memory is usually small and limited in size.
+
+**Access Speed**  
+It’s faster than heap memory because of its simple LIFO structure.
+
+**Example:**  
+```csharp
+void MyMethod()
+{
+    int num = 5;  // num is stored on the stack
+}
+```
+
+#### 2. Heap Memory
+
+**What is it?**  
+The heap is used for storing objects and dynamic memory allocation (i.e., when you use `new` to create an object).
+
+**Where is it stored?**  
+It’s a larger region of memory used for long-lived objects that need to persist beyond the method call.
+
+**Memory Allocation**  
+When an object is created, memory is allocated on the heap, and the reference (address) to the object is stored on the stack.
+
+**Size**  
+Heap memory is larger but slower to access than the stack.
+
+**Access Speed**  
+It’s slower because of the need to manage free memory, and it involves more complex operations (allocation and garbage collection).
+
+**Example:**  
+```csharp
+class MyClass
+{
+    public int Number;
+}
+
+MyClass obj = new MyClass();  // obj is stored on the heap, reference on the stack
+```
+
+### Key Differences Summary
+
+| **Aspect**            | **Stack**                        | **Heap**                             |
+| --------------------- | -------------------------------- | ------------------------------------ |
+| **Storage**           | Local variables and method calls | Objects and dynamic memory           |
+| **Size**              | Small and limited                | Large and flexible                   |
+| **Access Speed**      | Fast (LIFO structure)            | Slower (more complex management)     |
+| **Memory Management** | Managed automatically (push/pop) | Managed by garbage collector         |
+| **Lifetime**          | Temporary (within method scope)  | Long-lived (until garbage collected) |
+
+### Key Takeaway
+
+- **Stack**: Fast, small, used for local variables and method calls.
+- **Heap**: Slower, large, used for objects and dynamic memory.
+

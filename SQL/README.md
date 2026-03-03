@@ -660,3 +660,461 @@ To increase query performance, you can follow these techniques:
     Use transactions carefully and keep them short to avoid blocking other queries.
 
 By applying these techniques, you can make your query operations faster and more efficient!
+
+## SP are pre-compiled means what? explain with short and simple language
+
+When we say Stored Procedures (SPs) are pre-compiled, it means:
+
+### Once Compiled, Reused:
+
+The first time a stored procedure is executed, SQL Server compiles it into an execution plan, which is a step-by-step guide for running the procedure.
+
+This compiled plan is stored in memory and reused for subsequent calls to the stored procedure, saving the time and effort of compiling it again.
+
+### Improves Performance:
+
+Instead of compiling the SQL query each time it runs (like ad-hoc queries), the stored procedure's pre-compiled execution plan speeds up execution.
+
+### Example
+
+If you frequently run this query: `SELECT * FROM Orders WHERE OrderDate > '2023-01-01';`
+
+Instead of sending this query each time, wrap it in a stored procedure:
+
+```sql
+CREATE PROCEDURE GetRecentOrders
+AS
+BEGIN
+    SELECT * FROM Orders WHERE OrderDate > '2023-01-01';
+END;
+```
+
+The first run compiles it, and later calls reuse the compiled plan, reducing overhead.
+
+### Key Benefit
+
+**Consistency and Speed:** Pre-compilation reduces query parsing and compilation time, making stored procedures faster and more efficient than executing raw SQL each time.
+
+## How to design multi-tenant DB? Explain with short and simple language
+
+Designing a multi-tenant database means creating a system where multiple tenants (customers or users) share the same database while keeping their data isolated. Here's how to do it:
+
+### Approaches for Multi-Tenant DB Design
+
+#### Shared Database with Shared Schema
+
+**Description:** All tenants use the same database and the same tables. Data is separated using a column like TenantID.
+
+**Example:** Employees Table:
+| TenantID | EmployeeID | Name   | Department |
+|----------|------------|--------+------------|
+| 1        | 101        | Alice  | HR         |
+| 2        | 201        | Bob    | IT         |
+
+**Advantages:**
+
+- Simple to set up and maintain.
+- Cost-efficient.
+
+**Disadvantages:**
+
+- Complex queries for tenant-specific data.
+- Risk of data leakage if TenantID is not handled correctly.
+
+#### Shared Database with Separate Schemas
+
+**Description:** One database, but each tenant has their own schema (a group of tables).
+
+**Example:** Tenant1.Employees
+Tenant2.Employees
+
+**Advantages:**
+
+- Better data isolation.
+- Easier customization for each tenant.
+
+**Disadvantages:**
+
+- Slightly higher maintenance.
+- May not scale well with many tenants.
+
+#### Separate Database per Tenant
+
+**Description:** Each tenant has their own database.
+
+**Example:** Tenant1_DB
+Tenant2_DB
+
+**Advantages:**
+
+- Complete data isolation.
+- Best for security and customization.
+
+**Disadvantages:**
+
+- Expensive to maintain with many tenants.
+- Harder to manage at scale.
+
+### Best Practices for Multi-Tenant DB
+
+- **Use Tenant Identifiers:** Always include a unique TenantID to identify data belonging to a tenant.
+- **Plan for Scalability:** Choose the right design (shared schema, separate schema, or separate DB) based on expected tenant growth.
+- **Secure Data:** Ensure strong isolation using proper indexing, access control, and encryption.
+- **Centralized Metadata:** Use a metadata table to map tenants to their schemas or databases.
+
+  **Example:** TenantMetadata Table:
+  | TenantID | Schema/DatabaseName |
+  |----------|---------------------|
+  | 1        | Tenant1_DB          |
+  | 2        | Tenant2_DB          |
+
+- **Optimize Performance:** Index TenantID in shared schema designs. Use partitioning for large datasets.
+
+### When to Use Which Approach
+
+- **Shared Schema:** Small apps with low data sensitivity and many tenants.
+- **Separate Schema:** Medium-sized apps with some need for customization.
+- **Separate Database:** High-security apps or large tenants needing complete isolation.
+
+In short, choose the design based on your app’s size, security needs, and scalability goals.
+
+## How to improve the performance of DB. Explain with short and simple language
+
+Improving the performance of a database involves optimizing how data is stored, retrieved, and processed. Here are key techniques in simple terms:
+
+1. **Use Indexes**
+
+   Create indexes on columns used frequently in WHERE, JOIN, and ORDER BY clauses.
+
+   Avoid too many indexes; they slow down INSERT/UPDATE operations.
+
+2. **Optimize Queries**
+
+   Fetch only the needed columns (SELECT specific_column instead of SELECT *).
+
+   Write efficient WHERE conditions (e.g., avoid functions on columns like YEAR(Date)).
+
+   Use LIMIT or TOP to retrieve a small set of rows when needed.
+
+3. **Normalize and Denormalize**
+
+   Normalize: Organize data into smaller related tables to reduce redundancy.
+
+   Denormalize: Combine tables for frequently accessed data to reduce joins, if necessary.
+
+4. **Partition Large Tables**
+
+   Divide large tables into smaller, manageable partitions based on criteria (e.g., date ranges).
+
+   Makes querying faster by scanning only relevant partitions.
+
+5. **Use Proper Data Types**
+
+   Choose efficient data types (e.g., INT for IDs instead of VARCHAR).
+
+   Avoid unnecessarily large data types like TEXT when not needed.
+
+6. **Archive Old Data**
+
+   Move rarely accessed historical data to an archive table or database.
+
+   Reduces the size of active tables and speeds up queries.
+
+7. **Avoid Over-Locking**
+
+   Use transactions carefully and keep them short.
+
+   Reduce locking by using NOLOCK (if safe) for read-heavy operations.
+
+8. **Maintain Updated Statistics**
+
+   Ensure database statistics are up-to-date so the query optimizer makes better decisions.
+
+9. **Use Query Execution Plan**
+
+   Analyze execution plans to identify and fix slow operations like table scans or missing indexes.
+
+10. **Optimize Database Configuration**
+
+    Tune memory allocation, disk I/O, and connection settings based on workload.
+
+11. **Caching**
+
+    Use caching for frequently accessed data to reduce repeated database queries.
+
+    Tools: Redis, Memcached, or in-memory caching within the application.
+
+12. **Avoid Overly Complex Joins**
+
+    Simplify queries with too many joins. Break them into smaller steps or use temporary tables.
+
+13. **Use Stored Procedures**
+
+    Replace repetitive ad-hoc queries with stored procedures to reduce compilation overhead.
+
+14. **Backup and Clean Up**
+
+    Regularly remove unused indexes, shrink log files, and clean up unused tables.
+
+By applying these strategies, you can ensure your database performs efficiently and scales effectively as your application grows.
+
+## What is the better to use EF or SQL procedure? Explain with short and simple language
+
+Choosing between Entity Framework (EF) and SQL Stored Procedures depends on your project needs. Here’s a simple comparison to help you decide:
+
+### Entity Framework (EF)
+
+**Advantages:**
+
+- **Ease of Use:** EF allows you to write queries in C# (LINQ) instead of SQL. Reduces the need to know complex SQL syntax.
+- **Maintainability:** Changes in the database are reflected automatically (with migrations). Easier for developers to manage and understand code.
+- **Flexibility:** Works well when you need to interact with multiple tables or complex data structures dynamically.
+- **Cross-Platform:** EF Core works on .NET Core, making it suitable for modern cross-platform applications.
+
+**Disadvantages:**
+
+- **Performance:** Slower for complex queries compared to stored procedures due to overhead.
+- **Control:** Less control over how queries are executed compared to raw SQL.
+
+### SQL Stored Procedures
+
+**Advantages:**
+
+- **Performance:** Pre-compiled and optimized, leading to faster execution for complex operations. Can handle bulk operations efficiently.
+- **Security:** Provides better control over access (only execute permissions needed). Prevents SQL injection when properly used.
+- **Complex Logic:** Great for heavy data processing or reusable business logic directly in the database.
+
+**Disadvantages:**
+
+- **Tight Coupling:** Logic is tied to the database, making it harder to migrate or change databases.
+- **Developer Dependency:** Requires knowledge of SQL, which may not be ideal for all developers.
+
+### When to Use EF
+
+- Projects with frequent schema changes.
+- Applications requiring dynamic, complex queries in C#.
+- When ease of development and maintainability is a priority.
+
+### When to Use SQL Stored Procedures
+
+- Performance-critical operations.
+- Applications with heavy database processing.
+- Need for secure, pre-defined business logic at the database level.
+
+### Best Practice
+
+**Combine both:** Use EF for simpler queries and CRUD operations. Use stored procedures for complex, performance-critical operations.
+
+This approach gives you the best of both worlds!
+
+## How we can prevent SQL injection in stored procedure?
+
+To prevent SQL injection in stored procedures, you need to ensure that user input is handled safely and securely. Here are the key practices explained simply:
+
+1. **Use Parameterized Queries**
+
+   Always use parameters to pass values into the stored procedure instead of concatenating user input into SQL strings.
+
+   **Example:**
+   ```sql
+   CREATE PROCEDURE GetEmployeeById
+       @EmployeeID INT
+   AS
+   BEGIN
+       SELECT * FROM Employees WHERE EmployeeID = @EmployeeID;
+   END;
+   ```
+   This approach ensures that input is treated as data, not executable SQL.
+
+2. **Avoid Dynamic SQL**
+
+   Do not build SQL queries dynamically by concatenating strings with user input.
+
+   **Bad Example (Vulnerable to SQL Injection):**
+   ```sql
+   CREATE PROCEDURE GetEmployees
+       @Department NVARCHAR(50)
+   AS
+   BEGIN
+       EXEC('SELECT * FROM Employees WHERE Department = ''' + @Department + '''');
+   END;
+   ```
+   **Instead, use parameterized execution:**
+   ```sql
+   CREATE PROCEDURE GetEmployees
+       @Department NVARCHAR(50)
+   AS
+   BEGIN
+       SELECT * FROM Employees WHERE Department = @Department;
+   END;
+   ```
+
+3. **Validate Input**
+
+   Validate user input at the application level and, if needed, in the stored procedure itself.
+
+   Ensure that the input matches expected formats (e.g., numbers, email addresses, etc.).
+
+4. **Use Proper Permissions**
+
+   Limit database permissions for the application user:
+
+   - Read-only for SELECT operations.
+   - Only necessary permissions for executing specific stored procedures.
+   - Avoid granting direct access to underlying tables.
+
+5. **Avoid Executing Untrusted Code**
+
+   Do not use user input to determine table or column names in SQL queries.
+
+6. **Use QUOTENAME for Dynamic SQL**
+
+   If dynamic SQL is unavoidable, use the QUOTENAME function to safely handle identifiers (e.g., table or column names).
+
+   **Example:**
+   ```sql
+   CREATE PROCEDURE GetTableData
+       @TableName NVARCHAR(50)
+   AS
+   BEGIN
+       DECLARE @SQL NVARCHAR(MAX);
+       SET @SQL = 'SELECT * FROM ' + QUOTENAME(@TableName);
+       EXEC sp_executesql @SQL;
+   END;
+   ```
+
+7. **Use sp_executesql for Dynamic SQL**
+
+   If dynamic SQL is required, use sp_executesql with parameters.
+
+   **Example:**
+   ```sql
+   CREATE PROCEDURE GetEmployees
+       @Department NVARCHAR(50)
+   AS
+   BEGIN
+       DECLARE @SQL NVARCHAR(MAX);
+       SET @SQL = 'SELECT * FROM Employees WHERE Department = @Dept';
+       EXEC sp_executesql @SQL, N'@Dept NVARCHAR(50)', @Dept = @Department;
+   END;
+   ```
+
+8. **Regularly Monitor and Test**
+
+   Conduct regular security tests to ensure your stored procedures are not vulnerable.
+
+   Use tools to simulate and identify injection attempts.
+
+By following these practices, you can safeguard your stored procedures from SQL injection attacks effectively.
+
+## What is seek index and Scan Index? Explain in short and simple language
+
+### Seek Index vs. Scan Index
+
+When a database executes a query, it uses indexes to locate rows in a table. The way it accesses the data can either be an Index Seek or an Index Scan. Here’s a simple explanation:
+
+1. **Index Seek**
+
+   **Definition:** The database directly goes to the specific location of the required data using the index, like looking up a word in a dictionary.
+
+   **How it Works:** Uses the index to narrow down the search to just the rows that match the condition (efficient).
+
+   **When it Happens:**
+
+   - When a query uses a filter (WHERE clause) that matches the indexed column.
+   - Example: Searching for EmployeeID = 123 in an indexed column.
+
+   **Performance:** Faster and more efficient, as it only accesses relevant rows.
+
+2. **Index Scan**
+
+   **Definition:** The database reads the entire index (or table) row by row, like scanning every page in a book to find a word.
+
+   **How it Works:** Goes through all the rows in the index, even if only a few match the condition (less efficient).
+
+   **When it Happens:**
+
+   - No suitable index exists.
+   - The query needs most of the rows (e.g., no filtering or searching by a non-indexed column).
+
+   **Performance:** Slower and less efficient, especially for large tables.
+
+### Key Difference
+
+| **Feature**       | **Index Seek**                 | **Index Scan**                      |
+| ----------------- | ------------------------------ | ----------------------------------- |
+| **Search Method** | Directly locates matching rows | Reads all rows sequentially         |
+| **Efficiency**    | Highly efficient               | Less efficient for large datasets   |
+| **When Used**     | When a good index exists       | When no suitable index is available |
+
+### Which is Better?
+
+- **Index Seek** is better for performance because it retrieves only the required data.
+- **Index Scan** is okay when most of the table’s data is needed (e.g., full table report).
+
+### Optimization Tip
+
+To avoid unnecessary scans, create appropriate indexes on frequently queried columns.
+
+## Explain query of each seek index and scan index please
+
+### Examples of Query for Index Seek and Index Scan
+
+Here are examples to illustrate how queries result in Index Seek and Index Scan operations:
+
+1. **Query Example for Index Seek**
+
+   **Scenario:** You have an index on the EmployeeID column.
+
+   **Query:**
+   ```sql
+   SELECT * 
+   FROM Employees 
+   WHERE EmployeeID = 123;
+   ```
+
+   **Explanation:**
+
+   - The database uses the index to directly locate the row where EmployeeID = 123.
+   - Only the relevant rows are fetched.
+
+   **Result:** Index Seek because it’s a targeted search using the indexed column.
+
+2. **Query Example for Index Scan**
+
+   **Scenario:** You query on a non-indexed column (e.g., LastName) or use a query without a specific filter.
+
+   **Query:**
+   ```sql
+   SELECT * 
+   FROM Employees 
+   WHERE LastName = 'Smith';
+   ```
+
+   **Explanation:**
+
+   - If LastName is not indexed, the database has no choice but to scan the entire table or index to find rows where LastName = 'Smith'.
+   - Every row is checked, even if only a few match.
+
+   **Result:** Index Scan because the database reads the whole table or index.
+
+### How to Check Whether the Query Uses Seek or Scan
+
+**View Execution Plan:**
+
+- In SQL Server, before executing the query, click "Include Actual Execution Plan".
+- Run the query and check the execution plan.
+- Look for Index Seek or Index Scan in the plan diagram.
+
+**Interpreting the Plan:**
+
+- **Index Seek:** Indicates a direct, efficient search.
+- **Index Scan:** Indicates a full scan of rows or index.
+
+### Optimization
+
+To improve query performance and avoid scans:
+
+- Create indexes on columns used in filters (WHERE clauses) or joins.
+- Use SELECT specific columns instead of SELECT *.
+- Avoid functions or expressions on indexed columns in queries (e.g., WHERE UPPER(Name) = 'JOHN' prevents index usage).

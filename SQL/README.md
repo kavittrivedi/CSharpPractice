@@ -581,3 +581,82 @@ Here are some common techniques to improve SQL query performance, explained simp
     Why: Keeps the query optimizer informed about data distribution.
 
 By applying these techniques, you can improve query speed, reduce resource usage, and make your SQL applications more efficient.
+
+## How will you increase performance for your query operations? explain with short and simple language
+
+To increase query performance, you can follow these techniques:
+
+1. **Use Indexes**
+
+   Add indexes to frequently searched or joined columns to speed up lookups.
+
+   Use clustered indexes for primary keys and non-clustered indexes for other key columns.
+
+2. **Fetch Only Needed Data**
+
+   Avoid SELECT *—retrieve only the required columns.
+
+   Example: Use `SELECT Name, Salary FROM Employees` instead of `SELECT *`.
+
+3. **Filter Rows Early**
+
+   Use WHERE clauses to filter data as early as possible.
+
+   Example: `SELECT * FROM Orders WHERE OrderDate > '2023-01-01'`.
+
+4. **Use Joins Wisely**
+
+   Use INNER JOIN for relevant data and avoid unnecessary joins.
+
+   Ensure columns used in joins are indexed.
+
+5. **Optimize WHERE Conditions**
+
+   Avoid functions in WHERE clauses; they prevent index usage.
+
+   Replace: `WHERE YEAR(Date) = 2023`
+   With: `WHERE Date BETWEEN '2023-01-01' AND '2023-12-31'`.
+
+6. **Limit Rows**
+
+   Use LIMIT (or TOP in SQL Server) to fetch only what you need.
+
+   Example: `SELECT TOP 10 * FROM Employees`.
+
+7. **Avoid Duplicate Work**
+
+   Use CTEs or temporary tables to store intermediate results for reuse.
+
+8. **Use UNION ALL**
+
+   If duplicate records are not an issue, use UNION ALL instead of UNION to skip the extra step of removing duplicates.
+
+9. **Keep Queries Simple**
+
+   Avoid overly complex queries. Break them into smaller, manageable steps.
+
+10. **Analyze Execution Plan**
+
+    Check the execution plan to identify slow operations like table scans or missing indexes.
+
+11. **Update Statistics**
+
+    Ensure database statistics are up-to-date to help the query optimizer.
+
+12. **Partition Large Tables**
+
+    Divide large tables into smaller chunks (partitions) for faster query access.
+
+13. **Use Proper Data Types**
+
+    Use efficient data types (e.g., INT instead of VARCHAR for IDs).
+
+14. **Optimize Sorting**
+
+    Use indexed columns in ORDER BY clauses to speed up sorting.
+
+15. **Reduce Lock Contention**
+
+    Use transactions carefully and keep them short to avoid blocking other queries.
+
+By applying these techniques, you can make your query operations faster and more efficient!

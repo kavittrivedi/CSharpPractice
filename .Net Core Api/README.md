@@ -276,5 +276,82 @@ How to do it: Use a connection pool (most ORM frameworks like Entity Framework s
 
 By applying these strategies, you can improve the speed, scalability, and reliability of your API, ensuring that it can handle more requests efficiently and provide a better experience for users.
 
+## Explain HTTP verbs & status codes in simple language to give answer during interview
+
+Here is a short, clear, interview-ready explanation 👇  
+*(Simple language + easy to remember)*
+
+### HTTP Verbs (What action you want to do)
+
+**GET**
+
+- **Use:** Read data
+- **Example:** Get user details
+- **Safe?** Yes (no data change)
+- **Status Code:** 200 OK
+
+**POST**
+
+- **Use:** Create new data
+- **Example:** Create a new user
+- **Safe?** No
+- **Status Code:** 201 Created
+
+**PUT**
+
+- **Use:** Update entire resource
+- **Example:** Update full user profile
+- **Status Code:** 200 OK / 204 No Content
+
+**PATCH**
+
+- **Use:** Update partial data
+- **Example:** Update user email only
+- **Status Code:** 200 OK
+
+**DELETE**
+
+- **Use:** Delete data
+- **Example:** Delete user
+- **Status Code:** 200 OK / 204 No Content
+
+### HTTP Status Codes (What happened with the request)
+
+**2xx – Success**
+
+| Code  | Meaning                   |
+| ----- | ------------------------- |
+| `200` | Request successful        |
+| `201` | Resource created          |
+| `204` | Success, no response body |
+
+**4xx – Client Error**
+
+| Code  | Meaning                      |
+| ----- | ---------------------------- |
+| `400` | Bad request (invalid input)  |
+| `401` | Unauthorized (not logged in) |
+| `403` | Forbidden (no permission)    |
+| `404` | Resource not found           |
+
+**5xx – Server Error**
+
+| Code  | Meaning               |
+| ----- | --------------------- |
+| `500` | Internal server error |
+| `502` | Bad gateway           |
+| `503` | Service unavailable   |
+
+### One-Line Interview Answer
+
+HTTP verbs define what action we perform on a resource, and HTTP status codes tell us the result of that action.
+
+### Quick Memory Trick 🧠
+
+- GET → Read
+- POST → Create
+- PUT → Replace
+- PATCH → Update
+- DELETE → Remove
 
 

@@ -1,6 +1,30 @@
-# CSharpPractice
 
-## What is CTE, Explain why and when to use CTE in simple language
+# SQL Interview Questions and Explanations
+
+## Index
+
+- [What is CTE, Explain why and when to use CTE in simple language](#what-is-cte-explain-why-and-when-to-use-cte-in-simple-language)
+- [Where CTE's temporary result set resides?](#where-ctes-temporary-result-set-resides)
+- [When we should not use CTE?](#when-we-should-not-use-cte)
+- [What is a View?](#what-is-a-view)
+- [SQL Table Vs SQL Views difference? explain in short and simple language](#sql-table-vs-sql-views-difference-explain-in-short-and-simple-language)
+- [What is deadlock? how it occurs? Apart from sql deadlock what are the other places it can occur in application. Explain in short and simple language](#what-is-deadlock-how-it-occurs-apart-from-sql-deadlock-what-are-the-other-places-it-can-occur-in-application-explain-in-short-and-simple-language)
+- [How to resolve deadlock in SQL?](#how-to-resolve-deadlock-in-sql)
+- [Explain the meaning of query execution plan. In short and simple language](#explain-the-meaning-of-query-execution-plan-in-short-and-simple-language)
+- [How to use Query Execution Plan? explain in short and simple language](#how-to-use-query-execution-plan-explain-in-short-and-simple-language)
+- [Difference between clustered and non-clustered indexes? Which one is faster? Advantages and disadvantages of non-clustered indexes. Explain in short and simple language](#difference-between-clustered-and-non-clustered-indexes-which-one-is-faster-advantages-and-disadvantages-of-non-clustered-indexes-explain-in-short-and-simple-language)
+- [What is tempdb? Explain in short and simple language](#what-is-tempdb-explain-in-short-and-simple-language)
+- [What optimization techniques are there in SQL? in explain with short and simple language](#what-optimization-techniques-are-there-in-sql-in-explain-with-short-and-simple-language)
+- [How will you increase performance for your query operations? explain with short and simple language](#how-will-you-increase-performance-for-your-query-operations-explain-with-short-and-simple-language)
+- [SP are pre-compiled means what? explain with short and simple language](#sp-are-pre-compiled-means-what-explain-with-short-and-simple-language)
+- [How to design multi-tenant DB? Explain with short and simple language](#how-to-design-multi-tenant-db-explain-with-short-and-simple-language)
+- [How to improve the performance of DB. Explain with short and simple language](#how-to-improve-the-performance-of-db-explain-with-short-and-simple-language)
+- [What is the better to use EF or SQL procedure? Explain with short and simple language](#what-is-the-better-to-use-ef-or-sql-procedure-explain-with-short-and-simple-language)
+- [How we can prevent SQL injection in stored procedure?](#how-we-can-prevent-sql-injection-in-stored-procedure)
+- [What is seek index and Scan Index? Explain in short and simple language](#what-is-seek-index-and-scan-index-explain-in-short-and-simple-language)
+- [Explain query of each seek index and scan index please](#explain-query-of-each-seek-index-and-scan-index-please)
+
+## What is CTE, Explain why and when to use CTE in simple language {#what-is-cte-explain-why-and-when-to-use-cte-in-simple-language}
 
 ### What is a CTE?
 
@@ -56,7 +80,9 @@ FROM CTE_Name;
 
 By using CTEs effectively, you can make your SQL queries more efficient and easier to maintain.
 
-## Where CTE's temporary result set resides?
+[Back to Index](#index)
+
+## Where CTE's temporary result set resides? {#where-ctes-temporary-result-set-resides}
 
 A CTE's temporary result set resides in memory and is not physically stored in the database. It exists only for the duration of the query in which it is used.
 
@@ -69,7 +95,9 @@ A CTE's temporary result set resides in memory and is not physically stored in t
 
 In summary, a CTE is a logical construct that resides in memory and is optimized by the query engine as part of the overall query execution plan.
 
-## When we should not use CTE?
+[Back to Index](#index)
+
+## When we should not use CTE? {#when-we-should-not-use-cte}
 
 While CTEs are powerful and useful in many scenarios, there are situations where their use might not be the best choice. Here are some cases when you should avoid or reconsider using CTEs:
 
@@ -124,7 +152,9 @@ While CTEs are powerful and useful in many scenarios, there are situations where
 
 By carefully evaluating the query's complexity and performance requirements, you can determine whether a CTE is the right choice or if alternative approaches like temporary tables or views are better.
 
-## What is a View?
+[Back to Index](#index)
+
+## What is a View? {#what-is-a-view}
 
 A View in SQL is like a virtual table. It doesn't store data itself but provides a way to see data from one or more tables. Think of it as a saved SQL query that you can use like a table.
 
@@ -194,7 +224,9 @@ The view definition (not the data) is stored in the database system catalog.
 
 Use views for simplifying queries, improving security, ensuring consistency, and reusing complex logic.
 
-## SQL Table Vs SQL Views difference? explain in short and simple language
+[Back to Index](#index)
+
+## SQL Table Vs SQL Views difference? explain in short and simple language {#sql-table-vs-sql-views-difference-explain-in-short-and-simple-language}
 
 Here’s a simple comparison of SQL Tables vs SQL Views:
 
@@ -215,7 +247,9 @@ Use tables to store data.
 
 Use views to simplify complex queries, ensure data consistency, or improve security by restricting access.
 
-## What is deadlock? how it occurs? Apart from sql deadlock what are the other places it can occur in application. Explain in short and simple language
+[Back to Index](#index)
+
+## What is deadlock? how it occurs? Apart from sql deadlock what are the other places it can occur in application. Explain in short and simple language {#what-is-deadlock-how-it-occurs-apart-from-sql-deadlock-what-are-the-other-places-it-can-occur-in-application-explain-in-short-and-simple-language}
 
 ### What is a Deadlock?
 
@@ -267,7 +301,9 @@ Deadlocks happen in SQL when:
 - Prevention involves carefully ordering resource acquisition and avoiding circular waits.
 - Apart from SQL, deadlocks can occur in multithreading, OS resource management, file systems, distributed systems, and networking.
 
-## How to resolve deadlock in SQL?
+[Back to Index](#index)
+
+## How to resolve deadlock in SQL? {#how-to-resolve-deadlock-in-sql}
 
 To resolve deadlocks in SQL, you need to identify the causes, avoid circular dependencies, and implement best practices to prevent or handle them. Here's how you can manage and resolve deadlocks:
 
@@ -336,7 +372,9 @@ To resolve deadlocks in SQL, you need to identify the causes, avoid circular dep
 
 By following these strategies, you can either avoid deadlocks altogether or minimize their impact on your SQL transactions.
 
-## Explain the meaning of query execution plan. In short and simple language
+[Back to Index](#index)
+
+## Explain the meaning of query execution plan. In short and simple language {#explain-the-meaning-of-query-execution-plan-in-short-and-simple-language}
 
 A Query Execution Plan is a roadmap created by the database engine that shows how a query will be executed. It explains the steps the database will take to retrieve or modify data.
 
@@ -366,7 +404,9 @@ It helps:
 
 In short, it’s like a "GPS map" for your query, showing how the database gets your results.
 
-## How to use Query Execution Plan? explain in short and simple language
+[Back to Index](#index)
+
+## How to use Query Execution Plan? explain in short and simple language {#how-to-use-query-execution-plan-explain-in-short-and-simple-language}
 
 Using a Query Execution Plan helps you understand and optimize how a query runs. Here’s how to use it, step by step:
 
@@ -414,7 +454,9 @@ Helps make queries faster and more efficient.
 
 In short, the execution plan is a guide to fine-tuning your database queries for better performance.
 
-## Difference between clustered and non-clustered indexes? Which one is faster? Advantages and disadvantages of non-clustered indexes. Explain in short and simple language
+[Back to Index](#index)
+
+## Difference between clustered and non-clustered indexes? Which one is faster? Advantages and disadvantages of non-clustered indexes. Explain in short and simple language {#difference-between-clustered-and-non-clustered-indexes-which-one-is-faster-advantages-and-disadvantages-of-non-clustered-indexes-explain-in-short-and-simple-language}
 
 ### Difference Between Clustered and Non-Clustered Indexes
 
@@ -447,7 +489,9 @@ In short, the execution plan is a guide to fine-tuning your database queries for
 - When you need to optimize queries for columns that are not part of the primary key.
 - For queries involving multiple WHERE conditions or frequent searches on non-primary key columns.
 
-## What is tempdb? Explain in short and simple language
+[Back to Index](#index)
+
+## What is tempdb? Explain in short and simple language {#what-is-tempdb-explain-in-short-and-simple-language}
 
 TempDB is a special system database in SQL Server used to store temporary data. It is automatically created when the SQL Server starts and is re-created every time the server restarts.
 
@@ -471,7 +515,9 @@ Without TempDB, SQL Server cannot perform many critical operations, making it es
 
 In short, TempDB is like a scratchpad for SQL Server, helping it handle temporary and intermediate data efficiently.
 
-## What optimization techniques are there in SQL? in explain with short and simple language
+[Back to Index](#index)
+
+## What optimization techniques are there in SQL? in explain with short and simple language {#what-optimization-techniques-are-there-in-sql-in-explain-with-short-and-simple-language}
 
 ### SQL Optimization Techniques
 
@@ -582,7 +628,9 @@ Here are some common techniques to improve SQL query performance, explained simp
 
 By applying these techniques, you can improve query speed, reduce resource usage, and make your SQL applications more efficient.
 
-## How will you increase performance for your query operations? explain with short and simple language
+[Back to Index](#index)
+
+## How will you increase performance for your query operations? explain with short and simple language {#how-will-you-increase-performance-for-your-query-operations-explain-with-short-and-simple-language}
 
 To increase query performance, you can follow these techniques:
 
@@ -661,7 +709,9 @@ To increase query performance, you can follow these techniques:
 
 By applying these techniques, you can make your query operations faster and more efficient!
 
-## SP are pre-compiled means what? explain with short and simple language
+[Back to Index](#index)
+
+## SP are pre-compiled means what? explain with short and simple language {#sp-are-pre-compiled-means-what-explain-with-short-and-simple-language}
 
 When we say Stored Procedures (SPs) are pre-compiled, it means:
 
@@ -695,7 +745,9 @@ The first run compiles it, and later calls reuse the compiled plan, reducing ove
 
 **Consistency and Speed:** Pre-compilation reduces query parsing and compilation time, making stored procedures faster and more efficient than executing raw SQL each time.
 
-## How to design multi-tenant DB? Explain with short and simple language
+[Back to Index](#index)
+
+## How to design multi-tenant DB? Explain with short and simple language {#how-to-design-multi-tenant-db-explain-with-short-and-simple-language}
 
 Designing a multi-tenant database means creating a system where multiple tenants (customers or users) share the same database while keeping their data isolated. Here's how to do it:
 
@@ -778,7 +830,9 @@ Tenant2_DB
 
 In short, choose the design based on your app’s size, security needs, and scalability goals.
 
-## How to improve the performance of DB. Explain with short and simple language
+[Back to Index](#index)
+
+## How to improve the performance of DB. Explain with short and simple language {#how-to-improve-the-performance-of-db-explain-with-short-and-simple-language}
 
 Improving the performance of a database involves optimizing how data is stored, retrieved, and processed. Here are key techniques in simple terms:
 
@@ -858,7 +912,9 @@ Improving the performance of a database involves optimizing how data is stored, 
 
 By applying these strategies, you can ensure your database performs efficiently and scales effectively as your application grows.
 
-## What is the better to use EF or SQL procedure? Explain with short and simple language
+[Back to Index](#index)
+
+## What is the better to use EF or SQL procedure? Explain with short and simple language {#what-is-the-better-to-use-ef-or-sql-procedure-explain-with-short-and-simple-language}
 
 Choosing between Entity Framework (EF) and SQL Stored Procedures depends on your project needs. Here’s a simple comparison to help you decide:
 
@@ -907,7 +963,9 @@ Choosing between Entity Framework (EF) and SQL Stored Procedures depends on your
 
 This approach gives you the best of both worlds!
 
-## How we can prevent SQL injection in stored procedure?
+[Back to Index](#index)
+
+## How we can prevent SQL injection in stored procedure? {#how-we-can-prevent-sql-injection-in-stored-procedure}
 
 To prevent SQL injection in stored procedures, you need to ensure that user input is handled safely and securely. Here are the key practices explained simply:
 
@@ -1007,7 +1065,9 @@ To prevent SQL injection in stored procedures, you need to ensure that user inpu
 
 By following these practices, you can safeguard your stored procedures from SQL injection attacks effectively.
 
-## What is seek index and Scan Index? Explain in short and simple language
+[Back to Index](#index)
+
+## What is seek index and Scan Index? Explain in short and simple language {#what-is-seek-index-and-scan-index-explain-in-short-and-simple-language}
 
 ### Seek Index vs. Scan Index
 
@@ -1056,7 +1116,7 @@ When a database executes a query, it uses indexes to locate rows in a table. The
 
 To avoid unnecessary scans, create appropriate indexes on frequently queried columns.
 
-## Explain query of each seek index and scan index please
+## Explain query of each seek index and scan index please {#explain-query-of-each-seek-index-and-scan-index-please}
 
 ### Examples of Query for Index Seek and Index Scan
 
@@ -1118,3 +1178,5 @@ To improve query performance and avoid scans:
 - Create indexes on columns used in filters (WHERE clauses) or joins.
 - Use SELECT specific columns instead of SELECT *.
 - Avoid functions or expressions on indexed columns in queries (e.g., WHERE UPPER(Name) = 'JOHN' prevents index usage).
+
+[Back to Index](#index)

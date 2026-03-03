@@ -1,511 +1,583 @@
 # CSharpPractice
 
-## How foreach Loop Works
+## What is CTE, Explain why and when to use CTE in simple language
 
-how foreach loop works. explain technically. The foreach loop in C# works by leveraging the IEnumerable and IEnumerator interfaces. Here's a technical explanation of how it functions:
+### What is a CTE?
 
-### Step-by-Step Execution of foreach
+CTE (Common Table Expression) is a temporary result set in SQL that you can refer to within the same query. Think of it as a way to simplify complex queries by breaking them into smaller, readable parts. You define a CTE at the beginning of your query and use it as if it were a table.
 
-1. **Check if the Object Implements IEnumerable**  
-   The compiler checks if the collection object being iterated implements the IEnumerable or IEnumerable<T> interface. This interface provides the GetEnumerator() method.  
-   If the object implements IEnumerable, foreach can proceed.  
-   If not, a compile-time error occurs.
+### How to Write a CTE?
 
-2. **Call GetEnumerator Method**  
-   The GetEnumerator() method of IEnumerable is called, which returns an IEnumerator (or IEnumerator<T> for generic collections). The IEnumerator is responsible for actual iteration.
+Here's the syntax:
 
-3. **Use IEnumerator to Traverse**  
-   The IEnumerator interface provides these key members:  
-   - MoveNext(): Advances the enumerator to the next element in the collection. Returns true if there’s another element, otherwise false.  
-   - Current: Retrieves the current element in the collection.  
-   - Reset(): Resets the enumerator to its initial position (before the first element). However, Reset is rarely used and is optional.  
-
-   The foreach loop internally works like this:  
-   - Calls MoveNext() to check if there’s a next element.  
-   - Accesses the Current property to retrieve the element.  
-   - Repeats the process until MoveNext() returns false.
-
-4. **Dispose Enumerator**  
-   After the loop completes, the Dispose() method of the IEnumerator (if it implements IDisposable) is called to release any unmanaged resources.
-
-### Technical Representation of foreach
-
-The following foreach loop:  
-```csharp
-foreach (var item in collection)
-{
-    Console.WriteLine(item);
-}
-```  
-is equivalent to this code using IEnumerator:  
-```csharp
-var enumerator = collection.GetEnumerator();
-try
-{
-    while (enumerator.MoveNext()) // Move to the next element
-    {
-        var item = enumerator.Current; // Get the current element
-        Console.WriteLine(item);
-    }
-}
-finally
-{
-    // Dispose enumerator if necessary
-    if (enumerator is IDisposable disposable)
-    {
-        disposable.Dispose();
-    }
-}
+```sql
+WITH CTE_Name AS (
+    SELECT column1, column2
+    FROM TableName
+    WHERE some_condition
+)
+SELECT * 
+FROM CTE_Name;
 ```
 
-### Interfaces Involved
+### Why Use CTE?
 
-- **IEnumerable Interface**: Provides the GetEnumerator() method.
-- **IEnumerator Interface**:  
-  - MoveNext(): Advances the enumerator.  
-  - Current: Retrieves the current item.  
-  - Dispose(): Cleans up resources.
+- **Improves Readability:** It makes your SQL query easier to read and understand, especially when dealing with complex logic.
+- **Reusable Result Set:** You can refer to the CTE multiple times in your query, avoiding repetitive code.
+- **Divide-and-Conquer:** Break down large queries into smaller, more manageable parts.
+- **Recursion Support:** CTEs allow recursive queries, which are useful for hierarchical data like organizational charts or family trees.
 
-### Example: Custom foreach Implementation
+### When to Use CTE?
 
-Let's create a custom collection that supports the foreach loop:  
-```csharp
-using System;
-using System.Collections;
-using System.Collections.Generic;
+- **Simplifying Nested Queries:** Use a CTE to replace subqueries, making the query more organized.
 
-class MyCollection : IEnumerable<int>
-{
-    private int[] data = { 1, 2, 3 };
+  **Example:**  
+  Instead of:
+  ```sql
+  SELECT column1
+  FROM (SELECT column1, column2 FROM TableName WHERE some_condition) AS TempTable
+  WHERE column2 = some_value;
+  ```
+  Use:
+  ```sql
+  WITH CTE_Name AS (
+      SELECT column1, column2
+      FROM TableName
+      WHERE some_condition
+  )
+  SELECT column1
+  FROM CTE_Name
+  WHERE column2 = some_value;
+  ```
 
-    public IEnumerator<int> GetEnumerator()
-    {
-        foreach (var item in data)
-        {
-            yield return item; // Return items one by one
-        }
-    }
+- **Working with Hierarchical Data:** For example, finding all employees reporting to a manager recursively.
+- **Improving Query Readability:** When you have multiple intermediate steps to calculate results.
+- **Avoiding Temporary Tables:** CTEs provide a clean alternative to using temporary tables for intermediate calculations.
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-}
+By using CTEs effectively, you can make your SQL queries more efficient and easier to maintain.
 
-class Program
-{
-    static void Main()
-    {
-        var myCollection = new MyCollection();
+## Where CTE's temporary result set resides?
 
-        // foreach uses GetEnumerator internally
-        foreach (var item in myCollection)
-        {
-            Console.WriteLine(item);
-        }
-    }
-}
-```
-
-### Key Advantages of foreach
-
-- **Simplifies Iteration**: No need to manually manage the enumerator.
-- **Safe**: Automatically handles resource cleanup with Dispose().
-- **Readable**: Cleaner and less error-prone compared to while loops with enumerators.
-
-## Explain IQueryable with Simple Example
-
-Explain me IQueryable with simple example. In which situation we can use IEnumerator?
-
-IQueryable is an interface in C# used for querying data from a remote source like a database. Unlike IEnumerable, IQueryable supports deferred execution and query translation into the query language of the underlying data source (e.g., SQL for a database).
-
-### Key Features of IQueryable:
-
-- **Deferred Execution**: The query is not executed until you access the results (e.g., with ToList(), First(), or foreach).
-- **Efficient Query Translation**: Queries are translated to the underlying data source's native language (e.g., SQL for Entity Framework).
-- **Supports LINQ**: Works well with LINQ queries for filtering, sorting, and grouping.
-
-### Simple Example of IQueryable:
-
-**Scenario: Querying a Database (Mock Example)**  
-```csharp
-using System;
-using System.Linq;
-
-class Program
-{
-    static void Main()
-    {
-        // Simulating a database using an array
-        var data = new[] 
-        { 
-            new { Id = 1, Name = "Alice", Age = 30 },
-            new { Id = 2, Name = "Bob", Age = 25 },
-            new { Id = 3, Name = "Charlie", Age = 35 }
-        };
-
-        // Convert the array to IQueryable
-        IQueryable<dynamic> queryableData = data.AsQueryable();
-
-        // Define a query (not executed yet)
-        var query = queryableData.Where(person => person.Age > 30);
-
-        // Execute the query when accessing the results
-        foreach (var person in query)
-        {
-            Console.WriteLine($"{person.Name} is {person.Age} years old.");
-        }
-    }
-}
-```
-
-**Output:**  
-Charlie is 35 years old.
+A CTE's temporary result set resides in memory and is not physically stored in the database. It exists only for the duration of the query in which it is used.
 
 ### Key Points:
 
-- The `.Where(person => person.Age > 30)` query is not executed immediately.
-- Execution happens when you start iterating with `foreach`.
+- **Scope:** The CTE result set is available only to the query that defines it. Once the query finishes executing, the CTE result set is gone.
+- **Execution Location:** The database engine processes the CTE result set in memory during query execution. It does not create a separate physical table or write data to disk.
+- **Optimization:** The query optimizer determines how to handle the CTE internally. In many cases, the CTE is "inlined" into the main query during execution, meaning it's treated as part of the larger query, not as an independent result set.
+- **Performance:** Since the CTE resides in memory, its performance is tied to the complexity of the query and the available system resources. For very large datasets, consider whether alternative approaches (like indexed temporary tables) might be more efficient.
 
-### When to Use IQueryable
+In summary, a CTE is a logical construct that resides in memory and is optimized by the query engine as part of the overall query execution plan.
 
-**Working with Databases:**  
-Use IQueryable when querying data from Entity Framework, LINQ to SQL, or other ORMs.  
-Example: Querying a database table with LINQ in Entity Framework:  
-```csharp
-using (var context = new MyDbContext())
-{
-    IQueryable<Employee> employees = context.Employees.Where(e => e.Salary > 50000);
-    var result = employees.ToList(); // Executes the query in SQL
-}
+## When we should not use CTE?
+
+While CTEs are powerful and useful in many scenarios, there are situations where their use might not be the best choice. Here are some cases when you should avoid or reconsider using CTEs:
+
+1. **Performance-Intensive Scenarios**
+
+   **Issue:** CTEs do not inherently optimize performance. For large datasets or queries that require significant computation, CTEs might lead to inefficiencies because they are not materialized (i.e., stored temporarily).
+
+   **Alternative:** Use temporary tables or indexed tables if the result set needs to be reused multiple times or if query performance is critical.
+
+2. **When Multiple Reuses Are Required**
+
+   **Issue:** CTEs are recalculated every time they are referenced in the query. If the same CTE is used multiple times in a query, the database engine processes it repeatedly, potentially slowing down the query.
+
+   **Alternative:** Use a temporary table to store the intermediate result set for reuse.
+
+3. **Large Result Sets**
+
+   **Issue:** For queries that generate a large intermediate result set, CTEs can be resource-intensive because the result resides in memory and is recalculated as needed.
+
+   **Alternative:** Use a physical table or a temporary table to store the data and improve performance.
+
+4. **When Query Optimization Is Complex**
+
+   **Issue:** CTEs are sometimes inlined into the main query by the optimizer, which can result in inefficient execution plans, especially for complex queries with multiple joins or aggregations.
+
+   **Alternative:** Use views or restructure the query for better performance.
+
+5. **Recursive Queries on Large Hierarchies**
+
+   **Issue:** Recursive CTEs can be inefficient for large hierarchies or deeply nested data, leading to high CPU and memory usage.
+
+   **Alternative:** For very large hierarchies, consider iterative solutions or database-specific features like hierarchical queries (e.g., CONNECT BY in Oracle or nested sets model).
+
+6. **For Persistent Data**
+
+   **Issue:** Since CTEs are temporary and exist only for the duration of the query, they are not suitable for storing or persisting intermediate results for later use.
+
+   **Alternative:** Use a temporary table or a physical table for data that needs to persist across multiple queries.
+
+7. **Complex Queries with Many CTEs**
+
+   **Issue:** Excessive nesting of CTEs can make the query harder to debug, read, and maintain.
+
+   **Alternative:** Break the query into smaller, manageable parts using temporary tables, views, or even multiple queries.
+
+### Summary of When Not to Use CTE:
+
+- Queries with large datasets or complex execution plans.
+- Scenarios requiring repeated usage of the same intermediate result set.
+- Tasks involving persistent or reusable data.
+- Operations that demand high performance for large hierarchies or recursive structures.
+
+By carefully evaluating the query's complexity and performance requirements, you can determine whether a CTE is the right choice or if alternative approaches like temporary tables or views are better.
+
+## What is a View?
+
+A View in SQL is like a virtual table. It doesn't store data itself but provides a way to see data from one or more tables. Think of it as a saved SQL query that you can use like a table.
+
+For example:  
+If you often write a query to find active customers, you can create a view called ActiveCustomers instead of writing the query repeatedly.
+
+```sql
+CREATE VIEW ActiveCustomers AS
+SELECT CustomerID, CustomerName, IsActive
+FROM Customers
+WHERE IsActive = 1;
 ```
 
-**Large Data Sources:**  
-Ideal for working with large datasets where filtering should happen on the server-side instead of loading all data into memory.
+Now you can use the view like this:
 
-**Deferred Execution:**  
-When you want to construct a query dynamically and execute it later.
-
-### When to Use IEnumerator
-
-**Working with Databases:**  
-
-Use IEnumerator in scenarios where you need manual control over iteration. 
-
-Examples:
-
-Custom Iteration: Define how a custom collection is traversed.
-
-Lazy Loading: Generate items one at a time (e.g., generating Fibonacci numbers).
-
-Coroutines: In game development, IEnumerator is used to pause/resume code execution.
-
-IEnumerator is not typically used for querying data. Instead, use it for iterating collections or custom workflows, while IQueryable is used for data querying.
-
-## Explain Value Type and Reference Type
-
-Explain Value type and reference type? Memory allocation for both.  
-
-### Value Type and Reference Type: Explanation
-
-1. **Value Type**  
-   Definition: Stores the actual value directly.  
-   Examples: int, float, bool, struct, enum.  
-   Memory Allocation: Stored on the stack.  
-   The stack is a small, fast memory area used for temporary storage.  
-   Behavior:  
-   - When copied, a new copy of the value is created.  
-   - Changes to one copy do not affect the other.  
-
-   Example:  
-   ```csharp
-   int a = 5;  // a stores 5
-   int b = a;  // b gets a copy of 5
-   b = 10;     // Changing b doesn't affect a
-   Console.WriteLine(a);  // Output: 5
-   ```
-
-2. **Reference Type**  
-   Definition: Stores a reference (or address) to the value, not the value itself.  
-   Examples: class, array, string, object, delegate.  
-   Memory Allocation: Stored on the heap, with the reference stored on the stack.  
-   The heap is a larger, slower memory area used for long-lived objects.  
-   Behavior:  
-   - When copied, the reference is copied, not the actual value.  
-   - Changes to one reference affect all references pointing to the same object.  
-
-   Example:  
-   ```csharp
-   int[] arr1 = { 1, 2, 3 };  // arr1 points to an array in the heap
-   int[] arr2 = arr1;         // arr2 points to the same array
-   arr2[0] = 10;              // Modifying arr2 affects arr1
-   Console.WriteLine(arr1[0]); // Output: 10
-   ```
-
-### Memory Allocation Summary
-
-| **Aspect**        | **Value Type**     | **Reference Type**              |
-| ----------------- | ------------------ | ------------------------------- |
-| **Stored On**     | Stack              | Heap (value), Stack (reference) |
-| **Copy Behavior** | Creates a new copy | Copies the reference            |
-| **Lifetime**      | Temporary          | Longer-lived                    |
-
-### Key Takeaway
-
-- Use value types for small, simple data (e.g., numbers, structs).
-- Use reference types for complex objects (e.g., arrays, classes).
-
-## Memory Allocation for int Property in a Class
-
-If we have a class with an int property, then how is memory allocated for the int property? 
-
-When a class has an int property, memory allocation depends on whether the class instance is created (reference type) and where it resides. Let’s break it down:
-
-### Memory Allocation for a Class with an int Property
-
-1. **Class Definition**  
-   Classes are reference types, meaning their objects are stored on the heap, and a reference to the object is stored on the stack.  
-   ```csharp
-   class MyClass
-   {
-       public int MyProperty { get; set; }
-   }
-   ```  
-   Here:  
-   - MyClass is a reference type.  
-   - MyProperty is a value type (int).
-
-2. **When an Instance of the Class is Created**  
-   ```csharp
-   MyClass obj = new MyClass();
-   obj.MyProperty = 42;
-   ```  
-   - **Heap**: The actual memory for the MyClass object, including its MyProperty field (value type int), is allocated on the heap.  
-   - **Stack**: A reference to the obj instance is stored on the stack.  
-
-   So:  
-   - The int property (MyProperty) is stored within the object on the heap.  
-   - The object reference (obj) is stored on the stack.
-
-### Memory Breakdown
-
-| **Aspect**            | **Location** | **Details**                                |
-| --------------------- | ------------ | ------------------------------------------ |
-| **Class Instance**    | Heap         | Contains memory for `MyProperty`.          |
-| **Property Value**    | Heap         | Stored as part of the object memory.       |
-| **Reference (`obj`)** | Stack        | Points to the memory location on the heap. |
-
-### Illustration
-
-**Stack:**  
-  obj -> Reference to the object on the heap  
-
-**Heap:**  
-  MyClass object:  
-    MyProperty = 42
-
-### Key Points
-
-- A value type inside a reference type (like int inside a class) is stored on the heap as part of the reference type object.
-- The reference to the class object is stored on the stack.
-
-## Additional Details on Memory Allocation
-
-1. **Object Layout on the Heap**  
-   When a class contains a value type property (e.g., int), the value is stored inline within the object on the heap.  
-   The exact memory layout of an object depends on factors like the runtime environment (CLR) and alignment rules. For example:  
-   ```csharp
-   class MyClass
-   {
-       public int MyProperty { get; set; }
-       public string Name { get; set; }
-   }
-   MyClass obj = new MyClass { MyProperty = 42, Name = "John" };
-   ```  
-   The MyProperty (an int) is directly stored in the memory allocated for obj on the heap.  
-   The Name (a string) is a reference type, so only a reference is stored inline within obj, and the actual string data is in a separate location on the heap.
-
-2. **Garbage Collection**  
-   Since the class instance resides on the heap, it is subject to garbage collection.  
-   The int property, being part of the object, is managed by the garbage collector as part of the object lifecycle.
-
-3. **Boxing and Unboxing**  
-   If the int property is assigned to an object or dynamic, it undergoes boxing, which allocates additional memory on the heap to store the value type.  
-   Example:  
-   ```csharp
-   object boxedValue = obj.MyProperty; // Boxing: int (value type) is wrapped in an object.
-   int unboxedValue = (int)boxedValue; // Unboxing: Extracting the value back.
-   ```  
-   Boxing adds overhead, so avoid unnecessary boxing/unboxing for better performance.
-
-4. **Thread Safety**  
-   If multiple threads access and modify the int property, memory contention issues can arise.  
-   Use locking or Interlocked methods for thread-safe access to properties in a class.  
-   Example:  
-   ```csharp
-   class MyClass
-   {
-       private int _myProperty;
-       public int MyProperty
-       {
-           get => _myProperty;
-           set => Interlocked.Exchange(ref _myProperty, value);
-       }
-   }
-   ```
-
-5. **Structs vs. Classes**  
-   If the same property were part of a struct instead of a class:  
-   The int property would be allocated on the stack when the struct is used as a local variable.  
-   No reference is involved unless the struct is boxed.  
-   Example:  
-   ```csharp
-   struct MyStruct
-   {
-       public int MyProperty { get; set; }
-   }
-   ```
-
-## What is .NET Core?
-
-.NET Core is an open-source, cross-platform framework developed by Microsoft for building modern applications. It allows developers to create web apps, APIs, microservices, and console applications using languages like C#, F#, and VB.NET. Unlike the older .NET Framework, .NET Core runs on Windows, Linux, and macOS, making it more flexible for different environments.
-
-## What is Middleware?
-
-Have you written any custom middleware? Explain in simple language.
-
-Middleware in the context of web development is a piece of software that sits between the request from a user (client) and the response that your application sends back to the client. It processes the incoming request, modifies it, or performs actions based on it before it reaches the next part of your application or before the response is sent back.
-
-In simple terms, middleware acts like a gatekeeper for your application, doing tasks like:
-
-- **Logging**: Keeping track of requests to monitor how your app is being used.
-- **Authentication**: Checking if the user is allowed to access the requested resource.
-- **Error handling**: Catching errors in the application before the response is sent to the user.
-- **Request modification**: Changing or adding things to the request, like headers or query parameters.
-
-## Custom Middleware
-
-Yes, you can write your own custom middleware. Here's an example of a custom middleware in .NET Core:
-
-```csharp
-public class CustomMiddleware
-{
-    private readonly RequestDelegate _next;
-
-    public CustomMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
-
-    public async Task InvokeAsync(HttpContext context)
-    {
-        // Add custom logic before the request reaches the controller
-        Console.WriteLine("Request received at: " + DateTime.Now);
-
-        // Call the next middleware in the pipeline
-        await _next(context);
-
-        // Add custom logic after the response is generated
-        Console.WriteLine("Response sent at: " + DateTime.Now);
-    }
-}
+```sql
+SELECT * FROM ActiveCustomers;
 ```
 
-## Using Custom Middleware
+### Where is a View Stored in the Database?
 
-To use the custom middleware in your application, you need to register it in the Startup.cs file:
+A view's definition (SQL query) is stored in the database's system catalog (also called the data dictionary), which holds metadata about the database objects.
 
-```csharp
-public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-{
-    app.UseMiddleware<CustomMiddleware>();
+A view does not store actual data. Instead, when you query a view, the database dynamically executes the query stored in the view definition to fetch the latest data from the underlying tables.
 
-    // other middlewares like routing, authorization, etc.
-}
+### Key Points:
+
+- **Virtual Table:** A view doesn't hold its own data; it pulls data from the original tables at the time of query execution.
+- **Dynamic Data:** Since views are based on underlying tables, any changes in those tables (like adding or updating rows) are automatically reflected in the view.
+- **Stored Definition:** Only the query definition of the view is stored in the database, not the result set.
+- **Materialized Views (Special Case):** In some databases, you can create a materialized view. This is different because it stores the query results physically in the database, making data retrieval faster but requiring periodic refreshes to stay updated.
+
+### Why Use Views?
+
+- **Simplify Queries:** Instead of writing complex queries repeatedly, create a view to encapsulate the logic.
+- **Security:** Restrict access to specific columns or rows by exposing only the data you want through the view.
+- **Consistency:** Provide a consistent way to access data, even if the underlying table structure changes.
+- **Reusability:** Use the same view in multiple queries or applications.
+
+### Example:
+
+**Without a View:**
+```sql
+SELECT CustomerID, CustomerName
+FROM Customers
+WHERE IsActive = 1 AND Country = 'USA';
 ```
 
-In this example, the CustomMiddleware logs the time when the request is received and when the response is sent. You can extend this middleware to include other tasks as per your requirements.
+**With a View:**
+```sql
+CREATE VIEW ActiveUSCustomers AS
+SELECT CustomerID, CustomerName
+FROM Customers
+WHERE IsActive = 1 AND Country = 'USA';
+```
 
-## Purposes for Custom Middleware
+Now you can simply do:
+```sql
+SELECT * FROM ActiveUSCustomers;
+```
 
-For what purpose we can implement custom middleware? 
+### Summary:
 
-You can implement custom middleware for various purposes in your application. Here are some common use cases:
+A view is a virtual table that shows data from one or more tables based on a saved SQL query.
 
-- **Logging**: Track when requests come in, what the user is requesting, and when responses are sent back. This helps in debugging and monitoring.
-- **Authentication and Authorization**: Check if the user is logged in and has the right permissions before allowing them to access certain resources.
-- **Error Handling**: Catch errors and send a proper response (like a custom error page) to the user instead of crashing the application.
-- **Request Modification**: Modify or add information to the incoming request, like adding headers or processing data before passing it to the next part of the application.
-- **Performance Monitoring**: Track how long a request takes to process and log performance metrics for optimization.
-- **Caching**: Serve cached responses for frequently requested resources to improve performance and reduce load.
-- **Custom Headers**: Add or modify headers in the response for security or other purposes, like CORS (Cross-Origin Resource Sharing).
+The view definition (not the data) is stored in the database system catalog.
 
-Custom middleware allows you to insert these tasks in the request-response pipeline, helping you handle cross-cutting concerns in a clean and modular way.
+Use views for simplifying queries, improving security, ensuring consistency, and reusing complex logic.
 
-## Types of Files in a .NET Core Project
+## SQL Table Vs SQL Views difference? explain in short and simple language
 
-Explain me all types of files of .net core project. Here’s a simplified explanation of the common files you’ll find in a .NET Core project:
+Here’s a simple comparison of SQL Tables vs SQL Views:
 
-1. **Program.cs**  
-   Purpose: Entry point of the application. It’s where the application starts.  
-   What it does: Configures services and the request pipeline. In newer .NET Core versions (6 and above), it's used to set up dependency injection and middleware.
+| **Aspect**       | **SQL Table**                                    | **SQL View**                                                                                                        |
+| ---------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| **Definition**   | A table stores actual data in rows and columns.  | A view is a virtual table based on a SQL query; it does not store data.                                             |
+| **Storage**      | Data is physically stored in the database.       | Only the query definition is stored; no data is stored.                                                             |
+| **Purpose**      | Used to store and manage data permanently.       | Used to simplify queries and provide a custom way to view data.                                                     |
+| **Data Updates** | You can directly insert, update, or delete data. | Data in the view reflects changes in the underlying tables. Updates are limited and depend on the view's structure. |
+| **Performance**  | Accessing data is usually faster as it’s stored. | Query execution can be slower since the view pulls data dynamically.                                                |
+| **Security**     | Permissions control access to the entire table.  | Can restrict access by exposing only specific columns or rows.                                                      |
+| **Dependency**   | Independent; tables exist on their own.          | Depends on one or more tables for data.                                                                             |
+| **Example Use**  | Storing employee details permanently.            | Showing only active employees without writing a complex query every time.                                           |
 
-2. **Startup.cs** (For versions prior to .NET 6)  
-   Purpose: Configures services and the application's HTTP request pipeline.  
-   What it does: Sets up services for Dependency Injection, middleware, routing, etc. This file was replaced by Program.cs in .NET 6.
+### Key Takeaway:
 
-3. **appsettings.json**  
-   Purpose: Holds configuration settings for the application.  
-   What it does: Used to store key-value pairs for things like database connection strings, API keys, or application settings.
+Use tables to store data.
 
-4. **appsettings.Development.json** (or other environment-specific files)  
-   Purpose: Stores environment-specific settings for different configurations (like Development, Production).  
-   What it does: Used alongside appsettings.json to provide specific settings for the environment you're working in.
+Use views to simplify complex queries, ensure data consistency, or improve security by restricting access.
 
-5. **launchSettings.json**  
-   Purpose: Defines settings for launching and debugging the application.  
-   What it does: Specifies things like environment variables, profiles (e.g., IIS Express or Kestrel), and the port on which the application runs during development.
+## What is deadlock? how it occurs? Apart from sql deadlock what are the other places it can occur in application. Explain in short and simple language
 
-6. **.csproj** (C# Project file)  
-   Purpose: Contains project metadata and references.  
-   What it does: Defines dependencies, target framework (like .NET 6, .NET Core), and build settings for the project. It also specifies files to be included in the build process.
+### What is a Deadlock?
 
-7. **Properties/launchSettings.json** (same as above, sometimes exists under the Properties folder)  
-   Purpose: Defines settings for how the app is launched and debugged, like specific environments or URLs.
+A deadlock occurs when two or more processes are stuck waiting for each other to release resources, and none can proceed. It's like two people blocking a narrow doorway, each waiting for the other to move first, causing a standoff.
 
-8. **Controllers/** Folder  
-   Purpose: Contains controller classes for handling HTTP requests.  
-   What it does: In an MVC or Web API project, controllers define actions that handle incoming HTTP requests and return responses.
+### How Does a Deadlock Occur in SQL?
 
-9. **Models/** Folder  
-   Purpose: Contains data models or entities.  
-   What it does: Models represent data that the application works with (e.g., database entities or data transfer objects).
+Deadlocks happen in SQL when:
 
-10. **Views/** Folder (For MVC applications)  
-    Purpose: Contains HTML templates or Razor views for rendering UI.  
-    What it does: Stores .cshtml files that are rendered to the user as part of the MVC pattern.
+- Two or more transactions are trying to access resources (e.g., tables or rows) but in a conflicting order.
+- Each transaction holds a lock on a resource and waits for another resource that is locked by the other transaction.
 
-11. **wwwroot/** Folder  
-    Purpose: Stores static files such as images, JavaScript, CSS, etc.  
-    What it does: Anything in this folder is publicly accessible. The browser can request static files like style.css, app.js, and images.
+**Example:**
 
-12. **Migrations/** Folder (If using Entity Framework)  
-    Purpose: Holds migration files that help with updating the database schema.  
-    What it does: Contains classes that represent changes to the database schema, used by Entity Framework to apply changes to the database.
+- Transaction A locks Table 1 and wants to update Table 2.
+- Transaction B locks Table 2 and wants to update Table 1.
+- Both are waiting for each other, causing a deadlock.
 
-13. **bin/** and **obj/** Folders  
-    Purpose: Temporary files generated during the build process.  
-    What they do: These folders store compiled binaries and intermediate files. You don’t need to worry about them as they are created during build and deployment.
+### Other Places Where Deadlocks Can Occur:
 
-14. **Dockerfile**  
-    Purpose: Defines how to build a Docker image for your application.  
-    What it does: Contains instructions to package your application inside a Docker container.
+- **Multithreading in Applications:**
 
-15. **global.json**  
-    Purpose: Defines the version of the SDK to use in the project.  
-    What it does: Ensures consistency by locking the SDK version, preventing issues with different .NET SDK versions on different developer machines.
+  **Scenario:** Two threads each hold a lock on an object and try to acquire a lock on another object held by the other thread.
 
-16. **Dependencies** Folder (or packages/)  
-    Purpose: Contains external libraries and NuGet packages the project depends on.  
-    What it does: You won’t normally manually interact with this folder, as it's managed by the NuGet package manager.
+  **Example:**
 
+  - Thread 1 locks Resource A and waits for Resource B.
+  - Thread 2 locks Resource B and waits for Resource A.
+
+- **Operating Systems:**
+
+  Deadlocks can occur when multiple processes compete for limited resources like CPU, memory, or I/O devices.
+
+- **File Systems:**
+
+  Deadlocks happen when processes try to access files locked by others in a conflicting order.
+
+- **Distributed Systems:**
+
+  Deadlocks can occur across servers when processes wait for responses from each other in a circular dependency.
+
+- **Networking:**
+
+  Deadlocks can happen when two systems wait for each other's acknowledgment in communication protocols.
+
+### Key Takeaways:
+
+- Deadlocks occur when processes or threads are stuck waiting for resources in a circular dependency.
+- Prevention involves carefully ordering resource acquisition and avoiding circular waits.
+- Apart from SQL, deadlocks can occur in multithreading, OS resource management, file systems, distributed systems, and networking.
+
+## How to resolve deadlock in SQL?
+
+To resolve deadlocks in SQL, you need to identify the causes, avoid circular dependencies, and implement best practices to prevent or handle them. Here's how you can manage and resolve deadlocks:
+
+### 1. Identify Deadlock Causes
+
+- **Analyze Deadlock Graph:** SQL Server and other databases often provide tools like SQL Server Profiler or Extended Events to capture deadlock graphs. These graphs show which queries and resources are involved in the deadlock, helping you understand what went wrong.
+- **Deadlock Trace:** SQL Server can be configured to generate deadlock trace files (.xdl) which provide detailed information about the deadlock occurrence.
+
+### 2. Prevent Deadlocks
+
+- **Consistent Locking Order:** Always access resources (tables, rows, etc.) in a consistent order across all transactions. This prevents circular wait conditions. For example, always lock Table 1 before Table 2, not the other way around.
+
+  **Example:**
+
+  - Transaction A locks Table 1 → locks Table 2.
+  - Transaction B locks Table 1 → locks Table 2 (same order).
+
+- **Short Transactions:** Keep transactions as short as possible. The longer a transaction holds a lock, the higher the chance of a deadlock.
+- **Reduce Locking Granularity:** Avoid unnecessary locking of entire tables or large ranges of data. Instead, lock only the rows you need (e.g., use WITH (ROWLOCK) instead of WITH (TABLOCK)).
+- **Use Row-Level Locking:** If you can, use row-level locks (ROWLOCK) to prevent locking entire tables, which reduces contention.
+- **Optimize Indexes:** Well-indexed tables are less likely to result in long-running transactions, reducing the chance of deadlocks.
+
+### 3. Handle Deadlocks Dynamically
+
+- **Use SET DEADLOCK_PRIORITY:** In SQL Server, you can specify which transaction should be rolled back in case of a deadlock by setting a deadlock priority. Transactions with lower priority will be automatically rolled back to break the deadlock.
+
+  **Example:** `SET DEADLOCK_PRIORITY LOW;`
+
+- **Retry Logic:** Implement automatic retry logic in your application for deadlock errors. If a transaction is rolled back due to a deadlock, retry the operation after a short delay. This can be done using a try-catch block or equivalent error-handling mechanism.
+
+  **Example in T-SQL:**
+  ```sql
+  BEGIN TRY
+      -- Your transaction code here
+  END TRY
+  BEGIN CATCH
+      IF ERROR_NUMBER() = 1205 -- Deadlock error
+      BEGIN
+          -- Retry logic, e.g., wait and retry
+      END
+  END CATCH
+  ```
+
+### 4. Optimize Transaction Design
+
+- **Batch Updates:** If you're performing large data manipulations (e.g., updating many rows), break them into smaller batches. This reduces lock contention.
+- **Lock Timeout:** Use lock timeouts to prevent waiting indefinitely for a lock. In SQL Server, you can set LOCK_TIMEOUT to avoid waiting for a lock forever. `SET LOCK_TIMEOUT 1000; -- Time in milliseconds`
+
+### 5. Use Snapshot Isolation (Optional)
+
+- **Snapshot Isolation:** This isolation level allows transactions to access the database as it was at the start of the transaction, without acquiring locks on the data. This can reduce deadlock situations, especially in read-heavy systems. `ALTER DATABASE MyDB SET ALLOW_SNAPSHOT_ISOLATION ON;`
+
+### 6. Database-Specific Tools
+
+- **SQL Server:** SQL Server has a deadlock graph and trace events to capture detailed information about deadlocks.
+- **Other Databases:** Different databases have their own tools for detecting and handling deadlocks. For instance, MySQL provides the SHOW ENGINE INNODB STATUS command to view deadlock information.
+
+### Summary of Strategies:
+
+- Use consistent locking order.
+- Keep transactions short and lock only necessary resources.
+- Optimize indexing to reduce the time spent waiting for locks.
+- Use SET DEADLOCK_PRIORITY to control which transaction gets rolled back.
+- Implement retry logic in your application for deadlock errors.
+- Consider using snapshot isolation for reducing lock contention.
+
+By following these strategies, you can either avoid deadlocks altogether or minimize their impact on your SQL transactions.
+
+## Explain the meaning of query execution plan. In short and simple language
+
+A Query Execution Plan is a roadmap created by the database engine that shows how a query will be executed. It explains the steps the database will take to retrieve or modify data.
+
+### Key Points:
+
+- **Purpose:** It helps optimize queries by showing how resources like tables, indexes, and joins are used.
+- **Contains:** Details like the order of operations, which indexes are used, and how data is filtered or sorted.
+- **View Execution Plan:** You can see it in most databases using tools like:
+  - **SQL Server:** Use EXPLAIN or "Display Estimated Execution Plan."
+  - **MySQL:** Use EXPLAIN.
+
+### Example:
+
+If you run a query: `SELECT * FROM Employees WHERE Department = 'IT';`
+
+The execution plan will show:
+
+- Whether it scans the whole table or uses an index.
+- The sequence of steps it takes to find the data.
+
+### Why It’s Important:
+
+It helps:
+
+- Identify bottlenecks in queries.
+- Improve performance by suggesting optimizations (e.g., adding indexes).
+
+In short, it’s like a "GPS map" for your query, showing how the database gets your results.
+
+## How to use Query Execution Plan? explain in short and simple language
+
+Using a Query Execution Plan helps you understand and optimize how a query runs. Here’s how to use it, step by step:
+
+### 1. Generate the Execution Plan
+
+**SQL Server:**
+
+- Use the "Estimated Execution Plan" option in tools like SQL Server Management Studio (SSMS).
+- Or run: `SET SHOWPLAN_TEXT ON; -- Text-based plan`
+- `SET SHOWPLAN_XML ON; -- XML-based plan`
+
+### 2. Read the Plan
+
+The execution plan shows:
+
+- **Steps:** What operations (e.g., table scans, joins) are performed.
+- **Order:** The sequence of these steps.
+- **Indexes:** Whether indexes are used or not.
+- **Cost:** An estimate of how much time or resources each step takes.
+
+### 3. Look for Optimization Opportunities
+
+- **Full Table Scan:** If the query scans the whole table, consider adding an index to improve performance.
+- **Missing Indexes:** Check if the execution plan suggests missing indexes.
+- **Costly Joins:** Use better indexing or rewrite the query to optimize joins.
+- **Sorting or Filtering:** Ensure unnecessary sorting or filtering is avoided by writing efficient WHERE and ORDER BY clauses.
+
+### 4. Implement Optimizations
+
+Based on what you learn from the plan:
+
+- Add or update indexes.
+- Rewrite queries to be more efficient.
+- Avoid unnecessary columns or operations.
+
+### 5. Test Again
+
+After making changes, generate the execution plan again to see if the query is now faster and uses fewer resources.
+
+### Why Use It?
+
+It identifies bottlenecks and shows where time and resources are being spent.
+
+Helps make queries faster and more efficient.
+
+In short, the execution plan is a guide to fine-tuning your database queries for better performance.
+
+## Difference between clustered and non-clustered indexes? Which one is faster? Advantages and disadvantages of non-clustered indexes. Explain in short and simple language
+
+### Difference Between Clustered and Non-Clustered Indexes
+
+| **Aspect**        | **Clustered Index**                                                                         | **Non-Clustered Index**                                                     |
+| ----------------- | ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| **Data Storage**  | Physically sorts and stores rows in the table based on the indexed column(s).               | Stores pointers to the actual data rows without rearranging them.           |
+| **One per Table** | Only one clustered index allowed per table (because it defines the table's physical order). | Multiple non-clustered indexes can exist on a table.                        |
+| **Size**          | Generally smaller, as it’s part of the main table.                                          | Requires additional storage for pointers and data structure.                |
+| **Performance**   | Faster for retrieving sorted and range-based queries.                                       | Slightly slower for lookups, as it needs to follow pointers to access data. |
+
+### Which One is Faster?
+
+- **Clustered Index** is faster for retrieving data directly because the data is stored in the same order as the index.
+- **Non-Clustered Index** is slower in comparison, especially for large datasets, as it requires an extra step to fetch the actual data (lookup).
+
+### Advantages of Non-Clustered Indexes
+
+- **Supports Multiple Indexes:** You can create several non-clustered indexes on a table, each tailored for different queries.
+- **Improves Read Performance:** Speeds up SELECT queries for specific columns without affecting the physical order of data.
+- **Useful for Covering Indexes:** Can include non-key columns, making the index self-sufficient for some queries.
+
+### Disadvantages of Non-Clustered Indexes
+
+- **Slower than Clustered Index:** Requires an extra step (lookup) to find the actual data.
+- **Takes More Space:** Needs additional storage for pointers and the index structure.
+- **Performance Hit on INSERT/UPDATE/DELETE:** Maintaining non-clustered indexes adds overhead to these operations.
+
+### When to Use Non-Clustered Indexes
+
+- When you need to optimize queries for columns that are not part of the primary key.
+- For queries involving multiple WHERE conditions or frequent searches on non-primary key columns.
+
+## What is tempdb? Explain in short and simple language
+
+TempDB is a special system database in SQL Server used to store temporary data. It is automatically created when the SQL Server starts and is re-created every time the server restarts.
+
+### Uses of TempDB
+
+- **Temporary Tables:** Stores data for temporary tables (#TempTable or ##GlobalTempTable).
+- **Work Tables:** Holds intermediate results created by SQL Server during query execution (e.g., sorting or joining).
+- **Version Store:** Stores row versions for features like snapshot isolation or online index rebuilding.
+- **Table Variables:** Sometimes uses TempDB for table variable storage.
+- **Sorting/Hashing:** Used for operations requiring temporary sorting or hashing (e.g., ORDER BY, GROUP BY).
+
+### Characteristics
+
+- **Shared Across All Users:** TempDB is used by all users and sessions in SQL Server.
+- **Non-Persistent:** Data in TempDB is not saved permanently. It is wiped clean when the SQL Server restarts.
+- **Performance-Optimized:** Designed for high-speed temporary data storage.
+
+### Why It’s Important
+
+Without TempDB, SQL Server cannot perform many critical operations, making it essential for smooth database functioning.
+
+In short, TempDB is like a scratchpad for SQL Server, helping it handle temporary and intermediate data efficiently.
+
+## What optimization techniques are there in SQL? in explain with short and simple language
+
+### SQL Optimization Techniques
+
+Here are some common techniques to improve SQL query performance, explained simply:
+
+1. **Use Indexes**
+
+   What it does: Speeds up data retrieval by creating a "shortcut" to rows.
+
+   Example: Add an index to frequently queried columns in WHERE, JOIN, or ORDER BY.
+
+   Tip: Use clustered indexes for primary keys and non-clustered indexes for other important columns.
+
+2. **Avoid SELECT ***
+
+   Why: Fetching all columns wastes resources and slows performance.
+
+   What to do: Fetch only the required columns.
+
+   Example: Replace: `SELECT * FROM Employees;` with: `SELECT Name, Department FROM Employees;`
+
+3. **Use Joins Instead of Subqueries**
+
+   Why: Joins are generally faster than subqueries because they optimize execution plans better.
+
+   Example: Replace:
+   ```sql
+   SELECT Name FROM Employees WHERE DepartmentID IN (SELECT ID FROM Departments WHERE Name = 'IT');
+   ```
+   with:
+   ```sql
+   SELECT e.Name 
+   FROM Employees e 
+   JOIN Departments d ON e.DepartmentID = d.ID 
+   WHERE d.Name = 'IT';
+   ```
+
+4. **Add WHERE Clauses**
+
+   Why: Limits the rows processed, reducing workload.
+
+   Example: Instead of querying the entire table: `SELECT * FROM Employees;` Add conditions: `SELECT * FROM Employees WHERE Department = 'IT';`
+
+5. **Use Proper Data Types**
+
+   Why: Avoids extra storage and speeds up operations.
+
+   Example: Use INT for IDs instead of VARCHAR.
+
+6. **Optimize Index Usage**
+
+   Why: Index scans are faster than table scans.
+
+   How: Ensure the query uses the correct index. Check execution plans to verify.
+
+7. **Avoid Functions on Columns in WHERE**
+
+   Why: Functions prevent the database from using indexes.
+
+   Example: Replace: `WHERE YEAR(CreatedDate) = 2023;` with: `WHERE CreatedDate BETWEEN '2023-01-01' AND '2023-12-31';`
+
+8. **Use LIMIT/OFFSET or TOP**
+
+   Why: Fetching fewer rows improves performance.
+
+   Example: `SELECT * FROM Employees LIMIT 10;`
+
+9. **Use UNION ALL Instead of UNION**
+
+   Why: UNION ALL skips the duplicate-checking step of UNION, making it faster.
+
+   Example: Replace:
+   ```sql
+   SELECT Name FROM Employees 
+   UNION 
+   SELECT Name FROM Contractors;
+   ```
+   with:
+   ```sql
+   SELECT Name FROM Employees 
+   UNION ALL 
+   SELECT Name FROM Contractors;
+   ```
+
+10. **Use Temporary Tables or Common Table Expressions (CTEs)**
+
+    Why: Helps break down complex queries into manageable and reusable steps.
+
+11. **Analyze Execution Plans**
+
+    Why: Identify slow parts of your query (e.g., table scans, missing indexes).
+
+12. **Avoid Overusing Cursors**
+
+    Why: Cursors are slow for large datasets. Replace them with set-based operations like UPDATE or SELECT.
+
+13. **Optimize Joins**
+
+    Why: Proper indexing and reducing unnecessary columns in joins can significantly improve speed.
+
+14. **Partition Large Tables**
+
+    Why: Dividing data into smaller partitions improves query performance.
+
+15. **Update Statistics**
+
+    Why: Keeps the query optimizer informed about data distribution.
+
+By applying these techniques, you can improve query speed, reduce resource usage, and make your SQL applications more efficient.

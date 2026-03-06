@@ -23,6 +23,9 @@
 - [How we can prevent SQL injection in stored procedure?](#how-we-can-prevent-sql-injection-in-stored-procedure)
 - [What is seek index and Scan Index? Explain in short and simple language](#what-is-seek-index-and-scan-index-explain-in-short-and-simple-language)
 - [Explain query of each seek index and scan index please](#explain-query-of-each-seek-index-and-scan-index-please)
+- [Interview Question: SQL Database schema design what should we take care?](#interview-question-sql-database-schema-design-what-should-we-take-care)
+- [Interview Question: How you can troubleshoot SQL Performance?](#interview-question-how-you-can-troubleshoot-sql-performance)
+- [Interview Question: How to prevent SQL injection?](#interview-question-how-to-prevent-sql-injection)
 
 ## What is CTE, Explain why and when to use CTE in simple language
 
@@ -1180,3 +1183,278 @@ To improve query performance and avoid scans:
 - Avoid functions or expressions on indexed columns in queries (e.g., WHERE UPPER(Name) = 'JOHN' prevents index usage).
 
 [Back to Index](#index)
+
+## Interview Question: SQL Database schema design what should we take care? 
+
+Designing a SQL database schema is a critical step in ensuring efficient data management, retrieval, and integrity. Here are key considerations to take into account when designing a SQL database schema:
+
+### 1. **Normalization**
+
+* **Definition**: Organizing the data to minimize redundancy and dependency by dividing the database into tables and defining relationships.
+* **Consideration**: Aim for at least the third normal form (3NF), which helps eliminate duplicate data and ensures data integrity.
+
+### 2. **Data Types**
+
+* **Definition**: Choosing the appropriate data types for each column.
+* **Consideration**: Select data types that accurately represent the data while minimizing storage space. For example, use `VARCHAR` for variable-length strings and `INT` for integers.
+
+### 3. **Primary Keys**
+
+* **Definition**: Unique identifiers for records in a table.
+* **Consideration**: Ensure each table has a primary key that uniquely identifies each row. Use surrogate keys (like auto-incrementing integers) or natural keys (meaningful business keys) as appropriate.
+
+### 4. **Foreign Keys**
+
+* **Definition**: Constraints that establish relationships between tables.
+* **Consideration**: Use foreign keys to enforce referential integrity between tables, ensuring that relationships are valid and preventing orphaned records.
+
+### 5. **Indexes**
+
+* **Definition**: Structures that improve query performance by allowing faster data retrieval.
+* **Consideration**: Create indexes on columns that are frequently used in `WHERE`, `JOIN`, or `ORDER BY` clauses. However, avoid over-indexing, as it can impact write performance.
+
+### 6. **Naming Conventions**
+
+* **Definition**: A consistent approach to naming tables, columns, indexes, and other database objects.
+* **Consideration**: Use meaningful and descriptive names, and establish a naming convention (e.g., using singular nouns for table names) to improve clarity and maintainability.
+
+### 7. **Relationships**
+
+* **Definition**: Connections between tables, such as one-to-many, many-to-many, or one-to-one relationships.
+* **Consideration**: Clearly define relationships between entities and ensure that they are implemented through foreign keys and junction tables where necessary.
+
+### 8. **Scalability**
+
+* **Definition**: The ability to grow and accommodate increasing amounts of data and users.
+* **Consideration**: Design your schema to allow for future expansion, such as adding new tables or modifying existing ones without major disruptions.
+
+### 9. **Constraints and Rules**
+
+* **Definition**: Rules that enforce data integrity and business logic.
+* **Consideration**: Implement constraints such as `NOT NULL`, `UNIQUE`, and `CHECK` constraints to ensure data validity and adherence to business rules.
+
+### 10. **Documentation**
+
+* **Definition**: Detailed descriptions of the database schema and its components.
+* **Consideration**: Maintain documentation that explains the purpose of each table, column, relationship, and constraint, making it easier for developers and database administrators to understand the schema.
+
+### 11. **Performance Optimization**
+
+* **Definition**: Techniques to improve query performance.
+* **Consideration**: Analyze query performance, use query optimization techniques, and consider partitioning large tables if necessary to enhance performance.
+
+### 12. **Security**
+
+* **Definition**: Measures to protect data from unauthorized access and breaches.
+* **Consideration**: Implement user roles and permissions, and ensure sensitive data is encrypted or properly masked.
+
+### Summary
+
+When designing a SQL database schema, prioritize normalization, appropriate data types, primary and foreign keys, indexing strategies, naming conventions, and clear relationships. Additionally, consider scalability, data integrity constraints, performance optimization, and security measures to create a robust and efficient database schema that meets the needs of your application.
+Designing a SQL database schema is a critical step in ensuring efficient data management, retrieval, and integrity. Here are key considerations to take into account when designing a SQL database schema:
+
+### 1. **Normalization**
+
+* **Definition**: Organizing the data to minimize redundancy and dependency by dividing the database into tables and defining relationships.
+* **Consideration**: Aim for at least the third normal form (3NF), which helps eliminate duplicate data and ensures data integrity.
+
+### 2. **Data Types**
+
+* **Definition**: Choosing the appropriate data types for each column.
+* **Consideration**: Select data types that accurately represent the data while minimizing storage space. For example, use `VARCHAR` for variable-length strings and `INT` for integers.
+
+### 3. **Primary Keys**
+
+* **Definition**: Unique identifiers for records in a table.
+* **Consideration**: Ensure each table has a primary key that uniquely identifies each row. Use surrogate keys (like auto-incrementing integers) or natural keys (meaningful business keys) as appropriate.
+
+### 4. **Foreign Keys**
+
+* **Definition**: Constraints that establish relationships between tables.
+* **Consideration**: Use foreign keys to enforce referential integrity between tables, ensuring that relationships are valid and preventing orphaned records.
+
+### 5. **Indexes**
+
+* **Definition**: Structures that improve query performance by allowing faster data retrieval.
+* **Consideration**: Create indexes on columns that are frequently used in `WHERE`, `JOIN`, or `ORDER BY` clauses. However, avoid over-indexing, as it can impact write performance.
+
+### 6. **Naming Conventions**
+
+* **Definition**: A consistent approach to naming tables, columns, indexes, and other database objects.
+* **Consideration**: Use meaningful and descriptive names, and establish a naming convention (e.g., using singular nouns for table names) to improve clarity and maintainability.
+
+### 7. **Relationships**
+
+* **Definition**: Connections between tables, such as one-to-many, many-to-many, or one-to-one relationships.
+* **Consideration**: Clearly define relationships between entities and ensure that they are implemented through foreign keys and junction tables where necessary.
+
+### 8. **Scalability**
+
+* **Definition**: The ability to grow and accommodate increasing amounts of data and users.
+* **Consideration**: Design your schema to allow for future expansion, such as adding new tables or modifying existing ones without major disruptions.
+
+### 9. **Constraints and Rules**
+
+* **Definition**: Rules that enforce data integrity and business logic.
+* **Consideration**: Implement constraints such as `NOT NULL`, `UNIQUE`, and `CHECK` constraints to ensure data validity and adherence to business rules.
+
+### 10. **Documentation**
+
+* **Definition**: Detailed descriptions of the database schema and its components.
+* **Consideration**: Maintain documentation that explains the purpose of each table, column, relationship, and constraint, making it easier for developers and database administrators to understand the schema.
+
+### 11. **Performance Optimization**
+
+* **Definition**: Techniques to improve query performance.
+* **Consideration**: Analyze query performance, use query optimization techniques, and consider partitioning large tables if necessary to enhance performance.
+
+### 12. **Security**
+
+* **Definition**: Measures to protect data from unauthorized access and breaches.
+* **Consideration**: Implement user roles and permissions, and ensure sensitive data is encrypted or properly masked.
+
+### Summary
+
+When designing a SQL database schema, prioritize normalization, appropriate data types, primary and foreign keys, indexing strategies, naming conventions, and clear relationships. Additionally, consider scalability, data integrity constraints, performance optimization, and security measures to create a robust and efficient database schema that meets the needs of your application.
+Interview Question: How you can troubleshoot SQL Performance? Troubleshooting SQL performance issues can be complex and involves multiple steps. Here's a structured approach to identify and resolve SQL performance problems:
+
+### 1. **Identify Performance Issues**
+
+* **Monitor Performance Metrics**: Use monitoring tools (like SQL Server Profiler, Performance Monitor, or Azure SQL Database Analytics) to track metrics such as CPU usage, memory usage, disk I/O, and query execution times.
+* **User Feedback**: Gather feedback from users regarding slow queries or application performance issues.
+
+### 2. **Analyze Slow Queries**
+
+* **Execution Plans**: Analyze the execution plans of slow-running queries to understand how SQL Server processes them. Look for issues such as table scans, missing indexes, or inefficient joins.
+* **Query Performance**: Use `SQL Server Management Studio (SSMS)` to check the `Query Store` or run `sp_Blitz` to identify problematic queries and their execution statistics.
+
+### 3. **Check Indexing**
+
+* **Missing Indexes**: Identify and create missing indexes that could improve query performance. Use the execution plan to see suggestions for missing indexes.
+* **Fragmentation**: Check for index fragmentation and consider rebuilding or reorganizing fragmented indexes to improve performance.
+* **Over-indexing**: Remove unused or redundant indexes that can slow down `INSERT`, `UPDATE`, or `DELETE` operations.
+
+### 4. **Review Database Schema**
+
+* **Normalization**: Ensure that the database schema is properly normalized to reduce redundancy and improve data integrity.
+* **Data Types**: Check if the correct data types are used for columns, which can reduce storage and improve performance.
+
+### 5. **Optimize Queries**
+
+* **Rewrite Queries**: Review and rewrite inefficient queries, focusing on simplifying complex joins, using appropriate `WHERE` clauses, and avoiding SELECT *.
+* **Set-Based Operations**: Use set-based operations instead of cursors or loops whenever possible, as they are generally more efficient.
+
+### 6. **Check Server Configuration**
+
+* **Resource Allocation**: Ensure that the SQL Server instance has sufficient resources (CPU, memory, disk space) allocated.
+* **Max Degree of Parallelism (MAXDOP)**: Adjust the MAXDOP setting to optimize query execution on multi-core processors.
+
+### 7. **Analyze Locks and Blocking**
+
+* **Lock Monitoring**: Use tools like `sp_who2`, `sys.dm_exec_requests`, or `sys.dm_tran_locks` to identify locks and blocking issues.
+* **Deadlocks**: Investigate deadlocks using SQL Server's deadlock graph or Extended Events to identify and resolve them.
+
+### 8. **Review Statistics**
+
+* **Update Statistics**: Ensure that table statistics are up-to-date. Outdated statistics can lead to poor query performance due to inefficient query plans.
+* **Auto-update Statistics**: Check if the auto-update statistics feature is enabled and functioning correctly.
+
+### 9. **Consider Caching and Connection Pooling**
+
+* **Caching**: Use caching strategies (e.g., SQL Server cache, application-level caching) to reduce the frequency of database calls for frequently accessed data.
+* **Connection Pooling**: Ensure that connection pooling is configured correctly to reduce the overhead of establishing new connections.
+
+### 10. **Load Testing and Profiling**
+
+* **Simulate Load**: Use load testing tools to simulate user traffic and identify performance bottlenecks under load.
+* **Profile the Application**: Profile the application to ensure that the SQL calls made by the application are optimized.
+
+### 11. **Evaluate External Factors**
+
+* **Network Latency**: Check for network issues that may affect communication between the application and the database.
+* **Disk Performance**: Monitor disk performance to identify potential bottlenecks that may slow down read/write operations.
+
+### Summary
+
+To troubleshoot SQL performance issues effectively, start by identifying performance problems, analyzing slow queries, and checking indexing and database schema. Optimize queries and server configurations, analyze locks and statistics, and consider caching and load testing. By systematically addressing these areas, you can improve SQL performance and ensure a smoother user experience.
+
+## Interview Question: How to prevent SQL injection? 
+
+Preventing SQL injection is crucial for maintaining the security of your database applications. Here are some effective strategies to prevent SQL injection attacks:
+
+### 1. **Use Parameterized Queries**
+
+* **Definition**: Use parameterized queries or prepared statements instead of dynamically constructing SQL queries.
+* **Example** (C# with ADO.NET):
+
+  ```csharp
+  using (SqlConnection connection = new SqlConnection(connectionString))
+  {
+      SqlCommand command = new SqlCommand("SELECT * FROM Users WHERE Username = @username", connection);
+      command.Parameters.AddWithValue("@username", userInput);
+      // Execute the command...
+  }
+  ```
+
+### 2. **Use Stored Procedures**
+
+* **Definition**: Implement stored procedures that separate SQL code from user input. Make sure that the procedures do not construct dynamic SQL using user input.
+* **Example** (SQL Server):
+
+  ```sql
+  CREATE PROCEDURE GetUserByUsername
+      @Username NVARCHAR(50)
+  AS
+  BEGIN
+      SELECT * FROM Users WHERE Username = @Username;
+  END
+  ```
+
+### 3. **Input Validation and Sanitization**
+
+* **Definition**: Validate and sanitize all user inputs to ensure they conform to expected formats and types.
+* **Consideration**: Reject any input that does not match the expected criteria (e.g., length, type, format).
+
+### 4. **Use ORM Frameworks**
+
+* **Definition**: Utilize Object-Relational Mapping (ORM) frameworks (like Entity Framework, Dapper) that automatically use parameterized queries under the hood.
+* **Example** (C# with Entity Framework):
+
+  ```csharp
+  var user = context.Users.FirstOrDefault(u => u.Username == userInput);
+  ```
+
+### 5. **Limit Database Permissions**
+
+* **Definition**: Use the principle of least privilege. Grant only the necessary permissions to the database accounts used by the application.
+* **Consideration**: Avoid using admin or highly privileged accounts for application database access.
+
+### 6. **Use Web Application Firewalls (WAF)**
+
+* **Definition**: Implement a web application firewall to filter and monitor HTTP traffic to and from your web application.
+* **Consideration**: WAFs can help detect and block SQL injection attempts.
+
+### 7. **Regularly Update and Patch**
+
+* **Definition**: Keep your database and application frameworks up to date with the latest security patches.
+* **Consideration**: Regularly review and update libraries and dependencies to mitigate vulnerabilities.
+
+### 8. **Error Handling and Reporting**
+
+* **Definition**: Avoid exposing detailed error messages to users, as they can provide attackers with information about the database structure.
+* **Consideration**: Use generic error messages for end-users while logging detailed errors securely for internal review.
+
+### 9. **Use Application Security Tools**
+
+* **Definition**: Leverage security tools to scan your application for vulnerabilities, including SQL injection risks.
+* **Example**: Tools like SQLMap, OWASP ZAP, or commercial security solutions can help identify vulnerabilities.
+
+### 10. **Educate and Train Developers**
+
+* **Definition**: Provide training and resources for developers on secure coding practices and the risks of SQL injection.
+* **Consideration**: Regularly update the team on new threats and best practices in application security.
+
+### Summary
+
+To prevent SQL injection, use parameterized queries and stored procedures, validate and sanitize user inputs, and utilize ORM frameworks. Implement access controls, WAFs, and regular updates. Pay attention to error handling and educate your development team on secure coding practices. By adopting these measures, you can significantly reduce the risk of SQL injection attacks.
+

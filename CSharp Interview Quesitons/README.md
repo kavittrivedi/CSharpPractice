@@ -920,6 +920,191 @@ Post-Increment: i = 6, postIncrement = 5
 - **Pre-Increment (++i):** Increments the value before using it in the expression.
 - **Post-Increment (i++):** Uses the current value in the expression before incrementing it.
 
+## How to restrict object creation in C#?
+
+To restrict object creation in C#, you can use the following techniques:
+
+1. **Private Constructor**:
+
+   * Make the constructor `private`, preventing object instantiation from outside the class.
+   * Common in **singleton** patterns or static utility classes.
+
+   ```csharp
+   public class MyClass
+   {
+       private MyClass() { }
+   }
+   ```
+
+2. **Static Class**:
+
+   * Define the class as `static`, which cannot be instantiated.
+
+   ```csharp
+   public static class MyStaticClass { }
+   ```
+
+3. **Factory Pattern**:
+
+   * Control object creation by using a **factory method**.
+
+Each method is used based on design needs.
+
+## What is different in async/await and Task.Run()?
+
+`async/await` and `Task.Run()` are both used in asynchronous programming in C#, but they serve different purposes and have different behaviors. Here's a breakdown of their differences:
+
+### 1. **Purpose**:
+
+* **`async/await`**:
+
+  * Used to simplify asynchronous programming by allowing you to write asynchronous code in a more readable, synchronous-like manner.
+  * The `async` keyword is used to declare a method as asynchronous, and `await` is used to pause the execution of that method until the awaited task is complete.
+
+* **`Task.Run()`**:
+
+  * Used to offload work to a separate thread, particularly for CPU-bound operations. It runs a specified action or function on a thread pool thread.
+  * Typically used to run blocking code asynchronously.
+
+### 2. **Usage**:
+
+* **`async/await`**:
+
+  * Commonly used with I/O-bound operations, such as file access, network calls, or database queries, where the task can be awaited.
+
+  ```csharp
+  public async Task<string> GetDataAsync()
+  {
+      using (var client = new HttpClient())
+      {
+          var result = await client.GetStringAsync("https://example.com");
+          return result;
+      }
+  }
+  ```
+
+* **`Task.Run()`**:
+
+  * Suitable for CPU-bound tasks that need to be executed asynchronously. It creates a new task that runs on a thread pool thread.
+
+  ```csharp
+  public Task<string> ProcessDataAsync()
+  {
+      return Task.Run(() =>
+      {
+          // Simulating a CPU-bound operation
+          Thread.Sleep(5000);
+          return "Data processed.";
+      });
+  }
+  ```
+
+### 3. **Thread Management**:
+
+* **`async/await`**:
+
+  * It does not create new threads; instead, it allows other operations to run while waiting for the completion of an awaited task. It is more efficient in handling I/O-bound operations.
+
+* **`Task.Run()`**:
+
+  * It creates a new task on a separate thread from the thread pool, which can introduce overhead. It's primarily meant for CPU-bound tasks that may block for a while.
+
+### 4. **Scalability**:
+
+* **`async/await`**:
+
+  * More scalable for I/O-bound tasks since it does not block threads while waiting for the completion of tasks.
+
+* **`Task.Run()`**:
+
+  * Can lead to thread pool exhaustion if overused for I/O-bound tasks since it utilizes additional threads, which can be less efficient.
+
+### Summary:
+
+* Use **`async/await`** for I/O-bound operations to improve code readability and performance without blocking threads.
+* Use **`Task.Run()`** for CPU-bound operations to run them asynchronously on a separate thread but be cautious of overusing it for I/O-bound tasks.
+
+## How to call async method in non async method without using await?
+
+To call an asynchronous method from a non-asynchronous method without using `await`, you can use one of the following approaches. However, be cautious with these methods, as they can lead to blocking the calling thread or potential deadlocks.
+
+### 1. **Using `Task.Result`**:
+
+You can call the asynchronous method and get the result using `Task.Result`, which blocks the calling thread until the task completes.
+
+```csharp
+public string CallAsyncMethod()
+{
+    var result = MyAsyncMethod().Result; // Blocks until the async method is complete
+    return result;
+}
+
+public async Task<string> MyAsyncMethod()
+{
+    // Simulate async work
+    await Task.Delay(1000);
+    return "Hello from async!";
+}
+```
+
+### 2. **Using `Task.Wait()`**:
+
+You can call the asynchronous method and wait for it to complete using `Task.Wait()`.
+
+```csharp
+public void CallAsyncMethod()
+{
+    var task = MyAsyncMethod(); // Starts the async method
+    task.Wait(); // Blocks until the async method is complete
+    var result = task.Result; // Access the result
+}
+
+public async Task<string> MyAsyncMethod()
+{
+    // Simulate async work
+    await Task.Delay(1000);
+    return "Hello from async!";
+}
+```
+
+### 3. **Using `GetAwaiter().GetResult()`**:
+
+You can also use `GetAwaiter().GetResult()` to call the asynchronous method synchronously.
+
+```csharp
+public string CallAsyncMethod()
+{
+    var result = MyAsyncMethod().GetAwaiter().GetResult(); // Blocks until the async method is complete
+    return result;
+}
+
+public async Task<string> MyAsyncMethod()
+{
+    // Simulate async work
+    await Task.Delay(1000);
+    return "Hello from async!";
+}
+```
+
+### Important Considerations:
+
+* **Blocking**: All the methods mentioned above block the calling thread until the asynchronous operation completes. This can lead to performance issues and reduce the responsiveness of your application, especially in UI applications.
+* **Deadlocks**: In certain synchronization contexts (like UI threads), using `Result` or `Wait()` can lead to deadlocks if the asynchronous method attempts to marshal back to the calling context.
+
+### Best Practice:
+
+If possible, refactor your code to make the calling method asynchronous, allowing you to use `await` instead. This approach enhances code readability and avoids potential blocking issues:
+
+```csharp
+public async Task<string> CallAsyncMethod()
+{
+    var result = await MyAsyncMethod(); // Proper async call
+    return result;
+}
+```
+
+However, if you must call an async method from a synchronous context, use one of the above methods with caution.
+
 
 
 ## What's New in C# 12
@@ -1025,4 +1210,6 @@ Simplifies complex type names and improves code readability.
 ### Key Takeaway
 
 C# 12 focuses on reducing code verbosity and improving performance. Features like primary constructors and collection expressions make everyday coding easier, while inline arrays and other features help with high-performance scenarios. For interviews, mention that C# 12 builds on previous versions to make C# more modern and efficient.
+
+
 

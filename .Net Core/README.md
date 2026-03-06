@@ -515,6 +515,78 @@ Scoped: For services that should maintain state during a single HTTP request, su
 
 Singleton: For services that are expensive to create, need to maintain global state, or should be shared throughout the entire application.
 
+
+
+## Why to Use Dependency Injection? or What Problems Does Dependency Injection Solve? Please Explain in Simple Language
+
+Dependency Injection (DI) is a design pattern used to improve code organization, testability, and maintainability. It solves several problems in software development. Here's why we use DI and what problems it solves in simple language:
+
+### 1. Tight Coupling Problem
+
+**The Problem:** When a class directly creates instances of other classes, it becomes tightly coupled with those classes. If you need to change or replace a class (like switching from one logging service to another), you have to modify the code in multiple places.
+
+**How DI Helps:** DI loosens this coupling by allowing objects to be provided externally. This means if you need to switch a service (e.g., from one database service to another), you can do it without changing much code.
+
+**Example:**
+```csharp
+// Without DI
+public class MyService
+{
+    private DatabaseService _dbService = new DatabaseService();
+    // Hard to change or replace DatabaseService
+}
+
+// With DI
+public class MyService
+{
+    private readonly IDatabaseService _dbService;
+    public MyService(IDatabaseService dbService) // Passed externally
+    {
+        _dbService = dbService;
+    }
+}
+```
+
+### 2. Improves Testability
+
+**The Problem:** Without DI, testing becomes hard because classes are tightly coupled. It's difficult to test one part of the system without affecting others, especially if the class creates its own dependencies (like databases or external services).
+
+**How DI Helps:** DI makes it easy to inject mock or fake services during testing, allowing you to isolate parts of your system for testing.
+
+**Example:**
+```csharp
+// With DI, you can pass a mock database service for testing instead of a real one.
+// During testing
+var mockDbService = new Mock<IDatabaseService>();
+var myService = new MyService(mockDbService.Object);
+// No need to connect to real database for testing
+```
+
+### 3. Better Maintenance and Flexibility
+
+**The Problem:** As your application grows, it becomes difficult to manage changes if everything is tightly coupled. If you want to add new features or replace services, it can lead to modifying lots of code.
+
+**How DI Helps:** DI allows you to easily swap services or add new implementations without rewriting the entire application. It centralizes the configuration of dependencies, making the system easier to maintain.
+
+### 4. Single Responsibility Principle (SRP)
+
+**The Problem:** When a class is responsible for creating its dependencies, it's doing more than one job, violating SRP.
+
+**How DI Helps:** DI promotes SRP by separating the responsibility of managing dependencies from the class itself. The class only focuses on its main job, and the DI container takes care of supplying its dependencies.
+
+**Summary:**
+
+**Why Use DI?**
+
+- Loosens tight coupling between classes, making your code flexible and modular.
+- Improves testability by allowing you to inject mock objects.
+- Makes maintenance easier, as services can be easily swapped or updated.
+- Follows the Single Responsibility Principle, keeping classes focused on their main purpose.
+
+In simple terms, Dependency Injection helps keep your code cleaner, easier to test, and more flexible to change as your application grows.
+
+
+
 ## What is CQRS pattern? 
 
 The CQRS (Command Query Responsibility Segregation) pattern is a software architectural pattern that separates read operations (queries) from write operations (commands). The main goal of CQRS is to optimize and scale applications by treating reads and writes as distinct concerns. Key Concepts:
@@ -849,6 +921,126 @@ Query (Read): Get the list of products.
 Separate handlers for each operation ensure separation of concerns.
 
 This structure makes the application more maintainable, scalable, and adaptable to changes.
+
+## What is app.Use & app.Run in .NET Core?
+
+In ASP.NET Core, `app.Use()` and `app.Run()` are methods used to configure the middleware pipeline in the application. The middleware is a sequence of components that handle requests and responses as they pass through the pipeline.
+
+### 1. app.Use()
+
+- **Purpose:** `app.Use()` is used to add middleware components that can perform tasks both before and after passing the request further down the pipeline.
+- **Flow Control:** Middleware added with `app.Use()` can decide whether to pass the request to the next middleware or terminate the request at that point.
+- **Next():** Middleware defined with `app.Use()` usually calls `next()`, which forwards the request to the next component in the pipeline.
+
+**Example:**
+```csharp
+app.Use(async (context, next) =>
+{
+    // Do something before the next middleware
+    await context.Response.WriteAsync("Before Middleware 1\n");
+
+    // Call the next middleware in the pipeline
+    await next.Invoke();
+
+    // Do something after the next middleware
+    await context.Response.WriteAsync("After Middleware 1\n");
+});
+```
+
+### 2. app.Run()
+
+- **Purpose:** `app.Run()` is used to add terminal middleware, meaning it handles the request and stops the pipeline. It doesn't call the next() middleware in the pipeline.
+- **Flow Control:** Since `app.Run()` does not pass control to the next middleware, it typically handles the request completely and sends the response.
+
+**Example:**
+```csharp
+app.Run(async (context) =>
+{
+    // This will terminate the pipeline, no other middleware will be executed
+    await context.Response.WriteAsync("This is the final middleware.\n");
+});
+```
+
+### Key Differences
+
+- **Flow:**
+  - `app.Use()` allows passing the request to the next middleware using `next()`.
+  - `app.Run()` is terminal and does not call the next middleware.
+
+- **Use Case:**
+  - `app.Use()` is used for middleware that needs to perform work before and after the request is passed through the pipeline.
+  - `app.Run()` is used for middleware that ends the request pipeline (e.g., handling the final response).
+
+**Example Combining Both:**
+```csharp
+app.Use(async (context, next) =>
+{
+    await context.Response.WriteAsync("Before Middleware 1\n");
+    await next();  // Pass to the next middleware
+    await context.Response.WriteAsync("After Middleware 1\n");
+});
+
+app.Run(async (context) =>
+{
+    await context.Response.WriteAsync("This is the final middleware\n");
+});
+```
+
+**Summary:**
+
+- `app.Use()`: Adds middleware that can pass the request to the next middleware using `next()`.
+- `app.Run()`: Adds terminal middleware that handles the request and stops further processing.
+
+These methods help build a flexible and customizable request processing pipeline in ASP.NET Core.
+
+## What is app.Map() in .NET Core?
+
+In ASP.NET Core, `app.Map()` is used to branch the middleware pipeline based on a specific request path. It allows you to define a separate pipeline for handling requests that match a particular URL path.
+
+### How app.Map() Works
+
+- **Purpose:** `app.Map()` sets up middleware for a specific URL path and ensures that only requests starting with that path are processed by the middleware in that branch.
+- **Path-based Branching:** You can create different middleware pipelines for different request paths.
+- **Usage:** You pass a URL path as the first argument to `app.Map()`, and then define a middleware pipeline for that path. Only requests matching the given path will be handled by the mapped middleware.
+
+**Example:**
+```csharp
+app.Map("/greet", appBuilder =>
+{
+    appBuilder.Run(async context =>
+    {
+        await context.Response.WriteAsync("Hello from the /greet path!");
+    });
+});
+
+app.Map("/goodbye", appBuilder =>
+{
+    appBuilder.Run(async context =>
+    {
+        await context.Response.WriteAsync("Goodbye from the /goodbye path!");
+    });
+});
+```
+
+### How It Works
+
+- `app.Map("/greet")`: This maps requests that start with `/greet`. When someone navigates to `/greet`, it will respond with "Hello from the /greet path!".
+- `app.Map("/goodbye")`: This maps requests that start with `/goodbye`. When someone navigates to `/goodbye`, it will respond with "Goodbye from the /goodbye path!".
+
+If you visit any other path, these middlewares won't execute since they are specific to `/greet` and `/goodbye`.
+
+### Key Features
+
+- **Path Matching:** `app.Map()` only applies to requests that match the specified path.
+- **Branching:** You can define different processing pipelines for different paths.
+
+**Summary:**
+
+- `app.Map()` is used to branch the middleware based on the request path.
+- It helps you create separate logic for specific URL patterns.
+- It simplifies organizing request handling for different sections of your application.
+
+
 
 ## Explain extension method with example of registering dependency for layers in .net core 3 layer application
 

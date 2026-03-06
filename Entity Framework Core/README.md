@@ -308,3 +308,30 @@ Interview Question: what is difference between Entity Framework core and Dapper?
 
 Choose **Entity Framework Core** when you need a robust, feature-rich ORM with high-level abstractions and automatic change tracking. Opt for **Dapper** when you require high performance and prefer to write raw SQL queries, especially for simple CRUD operations or complex queries where performance is critical.
 
+## How transaction works in Entity framework core explain with simple example.
+
+In Entity Framework Core, transactions ensure that a series of database operations are executed as a single unit, meaning either all operations succeed, or none of them are committed. Transactions can be manually handled using `BeginTransaction()` and `Commit()`, or automatically using `SaveChanges()`.
+
+### Example:
+
+```csharp
+using (var transaction = await _context.Database.BeginTransactionAsync())
+{
+    try
+    {
+        _context.Students.Add(new Student { Name = "John" });
+        await _context.SaveChangesAsync();
+
+        _context.Courses.Add(new Course { Title = "Math" });
+        await _context.SaveChangesAsync();
+
+        await transaction.CommitAsync(); // Commits both operations
+    }
+    catch (Exception)
+    {
+        await transaction.RollbackAsync(); // Rolls back if any operation fails
+    }
+}
+```
+
+Here, both `Students` and `Courses` additions are part of the same transaction. If one fails, the transaction is rolled back, ensuring data consistency.

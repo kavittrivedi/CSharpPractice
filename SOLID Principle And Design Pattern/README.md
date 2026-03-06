@@ -384,7 +384,83 @@ Used to make code easier to maintain, reuse, and scale.
 - **Encapsulation**: Hides the internal details of a class and controls how data is accessed or modified.
 - **Modularization**: Breaks the system into smaller, independent units to improve organization and maintainability.
 
+Explain composite design pattern in simple language. The **Composite Design Pattern** is a structural pattern used to treat individual objects and compositions of objects uniformly. It allows you to build complex objects made of multiple smaller objects, where each object (both individual and composite) can be treated the same way.
 
+### Example:
+
+Imagine a company with employees. Some are managers (composites) with their own team (other employees), and others are regular workers. The pattern lets you treat both individual employees and teams as the same "Employee" type when performing actions like calculating salaries.
+
+### Real-world Use:
+
+File systems, where files and folders (which contain other files) are handled similarly.
+Here’s a simple example of the **Composite Design Pattern** in C#:
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+// Component
+public abstract class Employee
+{
+    public abstract void ShowDetails();
+}
+
+// Leaf
+public class Developer : Employee
+{
+    private string name;
+    public Developer(string name)
+    {
+        this.name = name;
+    }
+
+    public override void ShowDetails()
+    {
+        Console.WriteLine("Developer: " + name);
+    }
+}
+
+// Composite
+public class Manager : Employee
+{
+    private List<Employee> subordinates = new List<Employee>();
+
+    public void AddSubordinate(Employee employee)
+    {
+        subordinates.Add(employee);
+    }
+
+    public override void ShowDetails()
+    {
+        Console.WriteLine("Manager");
+        foreach (var employee in subordinates)
+        {
+            employee.ShowDetails();
+        }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Employee dev1 = new Developer("Alice");
+        Employee dev2 = new Developer("Bob");
+        Manager manager = new Manager();
+        manager.AddSubordinate(dev1);
+        manager.AddSubordinate(dev2);
+        
+        manager.ShowDetails();
+    }
+}
+```
+
+### Explanation:
+
+* **Employee**: Abstract base class.
+* **Developer**: Represents a leaf node (individual object).
+* **Manager**: A composite that can have multiple subordinates.
+* The `ShowDetails` method can be called on both individual employees and the manager, treating both uniformly.
 
 ## Can we implement Composite Design Pattern for workspace booking application that allows you to book workspaces of different locations?
 

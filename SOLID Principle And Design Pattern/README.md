@@ -1321,3 +1321,135 @@ class Program
 
 The Singleton Design Pattern is a simple yet effective way to ensure that a class has only one instance while providing a global access point. It's particularly useful for managing shared resources, but care should be taken to avoid potential drawbacks related to global state and testing.
 
+## Interview Question: What is aggregation?
+
+**Aggregation** in object-oriented programming is a relationship between two classes where one class (the whole) contains or is composed of objects of another class (the parts). It represents a "has-a" relationship, where the lifecycle of the "part" can be independent of the "whole."
+
+### Example:
+
+A `Car` class can have an aggregation relationship with the `Engine` class:
+
+```csharp
+class Car
+{
+    public Engine Engine { get; set; }
+}
+
+class Engine
+{
+    // Engine properties
+}
+```
+
+Here, the `Car` contains an `Engine`, but the `Engine` can exist without the `Car`.
+
+## Interview Question: What is composition? Please explain in simple language.
+
+**Composition** is a stronger relationship than aggregation in object-oriented programming. It indicates a "part-of" relationship, where one class (the whole) contains and controls the lifecycle of another class (the part). If the whole is destroyed, the parts are also destroyed.
+
+### Simple Example:
+
+Think of a `House` and `Room`. A `House` is made up of `Rooms`, and if the `House` is demolished, the `Rooms` no longer exist. This shows that `Rooms` are integral parts of the `House`.
+
+Here's a simple example of **composition** in C#:
+
+### Example:
+
+```csharp
+public class Room
+{
+    public string Name { get; set; }
+
+    public Room(string name)
+    {
+        Name = name;
+    }
+}
+
+public class House
+{
+    public List<Room> Rooms { get; private set; }
+
+    public House()
+    {
+        Rooms = new List<Room>();
+        Rooms.Add(new Room("Living Room"));
+        Rooms.Add(new Room("Bedroom"));
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        House myHouse = new House();
+        foreach (var room in myHouse.Rooms)
+        {
+            Console.WriteLine(room.Name);
+        }
+    }
+}
+```
+
+### Explanation:
+
+* The `House` class contains `Room` objects.
+* If the `House` is destroyed, the `Rooms` are also considered destroyed, illustrating the composition relationship.
+
+## Interview Question: Explain Encapsulation and Abstraction with example in simple language.
+
+### Encapsulation
+
+**Encapsulation** is the concept of bundling data (attributes) and methods (functions) that operate on the data into a single unit, usually a class. It restricts direct access to some of an object's components, which helps prevent unintended interference and misuse.
+
+**Example**:
+
+```csharp
+public class BankAccount
+{
+    private decimal balance; // private field
+
+    public void Deposit(decimal amount)
+    {
+        if (amount > 0)
+        {
+            balance += amount; // modify balance through method
+        }
+    }
+
+    public decimal GetBalance()
+    {
+        return balance; // access balance through method
+    }
+}
+```
+
+### Abstraction
+
+**Abstraction** is the concept of hiding complex implementation details and showing only the essential features of an object. It simplifies the design and usage of classes by exposing only the necessary components.
+
+**Example**:
+
+```csharp
+public abstract class Shape
+{
+    public abstract double Area(); // abstract method
+}
+
+public class Circle : Shape
+{
+    private double radius;
+
+    public Circle(double r)
+    {
+        radius = r;
+    }
+
+    public override double Area()
+    {
+        return Math.PI * radius * radius; // implementation of Area
+    }
+}
+```
+
+In this example, `BankAccount` encapsulates its `balance` and only allows manipulation through methods, while the `Shape` class provides an abstraction of different shapes without exposing their specific details.

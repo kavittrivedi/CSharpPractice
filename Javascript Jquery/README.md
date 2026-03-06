@@ -124,3 +124,33 @@ In this example, `logMessage` is a callback function. It gets passed as the seco
 
 Callbacks are often used for animations, AJAX requests, or any time you need to wait for an action to finish before executing another.
 
+## What is difference between == and === in javascript?
+
+In JavaScript, `==` and `===` are both comparison operators, but they behave differently when evaluating equality:
+
+### 1. **`==` (Equality Operator)**
+
+* The `==` operator checks for **value equality** but performs **type coercion**. This means that if the operands are of different types, JavaScript will attempt to convert one or both of them to a common type before making the comparison.
+* Example:
+
+  ```javascript
+  console.log(5 == '5'); // true, because '5' is converted to a number
+  console.log(null == undefined); // true, they are considered equal
+  console.log(0 == false); // true, 0 is converted to false
+  ```
+
+### 2. **`===` (Strict Equality Operator)**
+
+* The `===` operator checks for both **value equality** and **type equality**. It does not perform any type coercion; both operands must be of the same type and value to be considered equal.
+* Example:
+
+  ```javascript
+  console.log(5 === '5'); // false, different types (number vs. string)
+  console.log(null === undefined); // false, different types (null vs. undefined)
+  console.log(0 === false); // false, different types (number vs. boolean)
+  ```
+
+### Summary
+
+* Use `==` when you want to compare values and allow type conversion (though it is generally not recommended due to potential confusion).
+* Use `===` when you want a strict comparison that checks both the value and the type, which is the preferred practice to avoid unexpected results in your code.

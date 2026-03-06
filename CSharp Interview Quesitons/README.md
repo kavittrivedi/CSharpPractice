@@ -1372,6 +1372,119 @@ greet("Alice"); // Outputs: Hello, Alice!
 
 Lambda expressions are a powerful feature in C# that enable you to write concise and flexible code for representing anonymous functions. They are widely used in LINQ queries, event handling, and anywhere delegates are required. By providing a way to define functionality inline, lambda expressions enhance readability and maintainability of code.
 
+## How many types of constructor we can add in c# class. Please explain each with simple example.
+
+In C#, you can have several types of constructors in a class:
+
+1. **Default Constructor**: This is parameterless and automatically provided by C# if no constructor is defined.
+
+   ```csharp
+   public class MyClass {
+       public MyClass() { }
+   }
+   ```
+
+2. **Parameterized Constructor**: Accepts parameters to initialize the object with specific values.
+
+   ```csharp
+   public class MyClass {
+       public MyClass(string name) { }
+   }
+   ```
+
+3. **Copy Constructor**: Initializes an object by copying values from another object of the same class.
+
+   ```csharp
+   public class MyClass {
+       public MyClass(MyClass other) { }
+   }
+   ```
+
+4. **Static Constructor**: Used to initialize static members. It is parameterless and called only once.
+
+   ```csharp
+   public class MyClass {
+       static MyClass() { }
+   }
+   ```
+
+5. **Private Constructor**: Used to restrict object creation, often in Singleton patterns.
+
+   ```csharp
+   public class MyClass {
+       private MyClass() { }
+   }
+   ```
+
+## Interview Question: What is diamond problem?
+
+To restrict a **virtual method** in C#, you can use the **`sealed`** keyword in an override of the method. This prevents any further overriding in derived classes. Here's an example:
+
+```csharp
+public class BaseClass
+{
+    public virtual void Show() { }
+}
+
+public class DerivedClass : BaseClass
+{
+    public sealed override void Show() 
+    {
+        // Prevents further overriding in any class derived from DerivedClass
+    }
+}
+```
+
+In this example, `Show` in `DerivedClass` is sealed, so no further class can override this method.
+
+## Interview Question: Explain Interface vs abstract class.
+
+### Key Differences Between Interface and Abstract Class:
+
+1. **Multiple Inheritance**: A class can implement multiple interfaces but can inherit only one abstract class.
+2. **Implementation**: Interfaces can only have method signatures (no implementation), while abstract classes can have both method implementations and abstract methods.
+3. **Fields**: Abstract classes can have fields, whereas interfaces cannot.
+4. **Default Modifiers**: Interface members are public and abstract by default, while abstract class members can have different access modifiers.
+
+### Example:
+
+```csharp
+public interface IAnimal { void Speak(); }
+public abstract class Animal { public abstract void Speak(); }
+```
+
+## Interview question: What are the members of the interface?
+
+The members of an interface in C# can include:
+
+1. **Methods**: Define method signatures without a body.
+
+   ```csharp
+   void Speak();
+   ```
+2. **Properties**: Define property signatures without a body.
+
+   ```csharp
+   string Name { get; set; }
+   ```
+3. **Events**: Declare events that classes can subscribe to.
+
+   ```csharp
+   event EventHandler OnSpeak;
+   ```
+4. **Indexers**: Allow objects to be indexed like arrays.
+
+   ```csharp
+   string this[int index] { get; set; }
+   ```
+
+All members of an interface are abstract and public by default, without any implementation.
+
+## Interview Question: Can we inherit static class to another class?
+
+No, we **cannot inherit** a static class in C#. Static classes are designed to hold only static members (methods, properties, fields) and cannot be instantiated or inherited. They exist at the class level and are not meant to participate in inheritance hierarchies.
+
+If you need to share functionality, use static methods directly, or consider using inheritance in regular (non-static) classes. Static classes are often used as utility or helper classes that provide shared functionality across the application.
 
 
 ## What's New in C# 12

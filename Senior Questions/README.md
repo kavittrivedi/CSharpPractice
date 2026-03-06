@@ -363,3 +363,16 @@ The Agile Manifesto, created in 2001, outlines four core values and twelve princ
 ### Summary
 
 Agile is a flexible and collaborative approach to project management that prioritizes customer needs, iterative progress, and team empowerment. By embracing change and fostering continuous improvement, Agile helps teams deliver high-quality products that meet market demands efficiently.
+
+## Interview Question: We have a web application in asp.net webform. We want to migrate to .net core 8 MVC. How we can migrate?
+
+Migrating an ASP.NET WebForms application to .NET Core 8 MVC involves several steps:
+
+1. **Review Architecture**: Analyze your current WebForms architecture and identify key components like controls, pages, and session management.
+2. **Upgrade to .NET Framework 4.8**: This is the last supported version of .NET Framework before migrating to .NET Core.
+3. **Rebuild UI**: WebForms uses server controls, while .NET Core MVC uses Razor views. You'll need to rewrite UI using Razor and partial views.
+4. **Migrate Business Logic**: Move reusable logic to service classes, making it testable.
+5. **Dependency Injection**: Implement built-in DI in .NET Core.
+6. **Refactor for Middleware**: Use middleware for handling requests and sessions.
+7. **Migrate to EF Core**: If you use Entity Framework, update it to EF Core.
+8. **Test and Deploy**: Finally, test thoroughly and deploy on a .NET Core-compatible environment.

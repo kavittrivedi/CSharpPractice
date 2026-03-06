@@ -383,3 +383,122 @@ Used to make code easier to maintain, reuse, and scale.
 
 - **Encapsulation**: Hides the internal details of a class and controls how data is accessed or modified.
 - **Modularization**: Breaks the system into smaller, independent units to improve organization and maintainability.
+
+
+
+## Can we implement Composite Design Pattern for workspace booking application that allows you to book workspaces of different locations?
+
+Yes, the Composite Design Pattern can be implemented in a workspace booking application that allows you to book workspaces at different locations.
+
+### How It Fits
+
+The Composite Design Pattern is ideal for representing hierarchical structures, such as:
+
+- Individual Workspaces (e.g., desks or rooms).
+- Groups of Workspaces (e.g., floors or areas).
+- Locations (e.g., offices in different cities).
+
+### Implementation Example
+
+**Classes:**
+
+- **Component (Abstract Class or Interface):** Defines common operations like `Book()` for both individual and composite entities.
+- **Leaf (Individual Workspace):** Represents a single workspace.
+- **Composite (Group or Location):** Manages a collection of workspaces or other groups.
+
+**C# Code:**
+```csharp
+using System;
+using System.Collections.Generic;
+
+// Component
+interface IWorkspace
+{
+    void Book();
+}
+
+// Leaf
+class IndividualWorkspace : IWorkspace
+{
+    public string Name { get; set; }
+
+    public IndividualWorkspace(string name)
+    {
+        Name = name;
+    }
+
+    public void Book()
+    {
+        Console.WriteLine($"Workspace {Name} booked.");
+    }
+}
+
+// Composite
+class WorkspaceGroup : IWorkspace
+{
+    public string GroupName { get; set; }
+    private List<IWorkspace> workspaces = new();
+
+    public WorkspaceGroup(string groupName)
+    {
+        GroupName = groupName;
+    }
+
+    public void Add(IWorkspace workspace)
+    {
+        workspaces.Add(workspace);
+    }
+
+    public void Remove(IWorkspace workspace)
+    {
+        workspaces.Remove(workspace);
+    }
+
+    public void Book()
+    {
+        Console.WriteLine($"Booking all workspaces in group: {GroupName}");
+        foreach (var workspace in workspaces)
+        {
+            workspace.Book();
+        }
+    }
+}
+
+// Client
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Individual workspaces
+        var desk1 = new IndividualWorkspace("Desk 1");
+        var desk2 = new IndividualWorkspace("Desk 2");
+
+        // Group of workspaces
+        var floor1 = new WorkspaceGroup("Floor 1");
+        floor1.Add(desk1);
+        floor1.Add(desk2);
+
+        // Composite with another group
+        var office = new WorkspaceGroup("Office Location");
+        office.Add(floor1);
+        office.Add(new IndividualWorkspace("Meeting Room"));
+
+        // Booking all
+        office.Book();
+    }
+}
+```
+
+**Output:**
+```
+Booking all workspaces in group: Office Location
+Booking all workspaces in group: Floor 1
+Workspace Desk 1 booked.
+Workspace Desk 2 booked.
+Workspace Meeting Room booked.
+```
+
+## How is the security related to scaling?
+
+Security and scaling are interconnected. As systems scale, ensuring security becomes more challenging due to the increased number of users, devices, and potential attack vectors. To maintain security at scale, strategies like **load balancing**, **distributed firewalls**, **rate limiting**, **encryption**, and **securing APIs** are essential. Moreover, scaling can sometimes expose weaknesses or vulnerabilities, so continuous monitoring, authentication, and implementing strong access controls are critical to protect larger and more complex systems.
+

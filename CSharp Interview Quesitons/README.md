@@ -733,6 +733,195 @@ Used when you have a value that must remain unchanged throughout the entire prog
 - **`readonly`**: Can be set at runtime (usually in constructor), but can't be changed after the object is created.
 - **`const`**: Must be set at compile-time and cannot be changed during the program's execution.
 
+## What is difference between FirstOrDefault and SingleOrDefault
+
+FirstOrDefault and SingleOrDefault are methods in LINQ used to retrieve elements from a collection, but they behave differently:
+
+**FirstOrDefault:**
+
+- Returns the first element that matches a condition or null if no match is found.
+- Useful when you expect multiple matching elements but only want the first one.
+
+**Example:**
+```csharp
+var item = list.FirstOrDefault(x => x.Id == 1);
+```
+
+**SingleOrDefault:**
+
+- Returns only one element if it matches a condition or null if none exist.
+- Throws an exception if there are multiple matches.
+- Useful when you expect exactly one match.
+
+**Example:**
+```csharp
+var item = list.SingleOrDefault(x => x.Id == 1);
+```
+
+**Summary:** Use FirstOrDefault when multiple results are possible but only the first is needed. Use SingleOrDefault when exactly one result is expected; otherwise, it will throw an error if multiple exist.
+
+## Why stored procedures are faster than LINQ and Entity Framework Core?
+
+Stored procedures are often faster than LINQ and Entity Framework Core for several reasons:
+
+- **Precompiled Execution:** Stored procedures are precompiled and cached by the database, reducing query parsing and execution time.
+- **Optimized Query Plans:** Stored procedures generate optimized execution plans that the database reuses.
+- **Reduced Network Traffic:** Procedures allow you to run complex logic within the database server, minimizing data transfer between the application and the database.
+- **Direct Database Access:** They avoid the extra abstraction layers that LINQ and Entity Framework use, resulting in faster query execution.
+
+While Entity Framework Core is powerful for complex applications, stored procedures are preferable for performance-critical scenarios.
+
+## What is difference between First and FirstOrDefault explain with simple example
+
+### Difference Between First and FirstOrDefault in C#
+
+**Behavior When No Match is Found:**
+
+- **First:** Throws an exception if no matching element is found.
+- **FirstOrDefault:** Returns the default value (null for reference types, 0 for value types) if no match is found.
+
+**Use Case:**
+
+- Use First when you are sure that a matching element exists.
+- Use FirstOrDefault when there is a possibility of no match and you want to handle that gracefully.
+
+**Example:**
+```csharp
+using System;
+using System.Linq;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+
+        // Using First
+        try
+        {
+            int first = numbers.First(x => x > 10); // Throws InvalidOperationException
+            Console.WriteLine($"First: {first}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"First Exception: {ex.Message}");
+        }
+
+        // Using FirstOrDefault
+        int firstOrDefault = numbers.FirstOrDefault(x => x > 10); // Returns default value (0)
+        Console.WriteLine($"FirstOrDefault: {firstOrDefault}");
+    }
+}
+```
+
+**Output:**
+```
+First Exception: Sequence contains no matching element
+FirstOrDefault: 0
+```
+
+### Example with reference type
+
+**Example:**
+```csharp
+using System;
+using System.Linq;
+using System.Collections.Generic;
+
+class Program
+{
+    class Person
+    {
+        public string Name { get; set; }
+    }
+
+    static void Main()
+    {
+        List<Person> people = new List<Person>
+        {
+            new Person { Name = "Alice" },
+            new Person { Name = "Bob" },
+            new Person { Name = "Charlie" }
+        };
+
+        // Using First
+        try
+        {
+            Person first = people.First(p => p.Name == "David"); // Throws InvalidOperationException
+            Console.WriteLine($"First: {first.Name}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"First Exception: {ex.Message}");
+        }
+
+        // Using FirstOrDefault
+        Person firstOrDefault = people.FirstOrDefault(p => p.Name == "David"); // Returns null
+        if (firstOrDefault == null)
+        {
+            Console.WriteLine("FirstOrDefault: No match found");
+        }
+        else
+        {
+            Console.WriteLine($"FirstOrDefault: {firstOrDefault.Name}");
+        }
+    }
+}
+```
+
+**Output:**
+```
+First Exception: Sequence contains no matching element
+FirstOrDefault: No match found
+```
+
+**Key Points:**
+
+- First throws an exception when no match is found.
+- FirstOrDefault safely returns null (for reference types) if no match exists, allowing you to handle it without an exception.
+
+## What is difference between ++i and i++ explain with simple example
+
+The difference between ++i (pre-increment) and i++ (post-increment) lies in when the increment operation happens relative to the expression evaluation.
+
+**Explanation with Example:**
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int i = 5;
+
+        // Pre-increment (++i): Increment happens first, then the value is used
+        int preIncrement = ++i; // i becomes 6, and 6 is assigned to preIncrement
+        Console.WriteLine($"Pre-Increment: i = {i}, preIncrement = {preIncrement}");
+
+        // Reset i
+        i = 5;
+
+        // Post-increment (i++): Value is used first, then the increment happens
+        int postIncrement = i++; // 5 is assigned to postIncrement, then i becomes 6
+        Console.WriteLine($"Post-Increment: i = {i}, postIncrement = {postIncrement}");
+    }
+}
+```
+
+**Output:**
+```
+Pre-Increment: i = 6, preIncrement = 6
+Post-Increment: i = 6, postIncrement = 5
+```
+
+**Key Points:**
+
+- **Pre-Increment (++i):** Increments the value before using it in the expression.
+- **Post-Increment (i++):** Uses the current value in the expression before incrementing it.
+
+
+
 ## What's New in C# 12
 
 C# 12 introduces several new features that make coding simpler, more expressive, and efficient. Here are some key features explained in simple language with examples:

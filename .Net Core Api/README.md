@@ -657,4 +657,62 @@ In ASP.NET Core 6 API, data binding can be done in several ways to handle incomi
 
 These binding methods provide flexibility in how you can receive and work with data in your ASP.NET Core 6 APIs, allowing you to handle different types of input based on your application's requirements.
 
+## What action attributes comes in these "Authorization, Resource Action, Exception, Result" action filter types?
+
+In ASP.NET Core, action filters are a way to run code before and after an action method executes. The action filter types you mentioned can include various action attributes that correspond to their functionality. Here’s a breakdown of each type and the common action attributes associated with them:
+
+### 1. **Authorization Filters**
+
+Authorization filters are executed first and are used to determine whether a user is authorized to access a resource.
+
+**Common Action Attributes:**
+
+* **[Authorize]**: This attribute restricts access to the action method or controller to only authenticated users. It can be used with roles or policies.
+* **[AllowAnonymous]**: This attribute allows access to an action method or controller to anonymous users, even if the controller or action is decorated with `[Authorize]`.
+
+### 2. **Resource Filters**
+
+Resource filters are executed after authorization filters and are used to perform tasks related to the resource, such as caching or modifying the request or response.
+
+**Common Action Attributes:**
+
+* **[ServiceFilter]**: This attribute allows you to specify a resource filter that is registered in the DI container.
+* **[TypeFilter]**: Similar to `ServiceFilter`, but it creates an instance of the filter type directly, allowing for constructor parameters.
+
+### 3. **Action Filters**
+
+Action filters are executed before and after the action method is executed. They are used to perform tasks such as logging, modifying the action result, or implementing caching.
+
+**Common Action Attributes:**
+
+* **[ActionFilter]**: This attribute is used to apply a custom action filter that you create, inheriting from `ActionFilterAttribute`.
+* **[HttpGet]**, **[HttpPost]**, **[HttpPut]**, **[HttpDelete]**: These are routing attributes that specify the HTTP method the action supports, but they also imply a form of action filtering based on HTTP requests.
+
+### 4. **Exception Filters**
+
+Exception filters are executed when an unhandled exception occurs during the execution of an action method. They are used to handle errors globally or at a more granular level.
+
+**Common Action Attributes:**
+
+* **[ExceptionFilter]**: This attribute allows you to apply a custom exception filter that you create, inheriting from `IAsyncExceptionFilter` or `IExceptionFilter`.
+
+### 5. **Result Filters**
+
+Result filters are executed just before and after the result is executed, allowing you to modify the result (e.g., the view result or JSON result) before it is sent to the client.
+
+**Common Action Attributes:**
+
+* **[ResultFilter]**: This attribute allows you to apply a custom result filter that you create, inheriting from `IAsyncResultFilter` or `IResultFilter`.
+
+### Summary
+
+Here's a quick overview of the action attributes associated with each filter type:
+
+* **Authorization Filters**: `[Authorize]`, `[AllowAnonymous]`
+* **Resource Filters**: `[ServiceFilter]`, `[TypeFilter]`
+* **Action Filters**: `[ActionFilter]`, HTTP method attributes (`[HttpGet]`, `[HttpPost]`, etc.)
+* **Exception Filters**: `[ExceptionFilter]`
+* **Result Filters**: `[ResultFilter]`
+
+Using these action attributes, you can create a clean and maintainable way to handle cross-cutting concerns in your ASP.NET Core applications.
 

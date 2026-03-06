@@ -12,9 +12,26 @@ The MVC (Model-View-Controller) page life cycle describes the flow of how a requ
 5. **View**: The controller passes data from the model to the View, which is responsible for rendering the HTML page that the user will see.
 6. **Response**: Finally, the View generates the HTML, and it is sent as a response to the user's browser.
 
+
 In short, it follows this cycle: **Request → Routing → Controller → Model → View → Response**.
 
+## Interview Question: How Many Types of Filters Are There in .NET Core and in Which Order Do They Execute?
 
+In .NET Core, there are **five types of filters** used to execute logic before or after certain stages in an action method lifecycle:
+
+1. **Authorization Filters**: Handle user authorization before the action method executes.
+2. **Resource Filters**: Deal with resource management before and after an action is executed.
+3. **Action Filters**: Run before and after the execution of an action method.
+4. **Exception Filters**: Handle exceptions thrown during the action method.
+5. **Result Filters**: Run before and after the action result (e.g., view or JSON result).
+
+### Execution Order:
+
+1. **Authorization**
+2. **Resource**
+3. **Action**
+4. **Exception**
+5. **Result**
 
 ## What is Difference Between @Html.TextBoxFor and @Html.TextBox in Short and Simple Language
 
@@ -303,7 +320,7 @@ In ASP.NET Core 6, an Area is a way to organize large applications by grouping r
 
 In short, Areas help you organize and modularize large applications by grouping related functionality into distinct sections.
 
-## Explain ViewComponent in Short and Simple Language
+## Explain ViewComponent in Short and Simple Language  v1
 
 In ASP.NET Core, a View Component is a reusable component that encapsulates rendering logic in a way that allows you to create complex UI elements in a clean and organized manner. Here's a simple breakdown:
 
@@ -375,6 +392,24 @@ Invoke the View Component in your main view (e.g., `Index.cshtml`) to display th
 **Result:**
 
 When you run your application and navigate to the Index view, you will see the greeting "Hello, John!" rendered on the page as part of the View Component. This demonstrates how to create a reusable UI component that encapsulates both logic and rendering.
+
+
+
+## View Components in ASP.NET Core V2
+
+A **View Component** in ASP.NET Core is a reusable piece of UI logic that is similar to partial views but more powerful. It allows you to encapsulate rendering logic and is used when you need to provide complex data or functionality to the view. It doesn't depend on controllers, and it's ideal for reusable components like sidebars, footers, or widgets.
+
+### How to Use It:
+
+1. Create a class inheriting from `ViewComponent`.
+2. Implement `Invoke` or `InvokeAsync` methods.
+3. Call it from a view using `@Component.InvokeAsync("ComponentName")`.
+
+### Usage:
+
+* Sidebar components
+* Navigation menus
+* Widgets like recent posts, comments, etc.
 
 ## Explain Difference Between PartialView and ViewComponent in Short and Simple Language with Example
 
@@ -472,4 +507,162 @@ Use the View Component in a Parent View (e.g., `Index.cshtml`):
   - **View Component:** Used when you need a reusable component with its own logic.
 
 In summary, use Partial Views for simple UI pieces that depend on the parent model, and use View Components when you need a more robust, independent component that can handle its own data and logic.
+
+
+
+## Interview Question: What Is the Difference Between HTML Helper Controls and Tag Helpers?
+
+**HTML Helper Controls** and **Tag Helpers** are both ways to generate HTML in ASP.NET Core, but they have key differences:
+
+1. **HTML Helpers**: These are methods in Razor views (`@Html.TextBoxFor`, `@Html.ActionLink`) that generate HTML elements. They are based on C# syntax and can be harder to read since they look more like code than HTML.
+
+2. **Tag Helpers**: These use a syntax similar to standard HTML elements, making them more intuitive and readable. They enable server-side processing using attributes (e.g., `<input asp-for="Name" />`) and are closer to how standard HTML is written.
+
+**Example**:
+
+* HTML Helper: `@Html.TextBoxFor(m => m.Name)`
+* Tag Helper: `<input asp-for="Name" />`
+
+## How File Upload and Download Works in .NET Core 6 MVC and API?
+
+In ASP.NET Core 6 MVC and API, file upload and download functionality can be implemented using controllers and Razor views. Here's how you can achieve both:
+
+### File Upload
+
+#### 1. **Creating the Upload Form (MVC)**
+
+In a Razor view, create a form that allows users to upload files:
+
+```html
+<form asp-controller="FileUpload" asp-action="Upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" />
+    <button type="submit">Upload</button>
+</form>
+```
+
+#### 2. **Handling File Upload in the Controller**
+
+Create an action method in your controller to handle the file upload:
+
+```csharp
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+public class FileUploadController : Controller
+{
+    [HttpPost]
+    public async Task<IActionResult> Upload(IFormFile file)
+    {
+        if (file != null && file.Length > 0)
+        {
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", file.FileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return RedirectToAction("UploadSuccess");
+        }
+
+        return View();
+    }
+
+    public IActionResult UploadSuccess()
+    {
+        return View();
+    }
+}
+```
+
+### File Download
+
+#### 1. **Creating the Download Method in the Controller**
+
+You can create a method to allow users to download files:
+
+```csharp
+public class FileDownloadController : Controller
+{
+    [HttpGet]
+    public IActionResult Download(string fileName)
+    {
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", fileName);
+
+        if (!System.IO.File.Exists(filePath))
+        {
+            return NotFound();
+        }
+
+        var fileBytes = System.IO.File.ReadAllBytes(filePath);
+        return File(fileBytes, "application/octet-stream", fileName); // Set appropriate MIME type
+    }
+}
+```
+
+#### 2. **Link to Download the File (MVC)**
+
+In your view, create a link to download the file:
+
+```html
+<a asp-controller="FileDownload" asp-action="Download" asp-route-fileName="example.txt">Download Example File</a>
+```
+
+### API Implementation for File Upload and Download
+
+#### 1. **File Upload API Endpoint**
+
+Create an API controller for handling file uploads:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class FileUploadApiController : ControllerBase
+{
+    [HttpPost("upload")]
+    public async Task<IActionResult> Upload([FromForm] IFormFile file)
+    {
+        if (file != null && file.Length > 0)
+        {
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "uploads", file.FileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return Ok(new { filePath = path });
+        }
+
+        return BadRequest("No file uploaded.");
+    }
+}
+```
+
+#### 2. **File Download API Endpoint**
+
+Create an API endpoint for downloading files:
+
+```csharp
+[HttpGet("download/{fileName}")]
+public IActionResult Download(string fileName)
+{
+    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", fileName);
+
+    if (!System.IO.File.Exists(filePath))
+    {
+        return NotFound();
+    }
+
+    var fileBytes = System.IO.File.ReadAllBytes(filePath);
+    return File(fileBytes, "application/octet-stream", fileName); // Set appropriate MIME type
+}
+```
+
+### Summary
+
+* **File Upload**: In MVC, use forms with `enctype="multipart/form-data"` and handle uploads in the controller using `IFormFile`. In API, use a similar approach to handle file uploads.
+* **File Download**: Use the `File` method in the controller to return files, specifying the appropriate MIME type and file name. In MVC, create links in your views to trigger downloads.
+
+By following these steps, you can successfully implement file upload and download functionality in your .NET Core 6 MVC applications and APIs.
 

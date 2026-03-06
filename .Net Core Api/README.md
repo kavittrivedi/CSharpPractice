@@ -1,6 +1,8 @@
 
 
-How do You secure API requests? Securing API requests is essential to protect sensitive data and ensure that only authorized users can access your API. Here are some common practices to secure API requests:
+## How do You secure API requests? 
+
+Securing API requests is essential to protect sensitive data and ensure that only authorized users can access your API. Here are some common practices to secure API requests:
 
 ### 1. **Authentication**:
 
@@ -205,7 +207,7 @@ Here’s how it works:
 
 So, the server is responsible for checking if the JWT's signature is correct, ensuring that the token is authentic and trustworthy.
 
-Explain difference between GET and POST GET vs POST:
+## Explain difference between GET and POST GET vs POST:
 
 GET:
 
@@ -253,7 +255,9 @@ GET is for fetching data, typically returns 200 OK.
 
 POST is for sending data to be processed, often returns 201 Created or 200 OK.
 
-How to persist state/how to sync two web API communications?  To persist state or sync communications between two web APIs, you need to store and manage the data (state) in a way that both APIs can access and update it when needed.
+## How to persist state/how to sync two web API communications?  
+
+To persist state or sync communications between two web APIs, you need to store and manage the data (state) in a way that both APIs can access and update it when needed.
 
 Here are common approaches to achieve this:
 
@@ -468,5 +472,108 @@ HTTP verbs define what action we perform on a resource, and HTTP status codes te
 - PUT → Replace
 - PATCH → Update
 - DELETE → Remove
+
+
+## Custom Middleware - Explained for Logging in .net core api
+
+Creating a custom middleware for logging in a .NET Core API allows you to capture and log important information about incoming requests and outgoing responses. Middleware in ASP.NET Core is a way to process HTTP requests and responses, and custom middleware can be used to add additional functionality to the request pipeline, such as logging.
+
+### Steps to Create Custom Logging Middleware
+
+Here's a step-by-step guide on how to implement custom middleware for logging:
+
+#### 1. **Create the Middleware Class**
+
+First, create a new class for your middleware. This class will include the logic for logging.
+
+```csharp
+using Microsoft.AspNetCore.Http;
+using System.Diagnostics;
+using System.Threading.Tasks;
+
+public class LoggingMiddleware
+{
+    private readonly RequestDelegate _next;
+
+    public LoggingMiddleware(RequestDelegate next)
+    {
+        _next = next;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        // Log the incoming request
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        // Log request details
+        var request = context.Request;
+        Console.WriteLine($"Incoming Request: {request.Method} {request.Path}");
+
+        // Call the next middleware in the pipeline
+        await _next(context);
+
+        // Log the outgoing response
+        stopwatch.Stop();
+        var response = context.Response;
+        Console.WriteLine($"Outgoing Response: {response.StatusCode} in {stopwatch.ElapsedMilliseconds} ms");
+    }
+}
+```
+
+#### 2. **Register the Middleware**
+
+Next, you need to register the middleware in the `Startup.cs` file. This is done in the `Configure` method.
+
+```csharp
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // Add services to the container
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+
+        // Register the custom logging middleware
+        app.UseMiddleware<LoggingMiddleware>();
+
+        // Other middleware registrations (e.g., routing, authorization)
+        app.UseRouting();
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
+    }
+}
+```
+
+#### 3. **Using the Middleware**
+
+Once the middleware is registered, it will automatically log incoming requests and outgoing responses for every request processed by the API. You can run your application and check the console output or logs to see the details.
+
+### Example of the Logging Output
+
+When a request is made to the API, the console might output something like:
+
+```
+Incoming Request: GET /api/products
+Outgoing Response: 200 in 123 ms
+```
+
+### Benefits of Custom Middleware for Logging
+
+* **Centralized Logging**: All request and response logging is handled in one place, making it easier to maintain and update.
+* **Performance Monitoring**: By measuring the time taken for each request, you can identify slow endpoints and optimize them.
+* **Flexible and Reusable**: You can easily modify the logging behavior or extend it (e.g., adding log levels or writing logs to a file or external logging service).
+
+### Summary
+
+Creating a custom middleware for logging in a .NET Core API involves defining a middleware class, implementing the logging logic, and registering the middleware in the application pipeline. This approach provides a centralized way to capture request and response details, which can be beneficial for monitoring and debugging your API.
 
 

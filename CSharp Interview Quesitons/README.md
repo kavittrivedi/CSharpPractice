@@ -1103,7 +1103,274 @@ public async Task<string> CallAsyncMethod()
 }
 ```
 
+
 However, if you must call an async method from a synchronous context, use one of the above methods with caution.
+
+## Extension Methods in C#
+
+**Extension Methods** in C# are a powerful feature that allows you to "add" new methods to existing types without modifying their source code or creating a new derived type. This is particularly useful for adding functionality to types for which you do not have the source code, such as types defined in the .NET Framework or third-party libraries.
+
+### How Extension Methods Work
+
+An extension method is defined as a static method in a static class, with the first parameter specifying the type that the method will operate on. This first parameter must be preceded by the `this` keyword, indicating that the method is an extension method.
+
+### Defining an Extension Method
+
+Here's how to define an extension method:
+
+1. **Create a Static Class**: Extension methods must be defined in a static class.
+2. **Define a Static Method**: The method must be static and include the `this` keyword in the first parameter.
+
+#### Example
+
+Let's say you want to add a method to the `string` class to count the number of vowels in a string.
+
+```csharp
+using System;
+
+public static class StringExtensions
+{
+    public static int CountVowels(this string str)
+    {
+        if (string.IsNullOrEmpty(str))
+            return 0;
+
+        int count = 0;
+        foreach (char c in str.ToLower())
+        {
+            if ("aeiou".Contains(c))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+}
+```
+
+### Using an Extension Method
+
+Once you have defined an extension method, you can use it as if it were a regular method of the type.
+
+```csharp
+class Program
+{
+    static void Main(string[] args)
+    {
+        string myString = "Hello, World!";
+        int vowelCount = myString.CountVowels(); // Using the extension method
+        Console.WriteLine($"Number of vowels: {vowelCount}");
+    }
+}
+```
+
+### Key Points
+
+1. **Static Class and Method**: Extension methods must be defined in a static class and declared as static methods.
+2. **`this` Keyword**: The first parameter of the method must use the `this` keyword to indicate that it is an extension method for the specified type.
+3. **Namespaces**: To use an extension method, the namespace containing the static class must be included in the file where you want to use it (via a `using` directive).
+4. **Intellisense Support**: Extension methods show up in Intellisense, allowing developers to discover them easily when working with the type.
+
+### Limitations
+
+* **Cannot Override Existing Methods**: Extension methods do not override existing methods. If an instance of a type already has a method with the same name and signature, that method will take precedence.
+* **Scope**: Extension methods are only available when the appropriate namespace is included.
+* **Not Part of the Type**: They are not part of the actual type's definition, so they cannot access private members of the type.
+
+### Summary
+
+Extension methods in C# provide a way to add new functionality to existing types without modifying their code. They are defined in static classes and allow developers to extend the capabilities of classes, making code more modular and reusable. Proper use of extension methods can lead to cleaner and more readable code.
+
+## Explain IQueryable vs IEnumerable
+
+`IQueryable` and `IEnumerable` are two important interfaces in C# that are used for querying collections, but they have different purposes, capabilities, and performance characteristics. Here's a breakdown of the differences between the two:
+
+### 1. **Definition**:
+
+* **IEnumerable<T>**:
+
+  * Represents a forward-only cursor that can be used to iterate through a collection. It is part of the `System.Collections.Generic` namespace.
+  * It is typically used for in-memory collections (like arrays, lists, etc.).
+
+* **IQueryable<T>**:
+
+  * Represents a collection of objects that can be queried using LINQ (Language Integrated Query). It is part of the `System.Linq` namespace.
+  * It is used for querying data from external sources, such as databases or web services, where the query can be translated into a query language (e.g., SQL).
+
+### 2. **Execution**:
+
+* **IEnumerable<T>**:
+
+  * Executes queries in-memory and loads the entire collection into memory before querying.
+  * Queries are executed when you iterate over the collection (deferred execution).
+* **IQueryable<T>**:
+
+  * Executes queries against the data source directly and can be optimized by translating the query into the appropriate format (e.g., SQL for a database).
+  * Allows for more efficient querying since only the required data is fetched from the data source.
+
+### 3. **Usage**:
+
+* **IEnumerable<T>**:
+
+  * Used for working with in-memory collections. It is suitable for scenarios where the entire collection is available and needs to be filtered or processed.
+* **IQueryable<T>**:
+
+  * Used for querying data from remote data sources (like databases) and supports building complex queries.
+  * It allows for querying that takes advantage of the underlying data source's capabilities (e.g., SQL Server's execution plans).
+
+### 4. **Performance**:
+
+* **IEnumerable<T>**:
+
+  * May lead to performance issues if the collection is large, as it loads all data into memory before processing.
+  * All filtering is done in memory after the data has been retrieved.
+
+* **IQueryable<T>**:
+
+  * More efficient for large datasets as it can execute the query against the data source, returning only the relevant data.
+  * It allows for optimizations by the underlying data source.
+
+### 5. **LINQ**:
+
+* **IEnumerable<T>**:
+
+  * Supports LINQ but operates on the collection in memory.
+  * Any LINQ queries performed on an `IEnumerable<T>` are executed after the entire collection is loaded.
+
+* **IQueryable<T>**:
+
+  * Supports LINQ and translates the LINQ queries into a format that can be executed against the data source (like SQL).
+  * Queries can be composed and executed as a single command.
+
+### Example
+
+Here's a simple example to illustrate the differences:
+
+#### Using `IEnumerable`:
+
+```csharp
+List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+IEnumerable<int> evenNumbers = numbers.Where(n => n % 2 == 0); // Filtering in memory
+
+foreach (var number in evenNumbers)
+{
+    Console.WriteLine(number); // Outputs: 2, 4
+}
+```
+
+#### Using `IQueryable`:
+
+```csharp
+using (var context = new YourDbContext())
+{
+    IQueryable<int> evenNumbers = context.Numbers.Where(n => n % 2 == 0); // Filtering in the database
+
+    foreach (var number in evenNumbers)
+    {
+        Console.WriteLine(number); // Outputs even numbers from the database
+    }
+}
+```
+
+### Summary
+
+In summary, `IEnumerable<T>` is best suited for in-memory collections where you want to work with data already loaded into memory, while `IQueryable<T>` is designed for querying data from external data sources efficiently, translating queries to a format the data source can understand. Choosing between them depends on the context of your application and how you intend to work with the data.
+
+## Explain Lambda Expression
+
+A **lambda expression** in C# is a concise way to represent an anonymous function (a function without a name) that can contain expressions and statements. Lambda expressions are particularly useful when you need to pass a small piece of functionality as an argument to methods or to create inline functions without the boilerplate of defining a separate method.
+
+### Syntax
+
+The syntax of a lambda expression consists of:
+
+1. **Input Parameters**: Defined within parentheses. If there is a single parameter, parentheses can be omitted.
+2. **Arrow Operator (`=>`)**: Separates the input parameters from the body of the lambda expression.
+3. **Expression or Statement Block**: The body can be a single expression or a block of statements.
+
+#### Basic Syntax
+
+```csharp
+(parameters) => expression
+```
+
+or
+
+```csharp
+(parameters) => { statements }
+```
+
+### Examples
+
+#### 1. **Basic Lambda Expression**
+
+Here's a simple example of a lambda expression that takes an integer and returns its square:
+
+```csharp
+Func<int, int> square = x => x * x;
+
+int result = square(5); // result will be 25
+```
+
+In this example:
+
+* `Func<int, int>` is a delegate that represents a function taking an `int` and returning an `int`.
+* `x => x * x` is the lambda expression that computes the square of `x`.
+
+#### 2. **Lambda with Multiple Parameters**
+
+You can also define lambda expressions with multiple parameters:
+
+```csharp
+Func<int, int, int> add = (x, y) => x + y;
+
+int sum = add(3, 4); // sum will be 7
+```
+
+#### 3. **Lambda with Statement Block**
+
+If the body of the lambda expression contains more than one statement, use curly braces:
+
+```csharp
+Action<string> greet = name =>
+{
+    var message = $"Hello, {name}!";
+    Console.WriteLine(message);
+};
+
+greet("Alice"); // Outputs: Hello, Alice!
+```
+
+### Common Uses
+
+1. **LINQ Queries**: Lambda expressions are often used in LINQ (Language Integrated Query) to filter, select, and manipulate collections.
+
+   ```csharp
+   var numbers = new List<int> { 1, 2, 3, 4, 5 };
+   var evenNumbers = numbers.Where(n => n % 2 == 0);
+   ```
+
+2. **Event Handlers**: Lambda expressions can be used to define event handlers inline.
+
+   ```csharp
+   button.Click += (sender, e) => { Console.WriteLine("Button clicked!"); };
+   ```
+
+3. **Delegates**: They provide a convenient way to create delegate instances.
+
+   ```csharp
+   Predicate<string> isLong = s => s.Length > 5;
+   ```
+
+### Benefits
+
+* **Conciseness**: Lambda expressions allow you to write less code and improve readability, especially for short functions.
+* **Inline Definition**: They can be defined inline, which helps to keep related logic together.
+* **Functional Programming**: They facilitate functional programming styles, making it easier to work with collections and functional patterns.
+
+### Summary
+
+Lambda expressions are a powerful feature in C# that enable you to write concise and flexible code for representing anonymous functions. They are widely used in LINQ queries, event handling, and anywhere delegates are required. By providing a way to define functionality inline, lambda expressions enhance readability and maintainability of code.
 
 
 

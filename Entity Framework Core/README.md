@@ -62,65 +62,10 @@
 * **Eager Loading** is beneficial for loading related data efficiently when you know you'll need it, reducing the number of queries and improving performance when accessing related entities.
 **Lazy Loading** and **Eager Loading** are two strategies for loading related data in Entity Framework Core. They help manage how data is retrieved from the database, particularly when working with relationships between entities.
 
-### Lazy Loading
 
-* **Definition**: Lazy loading means that related data is loaded on demand, only when it is accessed. This can help improve performance and reduce memory usage, especially if related data is not always needed.
+## Interview Question: Explain Entity States in entity framework core. 
 
-* **How It Works**: When you access a navigation property of an entity, EF Core automatically loads the related data from the database. This typically requires a proxy for the entity.
-
-* **Setup**: To use lazy loading, you need to install the `Microsoft.EntityFrameworkCore.Proxies` package and configure it in your `DbContext`.
-
-  ```csharp
-  services.AddDbContext<MyDbContext>(options =>
-      options.UseLazyLoadingProxies()
-             .UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-  ```
-
-* **Example**:
-
-  ```csharp
-  public class Blog
-  {
-      public int BlogId { get; set; }
-      public string Name { get; set; }
-      public virtual ICollection<Post> Posts { get; set; } // Navigation property
-  }
-
-  // Usage
-  var blog = context.Blogs.Find(1);
-  var posts = blog.Posts; // Posts are loaded here (on-demand)
-  ```
-
-### Eager Loading
-
-* **Definition**: Eager loading means that related data is loaded at the same time as the main entity when the query is executed. This is useful when you know you will need the related data immediately.
-
-* **How It Works**: You specify which related entities to include in the query using the `Include` method.
-
-* **Setup**: Eager loading does not require any special setup in EF Core; you simply use the `Include` method in your queries.
-
-* **Example**:
-
-  ```csharp
-  var blogs = context.Blogs
-      .Include(b => b.Posts) // Eagerly load related Posts
-      .ToList();
-  ```
-
-### Comparison
-
-| Feature        | Lazy Loading                                                            | Eager Loading                                      |
-| -------------- | ----------------------------------------------------------------------- | -------------------------------------------------- |
-| Data Retrieval | Loads related data on demand                                            | Loads related data with the main entity            |
-| Performance    | May result in multiple database queries if many properties are accessed | Usually requires fewer database queries            |
-| Memory Usage   | Can use less memory initially                                           | Uses more memory as related data is loaded upfront |
-| Control        | Less control over when data is loaded                                   | More control over what data is loaded              |
-
-### Summary
-
-* **Lazy Loading** is useful for reducing initial load times and memory usage, but it can lead to the "N+1" query problem, where multiple queries are executed for related data.
-* **Eager Loading** is beneficial for loading related data efficiently when you know you'll need it, reducing the number of queries and improving performance when accessing related entities.
-Interview Question: Explain Entity States in entity framework core. In Entity Framework Core, **entity states** represent the status of an entity as it interacts with the database. Understanding these states is crucial for managing how changes to entities are tracked and persisted. The primary entity states in EF Core are:
+In Entity Framework Core, **entity states** represent the status of an entity as it interacts with the database. Understanding these states is crucial for managing how changes to entities are tracked and persisted. The primary entity states in EF Core are:
 
 ### 1. **Added**
 

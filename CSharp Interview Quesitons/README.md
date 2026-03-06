@@ -1486,6 +1486,523 @@ No, we **cannot inherit** a static class in C#. Static classes are designed to h
 
 If you need to share functionality, use static methods directly, or consider using inheritance in regular (non-static) classes. Static classes are often used as utility or helper classes that provide shared functionality across the application.
 
+## Interview question: Explain async vs sync with simple example and in simple language.
+
+### Synchronous (Sync)
+
+In synchronous programming, tasks are executed one after another. Each task must complete before the next one starts. This can lead to delays if one task takes a long time.
+
+**Example**:
+
+```csharp
+public void SyncMethod()
+{
+    Console.WriteLine("Start Sync");
+    Thread.Sleep(2000); // Simulate a delay
+    Console.WriteLine("End Sync");
+}
+```
+
+Here, the second message will only print after a 2-second delay.
+
+### Asynchronous (Async)
+
+In asynchronous programming, tasks can run concurrently. This allows other tasks to execute while waiting for a long-running task to complete, improving responsiveness.
+
+**Example**:
+
+```csharp
+public async Task AsyncMethod()
+{
+    Console.WriteLine("Start Async");
+    await Task.Delay(2000); // Simulate a delay
+    Console.WriteLine("End Async");
+}
+```
+
+In this case, the second message will print after 2 seconds, but the program can continue doing other work during that time.
+
+Here's a simple example of an asynchronous method in a C# console application:
+
+### Example Code
+
+```csharp
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        Console.WriteLine("Fetching data asynchronously...");
+        var data = await FetchDataAsync("https://jsonplaceholder.typicode.com/posts/1");
+        Console.WriteLine($"Data fetched: {data}");
+    }
+
+    static async Task<string> FetchDataAsync(string url)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            var response = await client.GetStringAsync(url);
+            return response;
+        }
+    }
+}
+```
+
+### Explanation
+
+1. **Main Method**: The `Main` method is marked as `async` and calls `FetchDataAsync` using `await`.
+2. **FetchDataAsync Method**: This method fetches data from a URL asynchronously without blocking the main thread.
+
+### Running the Example
+
+1. Create a new Console Application in Visual Studio or your preferred IDE.
+2. Replace the code in `Program.cs` with the example above.
+3. Run the application to see how it fetches data asynchronously.
+
+Here's an example of a console application in C# with multiple asynchronous methods:
+
+### Example Code
+
+```csharp
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        Console.WriteLine("Starting data fetch...");
+
+        var postData = await GetPostDataAsync(1);
+        Console.WriteLine($"Post Data: {postData}");
+
+        var userData = await GetUserDataAsync(1);
+        Console.WriteLine($"User Data: {userData}");
+
+        Console.WriteLine("All data fetched.");
+    }
+
+    static async Task<string> GetPostDataAsync(int postId)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            var response = await client.GetStringAsync($"https://jsonplaceholder.typicode.com/posts/{postId}");
+            return response;
+        }
+    }
+
+    static async Task<string> GetUserDataAsync(int userId)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            var response = await client.GetStringAsync($"https://jsonplaceholder.typicode.com/users/{userId}");
+            return response;
+        }
+    }
+}
+```
+
+### Explanation
+
+1. **Main Method**: Calls `GetPostDataAsync` and `GetUserDataAsync` asynchronously, awaiting each task.
+2. **GetPostDataAsync**: Fetches a post by ID.
+3. **GetUserDataAsync**: Fetches user information by ID.
+
+### Running the Example
+
+1. Create a new Console Application in Visual Studio or your preferred IDE.
+2. Replace the code in `Program.cs` with the example above.
+3. Run the application to see how it fetches post and user data asynchronously.
+
+## Explain await
+
+The `await` keyword in C# is used to asynchronously wait for a task to complete without blocking the executing thread. When an asynchronous method is called with `await`, the method can return control to the caller until the awaited task finishes. This helps improve application responsiveness, especially in UI applications, by allowing other operations to run while waiting for potentially long-running tasks, like file I/O or network calls.
+
+Here's a simple usage example:
+
+```csharp
+public async Task<int> GetDataAsync()
+{
+    int result = await SomeLongRunningOperation();
+    return result;
+}
+```
+
+Here are several different examples of asynchronous programming in C# using the `async` and `await` keywords:
+
+### 1. File I/O Operations
+
+```csharp
+using System;
+using System.IO;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        string content = await ReadFileAsync("example.txt");
+        Console.WriteLine(content);
+    }
+
+    static async Task<string> ReadFileAsync(string path)
+    {
+        using (StreamReader reader = new StreamReader(path))
+        {
+            return await reader.ReadToEndAsync();
+        }
+    }
+}
+```
+
+### 2. Asynchronous Database Call
+
+```csharp
+using System;
+using System.Data.SqlClient;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        string data = await FetchDataAsync("SELECT TOP 1 Name FROM Users");
+        Console.WriteLine(data);
+    }
+
+    static async Task<string> FetchDataAsync(string query)
+    {
+        using (SqlConnection conn = new SqlConnection("YourConnectionString"))
+        {
+            await conn.OpenAsync();
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                return (string)await cmd.ExecuteScalarAsync();
+            }
+        }
+    }
+}
+```
+
+### 3. Multiple Async Calls with `Task.WhenAll`
+
+```csharp
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        var tasks = new[]
+        {
+            GetDataAsync("https://jsonplaceholder.typicode.com/posts/1"),
+            GetDataAsync("https://jsonplaceholder.typicode.com/users/1")
+        };
+        
+        var results = await Task.WhenAll(tasks);
+        foreach (var result in results)
+        {
+            Console.WriteLine(result);
+        }
+    }
+
+    static async Task<string> GetDataAsync(string url)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            return await client.GetStringAsync(url);
+        }
+    }
+}
+```
+
+### 4. Using `ConfigureAwait`
+
+```csharp
+using System;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        await Task.Delay(2000).ConfigureAwait(false); // Do not capture the context
+        Console.WriteLine("Executed without capturing context.");
+    }
+}
+```
+
+### 5. Exception Handling in Async
+
+```csharp
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        try
+        {
+            var data = await GetDataAsync("https://invalid-url");
+            Console.WriteLine(data);
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error fetching data: {ex.Message}");
+        }
+    }
+
+    static async Task<string> GetDataAsync(string url)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            return await client.GetStringAsync(url);
+        }
+    }
+}
+```
+
+These examples cover a range of scenarios including file I/O, database calls, multiple asynchronous operations, and error handling, illustrating the versatility of async programming in C#.
+
+Here are a few additional examples of asynchronous programming that highlight various aspects and uses of `async` and `await` in C#:
+
+### 6. Async Method Returning `Task`
+
+```csharp
+using System;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        await PerformTaskAsync();
+        Console.WriteLine("Task completed.");
+    }
+
+    static async Task PerformTaskAsync()
+    {
+        await Task.Delay(1000); // Simulates a long-running task
+        Console.WriteLine("Task in progress...");
+    }
+}
+```
+
+### 7. Async Programming with Progress Reporting
+
+```csharp
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        var progress = new Progress<int>(value => Console.WriteLine($"Progress: {value}%"));
+        await ReportProgressAsync(progress);
+    }
+
+    static async Task ReportProgressAsync(IProgress<int> progress)
+    {
+        for (int i = 0; i <= 100; i += 20)
+        {
+            await Task.Delay(500); // Simulate work
+            progress.Report(i);
+        }
+    }
+}
+```
+
+### 8. Async Method Using Cancellation Token
+
+```csharp
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        var cancellationTokenSource = new CancellationTokenSource();
+        Task.Run(() =>
+        {
+            Thread.Sleep(2000); // Simulate delay before cancellation
+            cancellationTokenSource.Cancel();
+        });
+
+        try
+        {
+            await LongRunningOperationAsync(cancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("Operation was canceled.");
+        }
+    }
+
+    static async Task LongRunningOperationAsync(CancellationToken cancellationToken)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            await Task.Delay(1000); // Simulates work
+            Console.WriteLine("Working...");
+        }
+    }
+}
+```
+
+### 9. Using Async in Event Handlers
+
+```csharp
+using System;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        await Button_ClickAsync();
+    }
+
+    static async Task Button_ClickAsync()
+    {
+        await Task.Delay(1000); // Simulate a click event delay
+        Console.WriteLine("Button clicked, operation performed asynchronously.");
+    }
+}
+```
+
+### 10. Async with LINQ
+
+```csharp
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        var results = await GetDataAsync();
+        foreach (var item in results)
+        {
+            Console.WriteLine(item);
+        }
+    }
+
+    static async Task<List<string>> GetDataAsync()
+    {
+        await Task.Delay(1000); // Simulate data fetching
+        return new List<string> { "Data1", "Data2", "Data3" }.OrderBy(x => x).ToList();
+    }
+}
+```
+
+These additional examples demonstrate different scenarios where async programming can be effectively utilized, including task reporting, cancellation, event handling, and using LINQ. Each of these scenarios showcases the flexibility and benefits of using asynchronous programming in C#.
+
+
+## Explain SOA
+
+Service-Oriented Architecture (SOA) is a design paradigm that allows different services to communicate over a network. It promotes the development of software applications as a collection of loosely coupled, reusable services, which can be developed, deployed, and maintained independently. SOA emphasizes interoperability and integration, enabling services to be accessed and reused across various platforms. This architecture enhances flexibility and scalability, making it easier to adapt to changing business needs and integrate with other systems.
+
+For more information, you can check resources like [IBM's explanation of SOA](https://www.ibm.com/cloud/learn/soa).
+
+Here’s a simple example of implementing a Service-Oriented Architecture (SOA) in .NET Core 6.0 using two services: a Product Service and an Order Service.
+
+### 1. Product Service
+
+**ProductService.cs**
+
+```csharp
+using Microsoft.AspNetCore.Mvc;
+
+namespace ProductService.Controllers
+{
+    [ApiController]
+    [Route("api/products")]
+    public class ProductServiceController : ControllerBase
+    {
+        [HttpGet]
+        public IActionResult GetProducts()
+        {
+            var products = new List<string> { "Product1", "Product2", "Product3" };
+            return Ok(products);
+        }
+    }
+}
+```
+
+### 2. Order Service
+
+**OrderService.cs**
+
+```csharp
+using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+namespace OrderService.Controllers
+{
+    [ApiController]
+    [Route("api/orders")]
+    public class OrderServiceController : ControllerBase
+    {
+        private readonly HttpClient _httpClient;
+
+        public OrderServiceController(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOrderProducts()
+        {
+            var response = await _httpClient.GetStringAsync("http://localhost:5001/api/products"); // URL of Product Service
+            return Ok($"Order Products: {response}");
+        }
+    }
+}
+```
+
+### 3. Startup Configuration
+
+**Program.cs**
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Register HttpClient
+builder.Services.AddHttpClient<OrderServiceController>();
+
+var app = builder.Build();
+
+app.MapControllers();
+
+app.Run();
+```
+
+### Explanation
+
+* **Product Service** provides a simple API to return a list of products.
+* **Order Service** calls the Product Service to fetch the products and return them as part of an order response.
+* **HttpClient** is used for inter-service communication, showcasing how services interact in an SOA environment.
+
+This structure allows for independent development and deployment of services, demonstrating the principles of SOA.
+
 
 ## What's New in C# 12
 

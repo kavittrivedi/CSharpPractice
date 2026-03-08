@@ -1496,6 +1496,14 @@ In C#, you can have several types of constructors in a class:
 
 ## Interview Question: What is diamond problem?
 
+The **diamond problem** occurs in multiple inheritance, where a class inherits from two or more classes that have a common base class, leading to ambiguity. It’s named after the diamond-shaped structure in the inheritance hierarchy.
+
+For example, if class `A` is the base class, and both `B` and `C` inherit from `A`, and class `D` inherits from both `B` and `C`, `D` would have two paths to `A`, causing ambiguity in accessing `A`'s methods or properties.
+
+In C#, this problem is avoided because C# doesn’t support multiple inheritance for classes, but it supports interface inheritance, which handles this using the "explicit implementation" feature.
+
+## Interview Question: how to restrict virtual method?
+
 To restrict a **virtual method** in C#, you can use the **`sealed`** keyword in an override of the method. This prevents any further overriding in derived classes. Here's an example:
 
 ```csharp

@@ -833,7 +833,10 @@ var item = list.FirstOrDefault(x => x.Id == 1);
 var item = list.SingleOrDefault(x => x.Id == 1);
 ```
 
-**Summary:** Use FirstOrDefault when multiple results are possible but only the first is needed. Use SingleOrDefault when exactly one result is expected; otherwise, it will throw an error if multiple exist.
+**Summary:** 
+
+- Use FirstOrDefault when multiple results are possible but only the first is needed. 
+- Use SingleOrDefault when exactly one result is expected; otherwise, it will throw an error if multiple exist.
 
 ## Why stored procedures are faster than LINQ and Entity Framework Core?
 

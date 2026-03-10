@@ -652,7 +652,9 @@ Used to make code easier to maintain, reuse, and scale.
 - **Encapsulation**: Hides the internal details of a class and controls how data is accessed or modified.
 - **Modularization**: Breaks the system into smaller, independent units to improve organization and maintainability.
 
-Explain composite design pattern in simple language. The **Composite Design Pattern** is a structural pattern used to treat individual objects and compositions of objects uniformly. It allows you to build complex objects made of multiple smaller objects, where each object (both individual and composite) can be treated the same way.
+## Explain composite design pattern in simple language. 
+
+The **Composite Design Pattern** is a structural pattern used to treat individual objects and compositions of objects uniformly. It allows you to build complex objects made of multiple smaller objects, where each object (both individual and composite) can be treated the same way.
 
 ### Example:
 

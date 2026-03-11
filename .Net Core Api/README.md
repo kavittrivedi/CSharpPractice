@@ -54,7 +54,10 @@ Securing API requests is essential to protect sensitive data and ensure that onl
 ### Summary:
 
 Securing API requests involves a combination of authentication, authorization, encryption, rate limiting, and monitoring. By implementing these practices, you can protect your API and the data it handles from unauthorized access and attacks.
-How many ways we can do Web API Versioning? Web API versioning is essential for managing changes to your API while ensuring that existing clients can continue to function without disruption. There are several common strategies for versioning APIs:
+
+## How many ways we can do Web API Versioning? 
+
+Web API versioning is essential for managing changes to your API while ensuring that existing clients can continue to function without disruption. There are several common strategies for versioning APIs:
 
 ### 1. **URI Versioning**:
 

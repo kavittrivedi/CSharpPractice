@@ -1,5 +1,3 @@
-Great question—RAG (Retrieval-Augmented Generation) is a very important concept, especially with AI apps.
-
 If you want to **understand RAG properly (end-to-end)**, here’s a structured list of topics you should cover 👇
 
 ---

@@ -335,3 +335,60 @@ using (var transaction = await _context.Database.BeginTransactionAsync())
 ```
 
 Here, both `Students` and `Courses` additions are part of the same transaction. If one fails, the transaction is rolled back, ensuring data consistency.
+
+
+## Interview Question: Which packages are required if you want to use EF Core in a .NET Core application?
+
+To use **Entity Framework Core** in a .NET Core application, you usually need the following NuGet packages:
+
+### Required Packages
+
+1. **Microsoft.EntityFrameworkCore**
+
+   * This is the main EF Core package.
+   * It provides the core functionality of Entity Framework Core.
+
+2. **Database Provider Package**
+
+   * EF Core needs a database provider package based on the database you are using.
+   * Common examples:
+
+     | Database | Package |
+     | -------- | ------- |
+     | SQL Server | `Microsoft.EntityFrameworkCore.SqlServer` |
+     | SQLite | `Microsoft.EntityFrameworkCore.Sqlite` |
+     | PostgreSQL | `Npgsql.EntityFrameworkCore.PostgreSQL` |
+     | MySQL | `Pomelo.EntityFrameworkCore.MySql` |
+
+3. **Microsoft.EntityFrameworkCore.Tools**
+
+   * This package is used for EF Core commands such as migrations.
+   * Example commands include `Add-Migration`, `Update-Database`, and `Script-Migration`.
+
+### Optional Packages
+
+1. **Microsoft.EntityFrameworkCore.Design**
+
+   * This package is commonly used at design time for migrations and scaffolding.
+
+2. **Microsoft.EntityFrameworkCore.Proxies**
+
+   * This package is required only if you want to use lazy loading proxies.
+
+### Example for SQL Server
+
+```powershell
+Install-Package Microsoft.EntityFrameworkCore
+Install-Package Microsoft.EntityFrameworkCore.SqlServer
+Install-Package Microsoft.EntityFrameworkCore.Tools
+Install-Package Microsoft.EntityFrameworkCore.Design
+```
+
+### Summary
+
+For a basic EF Core setup with SQL Server, the most commonly used packages are:
+
+* `Microsoft.EntityFrameworkCore`
+* `Microsoft.EntityFrameworkCore.SqlServer`
+* `Microsoft.EntityFrameworkCore.Tools`
+* `Microsoft.EntityFrameworkCore.Design`

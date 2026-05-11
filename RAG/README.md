@@ -2849,3 +2849,168 @@ In .NET systems, you’ll implement this using:
 * Secure API design
 
 ---
+
+# AWS Bedrock Knowledge Base
+
+## Simple meaning
+
+An **AWS Bedrock Knowledge Base** is a managed RAG system from AWS.
+
+It helps an AI model answer questions using **your own documents**, not only the knowledge the model already learned during training.
+
+---
+
+## Very simple example
+
+Imagine your company has documents like:
+
+* HR policy PDFs
+* Product manuals
+* Support articles
+* Internal project notes
+
+A user asks:
+
+> What is our leave policy?
+
+Instead of guessing, Bedrock Knowledge Base:
+
+1. Searches your company documents
+2. Finds the most relevant text
+3. Sends that text to the AI model
+4. The model answers using that text
+
+---
+
+## Simple idea
+
+Bedrock Knowledge Base is like giving the AI a **company library**.
+
+The AI does not need to memorize everything.
+
+It can search the library first, then answer.
+
+---
+
+## How it works
+
+### 1. Store your documents
+
+You keep documents in a source like:
+
+* Amazon S3
+* Other supported enterprise data sources
+
+---
+
+### 2. Convert documents into embeddings
+
+Bedrock converts document text into **embeddings**.
+
+Embeddings are numeric representations of meaning.
+
+Simple meaning:
+
+> Similar sentences get similar numbers.
+
+Example:
+
+* "How many vacation days do I get?"
+* "What is the leave policy?"
+
+These may look different, but their meaning is similar.
+
+---
+
+### 3. Store embeddings in a vector database
+
+The embeddings are stored in a vector store such as:
+
+* Amazon OpenSearch Serverless
+* Amazon Aurora PostgreSQL with pgvector
+* Other supported vector stores
+
+---
+
+### 4. Retrieve relevant information
+
+When a user asks a question, Bedrock:
+
+* Converts the question into an embedding
+* Searches for similar document chunks
+* Retrieves the most relevant content
+
+---
+
+### 5. Generate the final answer
+
+Bedrock sends the retrieved content to a foundation model, such as an Amazon Bedrock model.
+
+The model then generates an answer based on your documents.
+
+---
+
+## Why use Bedrock Knowledge Base?
+
+### Without Knowledge Base
+
+The AI may answer from general training knowledge.
+
+Risk:
+
+* It may guess
+* It may be outdated
+* It may not know your private company data
+
+---
+
+### With Knowledge Base
+
+The AI answers using your trusted documents.
+
+Benefits:
+
+* More accurate answers
+* Uses private business data
+* Reduces hallucination
+* Faster to build RAG applications
+* Less custom infrastructure to manage
+
+---
+
+## Simple architecture
+
+User question
+
+-> Bedrock Knowledge Base
+
+-> Vector search
+
+-> Relevant document chunks
+
+-> Foundation model
+
+-> Final answer
+
+---
+
+## Real-life analogy
+
+Think of a student in an exam.
+
+Without Knowledge Base:
+
+> Student answers only from memory.
+
+With Knowledge Base:
+
+> Student is allowed to open the correct textbook page before answering.
+
+Bedrock Knowledge Base helps the AI open the right textbook page.
+
+---
+
+## One-line summary
+
+**AWS Bedrock Knowledge Base = AWS-managed RAG that lets AI answer using your own documents.**
+

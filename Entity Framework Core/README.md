@@ -1,6 +1,6 @@
 # Entity Framework Core Interview Practice
 
-## Interview Question: Explain  Lazy Loading and eager Loading in .net core 6 
+## Explain  Lazy Loading and eager Loading in .net core 6 
 
 **Lazy Loading** and **Eager Loading** are two strategies for loading related data in Entity Framework Core. They help manage how data is retrieved from the database, particularly when working with relationships between entities.
 
@@ -65,7 +65,7 @@
 **Lazy Loading** and **Eager Loading** are two strategies for loading related data in Entity Framework Core. They help manage how data is retrieved from the database, particularly when working with relationships between entities.
 
 
-## Interview Question: Explain Entity States in entity framework core. 
+##  Explain Entity States in entity framework core. 
 
 In Entity Framework Core, **entity states** represent the status of an entity as it interacts with the database. Understanding these states is crucial for managing how changes to entities are tracked and persisted. The primary entity states in EF Core are:
 
@@ -223,7 +223,10 @@ public class MyDbContext : DbContext
 * **Many-to-Many**: Use navigation properties in both entities and configure the relationship using Fluent API. In EF Core 5.0 and later, you can directly define many-to-many relationships without a separate join entity.
 
 These configurations allow Entity Framework Core to manage the relationships and ensure that the appropriate data is saved to and retrieved from the database.
-Interview Question: what is difference between Entity Framework core and Dapper? Entity Framework Core (EF Core) and Dapper are both popular data access technologies in .NET, but they serve different purposes and have distinct characteristics. Here’s a comparison of the two:
+
+## What is difference between Entity Framework core and Dapper? 
+
+Entity Framework Core (EF Core) and Dapper are both popular data access technologies in .NET, but they serve different purposes and have distinct characteristics. Here’s a comparison of the two:
 
 ### Entity Framework Core (EF Core)
 
@@ -339,7 +342,7 @@ using (var transaction = await _context.Database.BeginTransactionAsync())
 Here, both `Students` and `Courses` additions are part of the same transaction. If one fails, the transaction is rolled back, ensuring data consistency.
 
 
-## Interview Question: Which packages are required if you want to use EF Core in a .NET Core application?
+## Which packages are required if you want to use EF Core in a .NET Core application?
 
 To use **Entity Framework Core** in a .NET Core application, you usually need the following NuGet packages:
 

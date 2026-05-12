@@ -1,5 +1,4 @@
-
-
+# .Net Core MVC Interview Practice
 
 ## Explain MVC Page Life Cycle
 

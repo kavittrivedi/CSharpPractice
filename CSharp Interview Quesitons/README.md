@@ -1,4 +1,4 @@
-# CSharpPractice
+# C# Interview Practice
 
 ## How foreach Loop Works
 
@@ -142,9 +142,7 @@ Difference between for and foreach loop.
 - When you just want to access all elements in a collection.  
 - For better readability and less error-prone code.
 
-## Explain IQueryable with Simple Example
-
-Explain me IQueryable with simple example. In which situation we can use IEnumerator?
+## Explain IQueryable with Simple Example. In which situation we can use IEnumerator?
 
 IQueryable is an interface in C# used for querying data from a remote source like a database. Unlike IEnumerable, IQueryable supports deferred execution and query translation into the query language of the underlying data source (e.g., SQL for a database).
 
@@ -231,9 +229,7 @@ Coroutines: In game development, IEnumerator is used to pause/resume code execut
 
 IEnumerator is not typically used for querying data. Instead, use it for iterating collections or custom workflows, while IQueryable is used for data querying.
 
-## Explain Value Type and Reference Type
-
-Explain Value type and reference type? Memory allocation for both.  
+## Explain Value Type and Reference Type and explain memory allocation for both. 
 
 ### Value Type and Reference Type: Explanation
 
@@ -397,7 +393,9 @@ When a class has an int property, memory allocation depends on whether the class
 
 ## Async/Await vs TPL
 
-Async await vs TPL. Both async/await and the Task Parallel Library (TPL) are used for handling asynchronous operations and parallelism in C#. Here's a simple comparison:
+Async await vs TPL. Both async/await and the Task Parallel Library (TPL) are used for handling asynchronous operations and parallelism in C#. 
+
+Here's a simple comparison:
 
 ### 1. Async/Await
 

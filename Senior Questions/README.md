@@ -1,4 +1,4 @@
-## Interview Question: How to perform code review? 
+## How to perform code review? 
 
 Performing a code review involves several steps to ensure code quality:
 
@@ -12,7 +12,7 @@ Performing a code review involves several steps to ensure code quality:
 
 Feedback should be constructive and collaborative.
 
-## Interview Question: How to do estimation of any feature, User Story and bug? 
+## How to do estimation of any feature, User Story and bug? 
 
 Estimating features, user stories, and bugs is crucial for effective project management. Here's a structured approach to estimation:
 
@@ -56,7 +56,7 @@ Estimating features, user stories, and bugs is crucial for effective project man
 
 Estimation involves understanding the scope, breaking down tasks, choosing the right technique, considering team velocity, and involving the team. Regularly reviewing and adjusting estimates based on feedback helps improve accuracy over time.
 
-## Interview Question: Explain Branching strategy.  
+## Explain Branching strategy.  
 
 A **branching strategy** in version control systems (like Git) outlines how to create, manage, and merge branches in a code repository. It helps teams coordinate their work, manage features, and maintain code quality. Here are some common branching strategies:
 
@@ -103,7 +103,7 @@ A **branching strategy** in version control systems (like Git) outlines how to c
 
 A branching strategy provides a framework for managing code changes in a collaborative environment. Choosing the right strategy depends on the project's size, team structure, and deployment frequency. Implementing a consistent strategy helps improve collaboration, code quality, and release management.
 
-## Interview Question: What is difference between .Net Framework and .Net Core? 
+## What is difference between .Net Framework and .Net Core? 
 
 Here are the key differences between **.NET Framework** and **.NET Core**:
 
@@ -146,7 +146,7 @@ Here are the key differences between **.NET Framework** and **.NET Core**:
 
 In summary, **.NET Framework** is suitable for Windows-specific applications, while **.NET Core** is a cross-platform, lightweight framework ideal for modern application development. The choice between them depends on the project's requirements, target platform, and future considerations.
 
-## Interview Question: What is difference between MVC - Webform? 
+## What is difference between MVC - Webform? 
 
 Here are the key differences between **MVC (Model-View-Controller)** and **Web Forms** in ASP.NET:
 
@@ -188,7 +188,7 @@ Here are the key differences between **MVC (Model-View-Controller)** and **Web F
 
 In summary, **MVC** is more suited for modern web application development, emphasizing separation of concerns, testability, and flexibility, while **Web Forms** is an older framework that abstracts many complexities but may lead to issues with maintainability and scalability. The choice between the two often depends on the project requirements, team expertise, and future maintenance considerations.
 
-## Interview Question: SQL Best Practice. 
+## SQL Best Practice. 
 
 Here are some best practices for SQL development to ensure performance, security, and maintainability:
 
@@ -241,7 +241,7 @@ Here are some best practices for SQL development to ensure performance, security
 
 Following these SQL best practices can help ensure optimal performance, security, and maintainability of your database systems. Regularly reviewing and refining your practices in line with evolving technologies and methodologies will contribute to the overall health of your SQL database.
 
-## Interview Question: C# Best Practice. 
+## C# Best Practice. 
 
 Here are some best practices for C# development to enhance code quality, maintainability, and performance:
 
@@ -310,7 +310,7 @@ Here are some best practices for C# development to enhance code quality, maintai
 
 By following these C# best practices, developers can create cleaner, more maintainable code that adheres to industry standards. Regular code reviews and refactoring can further enhance code quality and ensure adherence to these best practices.
 
-## Interview Question: Explain Agile. 
+## Explain Agile. 
 
 **Agile** is a project management and product development methodology that emphasizes flexibility, collaboration, customer feedback, and iterative progress. It aims to deliver high-quality products that meet user needs in a rapidly changing environment. Here are the key concepts and principles of Agile:
 
@@ -364,7 +364,7 @@ The Agile Manifesto, created in 2001, outlines four core values and twelve princ
 
 Agile is a flexible and collaborative approach to project management that prioritizes customer needs, iterative progress, and team empowerment. By embracing change and fostering continuous improvement, Agile helps teams deliver high-quality products that meet market demands efficiently.
 
-## Interview Question: We have a web application in asp.net webform. We want to migrate to .net core 8 MVC. How we can migrate?
+## We have a web application in asp.net webform. We want to migrate to .net core 8 MVC. How we can migrate?
 
 Migrating an ASP.NET WebForms application to .NET Core 8 MVC involves several steps:
 

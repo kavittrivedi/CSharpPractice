@@ -76,7 +76,7 @@ You can implement custom middleware for various purposes in your application. He
 
 Custom middleware allows you to insert these tasks in the request-response pipeline, helping you handle cross-cutting concerns in a clean and modular way.
 
-## Interview Question: How Middleware Works in .NET Core?
+## How Middleware Works in .NET Core?
 
 In .NET Core, **middleware** is a component that processes requests and responses in the **request-response pipeline**. It works in a pipeline fashion where each middleware handles part of the request, can modify it, and then either passes control to the next middleware or short-circuits the pipeline (e.g., returning a response). Middleware components are executed in the order they are registered in the `Startup.cs` class, using methods like `app.Use()`, `app.Map()`, and `app.Run()`.
 

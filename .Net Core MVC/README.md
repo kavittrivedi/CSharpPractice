@@ -1,7 +1,7 @@
 
 
 
-## Explain MVC Page Life Cycle in Short and Simple Language
+## Explain MVC Page Life Cycle
 
 The MVC (Model-View-Controller) page life cycle describes the flow of how a request is processed in an ASP.NET MVC application from start to finish. Here's a simple breakdown:
 
@@ -15,7 +15,7 @@ The MVC (Model-View-Controller) page life cycle describes the flow of how a requ
 
 In short, it follows this cycle: **Request → Routing → Controller → Model → View → Response**.
 
-## Interview Question: How Many Types of Filters Are There in .NET Core and in Which Order Do They Execute?
+##  How Many Types of Filters Are There in .NET Core and in Which Order Do They Execute?
 
 In .NET Core, there are **five types of filters** used to execute logic before or after certain stages in an action method lifecycle:
 
@@ -156,7 +156,7 @@ Here's a quick overview of the different types of return values for action metho
 - MVC return types focus on rendering views, redirects, or data (like JSON).
 - API return types focus on sending HTTP responses (like OK, NotFound, Created) with or without data.
 
-## Explain Same in .NET Core MVC and API
+## Explain .NET Core MVC and API Controller Return Types
 
 In ASP.NET Core MVC and ASP.NET Core API, the types of return values from action methods are similar to those in previous versions, but with some refinements. Here's a short overview of the return types for both MVC and API controllers in .NET Core:
 
@@ -510,7 +510,7 @@ In summary, use Partial Views for simple UI pieces that depend on the parent mod
 
 
 
-## Interview Question: What Is the Difference Between HTML Helper Controls and Tag Helpers?
+##  What Is the Difference Between HTML Helper Controls and Tag Helpers?
 
 **HTML Helper Controls** and **Tag Helpers** are both ways to generate HTML in ASP.NET Core, but they have key differences:
 

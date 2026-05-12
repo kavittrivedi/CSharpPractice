@@ -1,3 +1,7 @@
+# jQuery and Javascript Interview Practice
+
+## How to check DOM is fully loaded?
+
 Yes, you can use `$(document).ready()` in jQuery to ensure that the DOM is fully loaded before executing any JavaScript code. Here’s a proper syntax example:
 
 ```javascript

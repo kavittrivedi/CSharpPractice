@@ -19,7 +19,10 @@ $(function() {
 ```
 
 Both methods are correct and ensure that your code will run after the DOM is fully loaded.
-Interview Question: Can we write $(document).ready() multiple times? Yes, you can write `$(document).ready()` multiple times in the same file. Each instance will be executed once the DOM is fully loaded. jQuery will queue up all `$(document).ready()` functions and run them in the order they were declared after the page is loaded. Here's an example:
+
+## Can we write $(document).ready() multiple times? 
+
+Yes, you can write `$(document).ready()` multiple times in the same file. Each instance will be executed once the DOM is fully loaded. jQuery will queue up all `$(document).ready()` functions and run them in the order they were declared after the page is loaded. Here's an example:
 
 ```javascript
 $(document).ready(function() {
@@ -32,7 +35,10 @@ $(document).ready(function() {
 ```
 
 Both functions will run once the DOM is ready.
-Interview Question: how many ways we can bind events in jquery? In jQuery, there are several ways to bind events to elements:
+
+## How many ways we can bind events in jquery? 
+
+In jQuery, there are several ways to bind events to elements:
 
 1. **Inline HTML**: Using `onclick`, `onmouseover`, etc., within the HTML element.
 
@@ -71,7 +77,10 @@ Interview Question: how many ways we can bind events in jquery? In jQuery, there
        alert('Dynamic button clicked');
    });
    ```
-Interview question: WHat is $ in jQuery? In jQuery, `$` is simply an alias for `jQuery`. It’s a shorthand notation used to access jQuery functions, such as selecting elements, manipulating the DOM, handling events, etc.
+
+## WHat is $ in jQuery? 
+
+In jQuery, `$` is simply an alias for `jQuery`. It’s a shorthand notation used to access jQuery functions, such as selecting elements, manipulating the DOM, handling events, etc.
 
 For example:
 

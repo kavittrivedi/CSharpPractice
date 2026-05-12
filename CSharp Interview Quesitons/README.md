@@ -1486,7 +1486,7 @@ In C#, you can have several types of constructors in a class:
    }
    ```
 
-## Interview Question: What is diamond problem?
+## What is diamond problem?
 
 The **diamond problem** occurs in multiple inheritance, where a class inherits from two or more classes that have a common base class, leading to ambiguity. It’s named after the diamond-shaped structure in the inheritance hierarchy.
 
@@ -1494,7 +1494,7 @@ For example, if class `A` is the base class, and both `B` and `C` inherit from `
 
 In C#, this problem is avoided because C# doesn’t support multiple inheritance for classes, but it supports interface inheritance, which handles this using the "explicit implementation" feature.
 
-## Interview Question: how to restrict virtual method?
+##  how to restrict virtual method?
 
 To restrict a **virtual method** in C#, you can use the **`sealed`** keyword in an override of the method. This prevents any further overriding in derived classes. Here's an example:
 
@@ -1515,7 +1515,7 @@ public class DerivedClass : BaseClass
 
 In this example, `Show` in `DerivedClass` is sealed, so no further class can override this method.
 
-## Interview Question: Explain Interface vs abstract class.
+##  Explain Interface vs abstract class.
 
 ### Key Differences Between Interface and Abstract Class:
 
@@ -1531,7 +1531,7 @@ public interface IAnimal { void Speak(); }
 public abstract class Animal { public abstract void Speak(); }
 ```
 
-## Interview question: What are the members of the interface?
+##  What are the members of the interface?
 
 The members of an interface in C# can include:
 
@@ -1558,13 +1558,13 @@ The members of an interface in C# can include:
 
 All members of an interface are abstract and public by default, without any implementation.
 
-## Interview Question: Can we inherit static class to another class?
+##  Can we inherit static class to another class?
 
 No, we **cannot inherit** a static class in C#. Static classes are designed to hold only static members (methods, properties, fields) and cannot be instantiated or inherited. They exist at the class level and are not meant to participate in inheritance hierarchies.
 
 If you need to share functionality, use static methods directly, or consider using inheritance in regular (non-static) classes. Static classes are often used as utility or helper classes that provide shared functionality across the application.
 
-## Interview question: Explain async vs sync with simple example and in simple language.
+##  Explain async vs sync with simple example.
 
 ### Synchronous (Sync)
 

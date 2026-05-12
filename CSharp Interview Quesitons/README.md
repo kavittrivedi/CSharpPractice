@@ -736,11 +736,7 @@ Avoid using `throw ex`, as it causes loss of stack trace information, making deb
 - Use `throw` to preserve the stack trace when rethrowing exceptions.
 - Avoid `throw ex` because it loses the stack trace and makes it difficult to diagnose the issue.
 
-## Readonly vs Constant
-
-What is different between readonly and constant.  
-
-### Readonly vs Constant
+## Readonly vs Constan. What is different between readonly and constant.  
 
 #### 1. readonly
 

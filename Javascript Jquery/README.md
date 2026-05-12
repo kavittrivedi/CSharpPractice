@@ -97,7 +97,10 @@ jQuery(document).ready(function() {
 ```
 
 You can also use `noConflict()` if `$` is conflicting with other libraries that use the `$` symbol.
-Interview Question: What is call back function in jquery? In jQuery, a callback function is a function that is passed as an argument to another function and is executed after the completion of that function. It ensures that a certain block of code runs after a specific event or action has completed.
+
+## What is call back function in jquery? 
+
+In jQuery, a callback function is a function that is passed as an argument to another function and is executed after the completion of that function. It ensures that a certain block of code runs after a specific event or action has completed.
 
 For example:
 
@@ -110,6 +113,7 @@ $("#myDiv").fadeOut("slow", function() {
 In this example, the anonymous function is a callback that runs after the `fadeOut` effect is completed.
 
 Callback functions are useful for handling asynchronous operations.
+
 In jQuery, a callback function is a function that is passed as an argument to another function and is executed after the completion of that function. It ensures that a certain block of code runs after a specific event or action has completed.
 
 For example:

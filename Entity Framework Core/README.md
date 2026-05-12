@@ -1,3 +1,5 @@
+# Entity Framework Core Interview Practice
+
 ## Interview Question: Explain  Lazy Loading and eager Loading in .net core 6 
 
 **Lazy Loading** and **Eager Loading** are two strategies for loading related data in Entity Framework Core. They help manage how data is retrieved from the database, particularly when working with relationships between entities.

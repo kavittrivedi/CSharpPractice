@@ -1442,7 +1442,7 @@ greet("Alice"); // Outputs: Hello, Alice!
 
 Lambda expressions are a powerful feature in C# that enable you to write concise and flexible code for representing anonymous functions. They are widely used in LINQ queries, event handling, and anywhere delegates are required. By providing a way to define functionality inline, lambda expressions enhance readability and maintainability of code.
 
-## How many types of constructor we can add in c# class. Please explain each with simple example.
+## How many types of constructor we can add in c# class?
 
 In C#, you can have several types of constructors in a class:
 

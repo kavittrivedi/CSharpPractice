@@ -1,4 +1,4 @@
-# CSharpPractice
+# .Net Core Interview Preparation
 
 ## What is .NET Core?
 

@@ -736,7 +736,7 @@ Avoid using `throw ex`, as it causes loss of stack trace information, making deb
 - Use `throw` to preserve the stack trace when rethrowing exceptions.
 - Avoid `throw ex` because it loses the stack trace and makes it difficult to diagnose the issue.
 
-## Readonly vs Constan. What is different between readonly and constant.  
+## Readonly vs Constant  
 
 #### 1. readonly
 
@@ -800,7 +800,7 @@ Used when you have a value that must remain unchanged throughout the entire prog
 - **`readonly`**: Can be set at runtime (usually in constructor), but can't be changed after the object is created.
 - **`const`**: Must be set at compile-time and cannot be changed during the program's execution.
 
-## What is difference between FirstOrDefault and SingleOrDefault
+## FirstOrDefault vs SingleOrDefault
 
 FirstOrDefault and SingleOrDefault are methods in LINQ used to retrieve elements from a collection, but they behave differently:
 
@@ -841,9 +841,7 @@ Stored procedures are often faster than LINQ and Entity Framework Core for sever
 
 While Entity Framework Core is powerful for complex applications, stored procedures are preferable for performance-critical scenarios.
 
-## What is difference between First and FirstOrDefault explain with simple example
-
-### Difference Between First and FirstOrDefault in C#
+## First vs FirstOrDefault
 
 **Behavior When No Match is Found:**
 
@@ -951,7 +949,7 @@ FirstOrDefault: No match found
 - First throws an exception when no match is found.
 - FirstOrDefault safely returns null (for reference types) if no match exists, allowing you to handle it without an exception.
 
-## What is difference between ++i and i++ explain with simple example
+## What is difference between ++i and i++?
 
 The difference between ++i (pre-increment) and i++ (post-increment) lies in when the increment operation happens relative to the expression evaluation.
 
@@ -1494,7 +1492,7 @@ For example, if class `A` is the base class, and both `B` and `C` inherit from `
 
 In C#, this problem is avoided because C# doesn’t support multiple inheritance for classes, but it supports interface inheritance, which handles this using the "explicit implementation" feature.
 
-##  how to restrict virtual method?
+##  How to restrict virtual method?
 
 To restrict a **virtual method** in C#, you can use the **`sealed`** keyword in an override of the method. This prevents any further overriding in derived classes. Here's an example:
 
@@ -1516,8 +1514,6 @@ public class DerivedClass : BaseClass
 In this example, `Show` in `DerivedClass` is sealed, so no further class can override this method.
 
 ##  Explain Interface vs abstract class.
-
-### Key Differences Between Interface and Abstract Class:
 
 1. **Multiple Inheritance**: A class can implement multiple interfaces but can inherit only one abstract class.
 2. **Implementation**: Interfaces can only have method signatures (no implementation), while abstract classes can have both method implementations and abstract methods.

@@ -397,3 +397,104 @@ For a basic EF Core setup with SQL Server, the most commonly used packages are:
 * `Microsoft.EntityFrameworkCore.SqlServer`
 * `Microsoft.EntityFrameworkCore.Tools`
 * `Microsoft.EntityFrameworkCore.Design`
+
+## How to Call Stored Procedure Using Entity Framework Core
+
+In Entity Framework Core, we can call a stored procedure in two common ways:
+
+* Use `FromSqlRaw()` when the stored procedure returns data.
+* Use `ExecuteSqlRaw()` when the stored procedure does insert, update, or delete work.
+
+### 1. Stored Procedure That Returns Data
+
+Suppose we have this stored procedure in SQL Server:
+
+```sql
+CREATE PROCEDURE GetEmployees
+AS
+BEGIN
+    SELECT Id, Name, Email, Salary
+    FROM Employees
+END
+```
+
+We can call it from EF Core like this:
+
+```csharp
+var employees = _context.Employees
+    .FromSqlRaw("EXEC GetEmployees")
+    .ToList();
+```
+
+Here, `Employees` is a `DbSet` in the `DbContext`.
+
+```csharp
+public DbSet<Employee> Employees { get; set; }
+```
+
+The stored procedure result columns should match the `Employee` class properties.
+
+### 2. Stored Procedure With Parameter
+
+Suppose we have this stored procedure:
+
+```sql
+CREATE PROCEDURE GetEmployeeById
+    @Id INT
+AS
+BEGIN
+    SELECT Id, Name, Email, Salary
+    FROM Employees
+    WHERE Id = @Id
+END
+```
+
+We can call it like this:
+
+```csharp
+int employeeId = 1;
+
+var employee = _context.Employees
+    .FromSqlRaw("EXEC GetEmployeeById @p0", employeeId)
+    .FirstOrDefault();
+```
+
+`@p0` is replaced by the value of `employeeId`.
+
+### 3. Stored Procedure for Insert, Update, or Delete
+
+If the stored procedure does not return data, use `ExecuteSqlRaw()`.
+
+Example stored procedure:
+
+```sql
+CREATE PROCEDURE UpdateEmployeeSalary
+    @Id INT,
+    @Salary DECIMAL(18, 2)
+AS
+BEGIN
+    UPDATE Employees
+    SET Salary = @Salary
+    WHERE Id = @Id
+END
+```
+
+Call it from EF Core:
+
+```csharp
+int employeeId = 1;
+decimal newSalary = 60000;
+
+_context.Database.ExecuteSqlRaw(
+    "EXEC UpdateEmployeeSalary @p0, @p1",
+    employeeId,
+    newSalary);
+```
+
+### Simple Summary
+
+* If stored procedure returns rows, use `FromSqlRaw()`.
+* If stored procedure changes data, use `ExecuteSqlRaw()`.
+* Use parameters instead of joining values into SQL strings.
+* This helps avoid SQL injection.
+

@@ -498,3 +498,124 @@ _context.Database.ExecuteSqlRaw(
 * Use parameters instead of joining values into SQL strings.
 * This helps avoid SQL injection.
 
+## AddDbContext VS AddDbContextPool in EF Core
+
+In .NET Core, both `AddDbContext` and `AddDbContextPool` are used to register `DbContext` in dependency injection.
+
+But they work in a slightly different way.
+
+### AddDbContext
+
+`AddDbContext` creates a new `DbContext` object for each request.
+
+Example:
+
+```csharp
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+```
+
+Here, when a request comes, .NET creates a new object of `AppDbContext`.
+
+After the request is completed, that object is disposed.
+
+Simple meaning:
+
+```text
+New request = New DbContext object
+```
+
+### AddDbContextPool
+
+`AddDbContextPool` reuses `DbContext` objects from a pool.
+
+Example:
+
+```csharp
+builder.Services.AddDbContextPool<AppDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+```
+
+Here, .NET does not always create a new `DbContext` object.
+
+It takes an existing `DbContext` object from the pool, uses it, resets it, and keeps it back in the pool.
+
+Simple meaning:
+
+```text
+New request = Reuse DbContext object from pool
+```
+
+### Real Life Example
+
+Think about a hotel.
+
+`AddDbContext` is like buying a new plate for every customer and throwing it away after use.
+
+`AddDbContextPool` is like using plates, washing them, and reusing them for the next customer.
+
+So, `AddDbContextPool` can improve performance because it reduces object creation.
+
+### Difference Between AddDbContext and AddDbContextPool
+
+| Feature | AddDbContext | AddDbContextPool |
+|---|---|---|
+| Object creation | Creates new DbContext object | Reuses DbContext object |
+| Performance | Good | Better for high traffic |
+| Memory usage | More object creation | Less object creation |
+| State handling | Safer for custom state | Need to be careful with custom state |
+| Common use | Normal applications | High-performance applications |
+
+### When to Use AddDbContext
+
+Use `AddDbContext` when:
+
+* Your application is simple or medium size.
+* You do not have very high traffic.
+* Your `DbContext` has custom state or extra properties.
+* You want the safest and most common approach.
+
+### When to Use AddDbContextPool
+
+Use `AddDbContextPool` when:
+
+* Your application has high traffic.
+* You want better performance.
+* Your `DbContext` does not store custom request-specific state.
+* You want to reduce object creation.
+
+### Important Point About AddDbContextPool
+
+When using `AddDbContextPool`, do not store request-specific data inside your `DbContext`.
+
+Bad example:
+
+```csharp
+public class AppDbContext : DbContext
+{
+    public int CurrentUserId { get; set; }
+}
+```
+
+This can be risky with pooling because the same `DbContext` object may be reused for another request.
+
+### Interview Answer
+
+`AddDbContext` creates a new `DbContext` instance for each request and disposes it after the request is completed.
+
+`AddDbContextPool` keeps `DbContext` objects in a pool and reuses them for better performance.
+
+`AddDbContext` is simple and safe for most applications. `AddDbContextPool` is useful for high-performance applications, but we should avoid storing request-specific state inside the `DbContext`.
+
+### Simple Summary
+
+* `AddDbContext` creates a new object every time.
+* `AddDbContextPool` reuses objects from a pool.
+* `AddDbContext` is safer and commonly used.
+* `AddDbContextPool` can improve performance.
+* Be careful with custom state when using `AddDbContextPool`.
+

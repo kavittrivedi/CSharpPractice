@@ -198,3 +198,160 @@ For **twbsPagination**, the file name is:
 * **`jquery.twbsPagination.min.js`** for the JavaScript file.
 
 These libraries need to be included in your project for pagination functionality. You can download them from the official DataTables or twbsPagination websites or use a CDN.
+
+## var vs let vs const in JavaScript / jQuery
+
+`var`, `let`, and `const` are used to declare variables in JavaScript. They work the same way whether the code is plain JavaScript or written inside jQuery functions like `$(document).ready()` or click handlers.
+
+### 1. var
+
+`var` is the old way of declaring variables in JavaScript.
+
+Important points:
+
+* `var` has function scope.
+* It does not have block scope.
+* It can be re-declared and updated.
+* It is hoisted and initialized with `undefined`.
+
+Example:
+
+```javascript
+function testVar() {
+    if (true) {
+        var name = "John";
+    }
+
+    console.log(name); // John
+}
+```
+
+Here, `name` is accessible outside the `if` block because `var` is function scoped.
+
+Another example:
+
+```javascript
+var age = 25;
+var age = 30;
+
+console.log(age); // 30
+```
+
+`var` allows re-declaration, which can sometimes create bugs in large code.
+
+### 2. let
+
+`let` is the modern way of declaring variables whose value can change.
+
+Important points:
+
+* `let` has block scope.
+* It can be updated.
+* It cannot be re-declared in the same scope.
+* It is hoisted, but cannot be used before declaration because of the temporal dead zone.
+
+Example:
+
+```javascript
+function testLet() {
+    if (true) {
+        let name = "John";
+        console.log(name); // John
+    }
+
+    // console.log(name); // Error: name is not defined
+}
+```
+
+Here, `name` is only available inside the `if` block.
+
+Another example:
+
+```javascript
+let count = 1;
+count = 2;
+
+console.log(count); // 2
+```
+
+`let` is useful when the variable value needs to change later.
+
+### 3. const
+
+`const` is used to declare variables whose assignment should not change.
+
+Important points:
+
+* `const` has block scope.
+* It must be initialized at the time of declaration.
+* It cannot be re-declared in the same scope.
+* It cannot be reassigned.
+* For objects and arrays, the reference cannot change, but internal values can change.
+
+Example:
+
+```javascript
+const pi = 3.14;
+
+// pi = 3.14159; // Error: Assignment to constant variable
+```
+
+Object example:
+
+```javascript
+const user = {
+    name: "John"
+};
+
+user.name = "David"; // Allowed
+
+console.log(user.name); // David
+```
+
+This is allowed because the object reference is still the same. Only the property value changed.
+
+But this is not allowed:
+
+```javascript
+const user = {
+    name: "John"
+};
+
+// user = { name: "David" }; // Error
+```
+
+### jQuery example
+
+```javascript
+$(document).ready(function() {
+    const button = $("#btnSave");
+    let clickCount = 0;
+
+    button.on("click", function() {
+        clickCount++;
+        console.log("Button clicked " + clickCount + " times");
+    });
+});
+```
+
+In this example:
+
+* `const button` is used because the selected jQuery element reference does not need to change.
+* `let clickCount` is used because the count changes every time the button is clicked.
+* `var` is avoided because `let` and `const` provide better scoping and safer code.
+
+### Main difference table
+
+| Feature | var | let | const |
+| --- | --- | --- | --- |
+| Scope | Function scope | Block scope | Block scope |
+| Re-declaration | Allowed | Not allowed in same scope | Not allowed in same scope |
+| Reassignment | Allowed | Allowed | Not allowed |
+| Must initialize | No | No | Yes |
+| Hoisting | Yes, initialized with undefined | Yes, but temporal dead zone | Yes, but temporal dead zone |
+| Modern usage | Avoid mostly | Use when value changes | Use by default |
+
+### Interview answer
+
+`var` is function scoped and can be re-declared, so it can create unexpected bugs. `let` and `const` are block scoped and are preferred in modern JavaScript. I use `let` when the value needs to change, and `const` when the variable should not be reassigned. In jQuery also, the same rules apply because jQuery is just a JavaScript library.
+

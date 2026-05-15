@@ -1253,70 +1253,9 @@ Designing a SQL database schema is a critical step in ensuring efficient data ma
 When designing a SQL database schema, prioritize normalization, appropriate data types, primary and foreign keys, indexing strategies, naming conventions, and clear relationships. Additionally, consider scalability, data integrity constraints, performance optimization, and security measures to create a robust and efficient database schema that meets the needs of your application.
 Designing a SQL database schema is a critical step in ensuring efficient data management, retrieval, and integrity. Here are key considerations to take into account when designing a SQL database schema:
 
-### 1. **Normalization**
+## How you can troubleshoot SQL Performance? 
 
-* **Definition**: Organizing the data to minimize redundancy and dependency by dividing the database into tables and defining relationships.
-* **Consideration**: Aim for at least the third normal form (3NF), which helps eliminate duplicate data and ensures data integrity.
-
-### 2. **Data Types**
-
-* **Definition**: Choosing the appropriate data types for each column.
-* **Consideration**: Select data types that accurately represent the data while minimizing storage space. For example, use `VARCHAR` for variable-length strings and `INT` for integers.
-
-### 3. **Primary Keys**
-
-* **Definition**: Unique identifiers for records in a table.
-* **Consideration**: Ensure each table has a primary key that uniquely identifies each row. Use surrogate keys (like auto-incrementing integers) or natural keys (meaningful business keys) as appropriate.
-
-### 4. **Foreign Keys**
-
-* **Definition**: Constraints that establish relationships between tables.
-* **Consideration**: Use foreign keys to enforce referential integrity between tables, ensuring that relationships are valid and preventing orphaned records.
-
-### 5. **Indexes**
-
-* **Definition**: Structures that improve query performance by allowing faster data retrieval.
-* **Consideration**: Create indexes on columns that are frequently used in `WHERE`, `JOIN`, or `ORDER BY` clauses. However, avoid over-indexing, as it can impact write performance.
-
-### 6. **Naming Conventions**
-
-* **Definition**: A consistent approach to naming tables, columns, indexes, and other database objects.
-* **Consideration**: Use meaningful and descriptive names, and establish a naming convention (e.g., using singular nouns for table names) to improve clarity and maintainability.
-
-### 7. **Relationships**
-
-* **Definition**: Connections between tables, such as one-to-many, many-to-many, or one-to-one relationships.
-* **Consideration**: Clearly define relationships between entities and ensure that they are implemented through foreign keys and junction tables where necessary.
-
-### 8. **Scalability**
-
-* **Definition**: The ability to grow and accommodate increasing amounts of data and users.
-* **Consideration**: Design your schema to allow for future expansion, such as adding new tables or modifying existing ones without major disruptions.
-
-### 9. **Constraints and Rules**
-
-* **Definition**: Rules that enforce data integrity and business logic.
-* **Consideration**: Implement constraints such as `NOT NULL`, `UNIQUE`, and `CHECK` constraints to ensure data validity and adherence to business rules.
-
-### 10. **Documentation**
-
-* **Definition**: Detailed descriptions of the database schema and its components.
-* **Consideration**: Maintain documentation that explains the purpose of each table, column, relationship, and constraint, making it easier for developers and database administrators to understand the schema.
-
-### 11. **Performance Optimization**
-
-* **Definition**: Techniques to improve query performance.
-* **Consideration**: Analyze query performance, use query optimization techniques, and consider partitioning large tables if necessary to enhance performance.
-
-### 12. **Security**
-
-* **Definition**: Measures to protect data from unauthorized access and breaches.
-* **Consideration**: Implement user roles and permissions, and ensure sensitive data is encrypted or properly masked.
-
-### Summary
-
-When designing a SQL database schema, prioritize normalization, appropriate data types, primary and foreign keys, indexing strategies, naming conventions, and clear relationships. Additionally, consider scalability, data integrity constraints, performance optimization, and security measures to create a robust and efficient database schema that meets the needs of your application.
-Interview Question: How you can troubleshoot SQL Performance? Troubleshooting SQL performance issues can be complex and involves multiple steps. Here's a structured approach to identify and resolve SQL performance problems:
+Troubleshooting SQL performance issues can be complex and involves multiple steps. Here's a structured approach to identify and resolve SQL performance problems:
 
 ### 1. **Identify Performance Issues**
 

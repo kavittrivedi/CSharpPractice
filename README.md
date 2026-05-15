@@ -370,6 +370,74 @@ When a class has an int property, memory allocation depends on whether the class
 
 .NET Core is an open-source, cross-platform framework developed by Microsoft for building modern applications. It allows developers to create web apps, APIs, microservices, and console applications using languages like C#, F#, and VB.NET. Unlike the older .NET Framework, .NET Core runs on Windows, Linux, and macOS, making it more flexible for different environments.
 
+## Explain Area in ASP.NET Core 6
+
+In ASP.NET Core 6 MVC, an Area is used to organize a large application by grouping related controllers, views, and models into separate sections. For example, an application can have separate areas for Admin, User, Reports, or Customer functionality.
+
+Areas help keep the project structure clean when the application has many features.
+
+### Example Folder Structure
+
+```text
+Areas/
+  Admin/
+    Controllers/
+      DashboardController.cs
+    Views/
+      Dashboard/
+        Index.cshtml
+      Shared/
+    Models/
+  User/
+    Controllers/
+    Views/
+    Models/
+```
+
+### Controller Example
+
+Use the `[Area]` attribute to specify which area a controller belongs to.
+
+```csharp
+[Area("Admin")]
+public class DashboardController : Controller
+{
+    public IActionResult Index()
+    {
+        return View();
+    }
+}
+```
+
+### Routing for Areas
+
+Area URLs work when area routing is configured in `Program.cs`.
+
+```csharp
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+```
+
+With this route, the `Index` action of `DashboardController` inside the Admin area can be accessed using:
+
+```text
+/Admin/Dashboard/Index
+```
+
+### Benefits of Areas
+
+- Helps organize large ASP.NET Core MVC applications.
+- Groups related functionality into separate sections.
+- Keeps controllers, views, and models easier to manage.
+- Makes URL structure clearer for large applications.
+
+In short, Areas help modularize ASP.NET Core MVC applications by separating related functionality into distinct sections.
+
 ## What is Middleware?
 
 Have you written any custom middleware? Explain in simple language.

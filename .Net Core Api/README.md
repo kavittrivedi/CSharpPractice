@@ -199,7 +199,7 @@ JWTs are commonly used for securely transmitting information between a client an
 
 ## Who Verifies the Signature of a JWT Token?
 
-Who verifies the signature of a JWT token? The server verifies the signature of a JWT token.
+The server verifies the signature of a JWT token.
 
 Here’s how it works:
 
@@ -307,7 +307,7 @@ To persist state, store data in a shared location like a database or cache.
 
 To sync communications, you can use mechanisms like shared databases, message queues, tokens, or webhooks to make sure both APIs stay in sync and can access the latest state.
 
-How will you increase performance for your API? 
+## How will you increase performance for your API? 
 
 To increase the performance of your API, you can focus on improving speed, reducing response time, and handling more requests efficiently. Here are some simple strategies:
 
@@ -719,4 +719,180 @@ Here's a quick overview of the action attributes associated with each filter typ
 * **Result Filters**: `[ResultFilter]`
 
 Using these action attributes, you can create a clean and maintainable way to handle cross-cutting concerns in your ASP.NET Core applications.
+
+## What is Rate Limiting in .NET Core API?
+
+Rate limiting means limiting how many requests a client can send to an API in a fixed time.
+
+Example:
+
+If we allow only 5 requests per minute, then one user or one client can call the API only 5 times in 1 minute.
+
+If the client sends more than 5 requests, the API will block extra requests and return an error like `429 Too Many Requests`.
+
+### Why Do We Use Rate Limiting?
+
+Rate limiting is used to protect our API.
+
+It helps us to:
+
+* Stop users from sending too many requests.
+* Protect the server from heavy traffic.
+* Prevent API abuse.
+* Improve application performance.
+* Make the API available for all users fairly.
+
+### Real Life Example
+
+Suppose we have a login API.
+
+If one user tries to call the login API 100 times in 1 minute, it may be a brute force attack.
+
+Using rate limiting, we can allow only a few login attempts in a fixed time.
+
+### How to Implement Rate Limiting in .NET Core API
+
+In .NET 7 and .NET 8, rate limiting is available by default in ASP.NET Core.
+
+First, add this namespace in `Program.cs`:
+
+```csharp
+using System.Threading.RateLimiting;
+```
+
+Then add rate limiting service:
+
+```csharp
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("FixedPolicy", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 5;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 0;
+    });
+});
+```
+
+Here:
+
+* `FixedPolicy` is the policy name.
+* `PermitLimit = 5` means only 5 requests are allowed.
+* `Window = TimeSpan.FromMinutes(1)` means the time limit is 1 minute.
+* `QueueLimit = 0` means extra requests will not wait in queue.
+
+After adding the service, add middleware in `Program.cs`:
+
+```csharp
+app.UseRateLimiter();
+```
+
+Important:
+
+Add `app.UseRateLimiter()` before mapping controllers.
+
+Example:
+
+```csharp
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.UseRateLimiter();
+
+app.MapControllers();
+```
+
+### Apply Rate Limiting on Controller or Action Method
+
+To apply rate limiting, use `[EnableRateLimiting]`.
+
+Controller example:
+
+```csharp
+using Microsoft.AspNetCore.RateLimiting;
+
+[ApiController]
+[Route("api/[controller]")]
+[EnableRateLimiting("FixedPolicy")]
+public class ProductsController : ControllerBase
+{
+    [HttpGet]
+    public IActionResult GetProducts()
+    {
+        return Ok("Products list");
+    }
+}
+```
+
+Here, rate limiting is applied to the full `ProductsController`.
+
+Action method example:
+
+```csharp
+using Microsoft.AspNetCore.RateLimiting;
+
+[HttpGet]
+[EnableRateLimiting("FixedPolicy")]
+public IActionResult GetProducts()
+{
+    return Ok("Products list");
+}
+```
+
+Here, rate limiting is applied only to this action method.
+
+### Complete Program.cs Example
+
+```csharp
+using System.Threading.RateLimiting;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("FixedPolicy", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 5;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        limiterOptions.QueueLimit = 0;
+    });
+});
+
+var app = builder.Build();
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.UseRateLimiter();
+
+app.MapControllers();
+
+app.Run();
+```
+
+### Output
+
+If the user sends requests within the limit, the API will return a normal response.
+
+If the user sends more requests than the allowed limit, the API will return:
+
+```text
+429 Too Many Requests
+```
+
+### Important Points
+
+* Rate limiting controls how many requests a client can send.
+* It protects the API from overuse and abuse.
+* In .NET 7 and .NET 8, we can use built-in rate limiting.
+* Use `AddRateLimiter()` to register rate limiting.
+* Use `UseRateLimiter()` to enable rate limiting middleware.
+* Use `[EnableRateLimiting("PolicyName")]` on controller or action method.
+* `429 Too Many Requests` means the request limit has been crossed.
 

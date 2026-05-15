@@ -896,3 +896,140 @@ If the user sends more requests than the allowed limit, the API will return:
 * Use `[EnableRateLimiting("PolicyName")]` on controller or action method.
 * `429 Too Many Requests` means the request limit has been crossed.
 
+## What is Content Negotiation in .NET Core API?
+
+Content negotiation means the client can tell the API which response format it wants.
+
+The API can return data in different formats like:
+
+* JSON
+* XML
+* Plain text
+
+In .NET Core API, content negotiation is mostly done using the `Accept` header.
+
+### Simple Example
+
+Suppose the client sends this request header:
+
+```text
+Accept: application/json
+```
+
+Then the API returns data in JSON format.
+
+Example JSON response:
+
+```json
+{
+  "id": 1,
+  "name": "Rahul"
+}
+```
+
+If the client sends this request header:
+
+```text
+Accept: application/xml
+```
+
+Then the API can return data in XML format, if XML support is configured.
+
+Example XML response:
+
+```xml
+<User>
+  <Id>1</Id>
+  <Name>Rahul</Name>
+</User>
+```
+
+### Real Life Meaning
+
+Content negotiation is like asking the API:
+
+```text
+Please send me data in this format.
+```
+
+The API checks the requested format and sends the response in that format if it supports it.
+
+### Default Format in .NET Core API
+
+By default, .NET Core API returns data in JSON format.
+
+Example controller:
+
+```csharp
+[HttpGet]
+public IActionResult GetUser()
+{
+    var user = new
+    {
+        Id = 1,
+        Name = "Rahul"
+    };
+
+    return Ok(user);
+}
+```
+
+Default response:
+
+```json
+{
+  "id": 1,
+  "name": "Rahul"
+}
+```
+
+### How to Add XML Support
+
+If we want the API to return XML also, we can add XML formatter in `Program.cs`.
+
+```csharp
+builder.Services.AddControllers()
+    .AddXmlSerializerFormatters();
+```
+
+After this, the API can return XML when the client sends:
+
+```text
+Accept: application/xml
+```
+
+### Complete Program.cs Example
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers()
+    .AddXmlSerializerFormatters();
+
+var app = builder.Build();
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+```
+
+### Interview Answer
+
+Content negotiation in .NET Core API is a process where the client tells the server which response format it wants using the `Accept` header.
+
+For example, if the client sends `Accept: application/json`, the API returns JSON. If the client sends `Accept: application/xml` and XML formatter is configured, the API returns XML.
+
+By default, .NET Core API returns JSON.
+
+### Important Points
+
+* Content negotiation decides the response format.
+* The client sends the expected format using the `Accept` header.
+* JSON is the default response format in .NET Core API.
+* XML support can be added using `AddXmlSerializerFormatters()`.
+* If the requested format is not supported, the API may return the default format or an error depending on configuration.
+

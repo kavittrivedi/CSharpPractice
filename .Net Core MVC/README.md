@@ -665,3 +665,308 @@ public IActionResult Download(string fileName)
 
 By following these steps, you can successfully implement file upload and download functionality in your .NET Core 6 MVC applications and APIs.
 
+## How to Write If Condition in MVC View File
+
+In .NET Core MVC, view files use Razor syntax. Razor allows us to write C# code inside an HTML page.
+
+To write an `if` condition in a `.cshtml` view file, start with `@if`.
+
+### Basic Syntax
+
+```cshtml
+@if (condition)
+{
+    // HTML or C# code here
+}
+```
+
+Example:
+
+```cshtml
+@if (Model.IsActive)
+{
+    <p>User is active</p>
+}
+```
+
+Here:
+
+* `@if` tells Razor that we are writing a C# if condition.
+* `Model.IsActive` is the condition.
+* If the condition is true, then `<p>User is active</p>` will be shown on the page.
+* If the condition is false, nothing will be shown.
+
+### If Else Example
+
+```cshtml
+@if (Model.IsActive)
+{
+    <p>User is active</p>
+}
+else
+{
+    <p>User is not active</p>
+}
+```
+
+Here, if `Model.IsActive` is true, the first message will be shown. Otherwise, the message inside `else` will be shown.
+
+### Example with ViewBag
+
+```cshtml
+@if (ViewBag.Message != null)
+{
+    <p>@ViewBag.Message</p>
+}
+```
+
+This checks whether `ViewBag.Message` has a value. If it has a value, then the message is displayed.
+
+### Example with List Count
+
+```cshtml
+@if (Model.Products != null && Model.Products.Count > 0)
+{
+    <p>Products are available</p>
+}
+else
+{
+    <p>No products found</p>
+}
+```
+
+This checks whether the product list is not null and contains at least one item.
+
+### Important Points
+
+* Use `@if` in the view file.
+* Write the condition inside round brackets `()`.
+* Write the HTML output inside curly brackets `{ }`.
+* You can use `else` when you want to show another output if the condition is false.
+* Razor can understand both C# code and HTML inside the same view file.
+
+## How to Write For Loop in MVC View File
+
+In .NET Core MVC, we can write a `for` loop in a `.cshtml` view file using Razor syntax.
+
+To write a `for` loop, start with `@for`.
+
+### Basic Syntax
+
+```cshtml
+@for (int i = 0; i < 5; i++)
+{
+    <p>Number: @i</p>
+}
+```
+
+Here:
+
+* `@for` tells Razor that we are writing a C# for loop.
+* `int i = 0` means the loop starts from 0.
+* `i < 5` means the loop will run while `i` is less than 5.
+* `i++` means the value of `i` increases by 1 every time.
+* `<p>Number: @i</p>` displays the current value of `i` on the page.
+
+Output:
+
+```text
+Number: 0
+Number: 1
+Number: 2
+Number: 3
+Number: 4
+```
+
+### For Loop with Model List
+
+If your model has a list, you can use a `for` loop to display each item.
+
+Example:
+
+```cshtml
+@for (int i = 0; i < Model.Products.Count; i++)
+{
+    <p>@Model.Products[i].Name</p>
+}
+```
+
+Here:
+
+* `Model.Products.Count` gives the total number of products.
+* `Model.Products[i]` gets one product from the list.
+* `.Name` displays the product name.
+
+### For Loop with HTML Table
+
+```cshtml
+<table>
+    <tr>
+        <th>No.</th>
+        <th>Product Name</th>
+    </tr>
+
+    @for (int i = 0; i < Model.Products.Count; i++)
+    {
+        <tr>
+            <td>@(i + 1)</td>
+            <td>@Model.Products[i].Name</td>
+        </tr>
+    }
+</table>
+```
+
+Here, the loop creates one table row for each product.
+
+`@(i + 1)` is used because `i` starts from 0, but normally we want to show numbering from 1.
+
+### Important Points
+
+* Use `@for` in the view file.
+* Write the loop condition inside round brackets `()`.
+* Write HTML inside curly brackets `{ }`.
+* Use `@i` to print the value of `i`.
+* Use `Model.ListName[i]` to get an item from a list by index.
+* In MVC views, `foreach` is usually simpler for displaying lists, but `for` is useful when you need the index number.
+
+## ViewBag, ViewData and TempData in .NET Core MVC
+
+In .NET Core MVC, `ViewBag`, `ViewData` and `TempData` are used to pass data from controller to view.
+
+They are useful when we want to send small data like message, title, success message, error message, etc.
+
+### ViewBag
+
+`ViewBag` is used to pass data from controller to view.
+
+It uses dynamic properties, so we can create any property name directly.
+
+Controller example:
+
+```csharp
+public IActionResult Index()
+{
+    ViewBag.Message = "Welcome to MVC";
+    ViewBag.Name = "Rahul";
+
+    return View();
+}
+```
+
+View example:
+
+```cshtml
+<h2>@ViewBag.Message</h2>
+<p>@ViewBag.Name</p>
+```
+
+Here:
+
+* `ViewBag.Message` stores the message.
+* `ViewBag.Name` stores the name.
+* These values are displayed in the view using `@ViewBag.Message` and `@ViewBag.Name`.
+
+Important point:
+
+`ViewBag` data is available only for the current request. If the page redirects to another action, then `ViewBag` data will be lost.
+
+### ViewData
+
+`ViewData` is also used to pass data from controller to view.
+
+It stores data in key-value format.
+
+Controller example:
+
+```csharp
+public IActionResult Index()
+{
+    ViewData["Message"] = "Welcome to MVC";
+    ViewData["Name"] = "Rahul";
+
+    return View();
+}
+```
+
+View example:
+
+```cshtml
+<h2>@ViewData["Message"]</h2>
+<p>@ViewData["Name"]</p>
+```
+
+Here:
+
+* `"Message"` is the key.
+* `"Welcome to MVC"` is the value.
+* We access the value in view using `ViewData["Message"]`.
+
+Important point:
+
+`ViewData` data is also available only for the current request. If redirect happens, then `ViewData` data will be lost.
+
+### TempData
+
+`TempData` is used to pass data from one action method to another action method.
+
+It is mostly used after redirect.
+
+Controller example:
+
+```csharp
+public IActionResult Save()
+{
+    TempData["SuccessMessage"] = "Record saved successfully";
+
+    return RedirectToAction("Index");
+}
+
+public IActionResult Index()
+{
+    return View();
+}
+```
+
+View example:
+
+```cshtml
+@if (TempData["SuccessMessage"] != null)
+{
+    <p>@TempData["SuccessMessage"]</p>
+}
+```
+
+Here:
+
+* `TempData["SuccessMessage"]` stores the success message.
+* `RedirectToAction("Index")` redirects the user to the Index action.
+* The message is still available after redirect.
+* This is why `TempData` is useful for success and error messages.
+
+Important point:
+
+`TempData` keeps data for the next request. After reading the value, it is usually removed automatically.
+
+### Difference Between ViewBag, ViewData and TempData
+
+| Feature | ViewBag | ViewData | TempData |
+|---|---|---|---|
+| Used for | Controller to View | Controller to View | One action to another action |
+| Syntax type | Dynamic property | Key-value pair | Key-value pair |
+| Available after redirect | No | No | Yes |
+| Data lifetime | Current request only | Current request only | Next request |
+| Common use | Small view data | Small view data | Success/error message after redirect |
+
+### Simple Memory Trick
+
+* Use `ViewBag` when you want simple and easy syntax.
+* Use `ViewData` when you want key-value syntax.
+* Use `TempData` when you want data after redirect.
+
+### Important Points
+
+* `ViewBag` and `ViewData` are used to send data from controller to view in the same request.
+* `TempData` is used when data is needed after redirect.
+* `ViewBag` internally uses `ViewData`.
+* For large or strongly typed data, using a model or view model is better than `ViewBag`, `ViewData` or `TempData`.
+

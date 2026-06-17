@@ -1455,6 +1455,12 @@ A Predicate<T> in C# is a built‑in delegate type that represents a function ta
 
    ```
 
+### When to use Predicate<T>
+Use it for filtering, searching, validation, or any yes/no test on a single item.
+
+It’s commonly used with collection methods like Find, FindAll, Exists, RemoveAll. 
+
+
 ## How many types of constructor we can add in c# class?
 
 In C#, you can have several types of constructors in a class:

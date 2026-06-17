@@ -33,7 +33,7 @@
 - **.NET Core/.NET 6+:** All new applications, cloud deployments, microservices
 - **.NET 8:** Latest projects requiring cutting-edge features and long-term support
 
-**From my experience:** At Civica, I used .NET Core 8 for building AI-powered document review systems with Angular 16, which gave us cross-platform deployment capability and excellent performance for processing high-volume documents.
+**From my experience:** At Globant, I used .NET Core 8 for building AI-powered document review systems with Angular 16, which gave us cross-platform deployment capability and excellent performance for processing high-volume documents.
 
 ---
 

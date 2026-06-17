@@ -1436,6 +1436,11 @@ greet("Alice"); // Outputs: Hello, Alice!
 * **Inline Definition**: They can be defined inline, which helps to keep related logic together.
 * **Functional Programming**: They facilitate functional programming styles, making it easier to work with collections and functional patterns.
 
+### How lambdas connect to delegates
+
+If a lambda returns a value, it typically converts to a Func<...> delegate.
+If it returns nothing, it converts to an Action<...> delegate. 
+
 ### Summary
 
 Lambda expressions are a powerful feature in C# that enable you to write concise and flexible code for representing anonymous functions. They are widely used in LINQ queries, event handling, and anywhere delegates are required. By providing a way to define functionality inline, lambda expressions enhance readability and maintainability of code.

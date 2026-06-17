@@ -1445,6 +1445,16 @@ If it returns nothing, it converts to an Action<...> delegate.
 
 Lambda expressions are a powerful feature in C# that enable you to write concise and flexible code for representing anonymous functions. They are widely used in LINQ queries, event handling, and anywhere delegates are required. By providing a way to define functionality inline, lambda expressions enhance readability and maintainability of code.
 
+## Explain predicate
+
+A Predicate<T> in C# is a built‑in delegate type that represents a function taking one value of type T and returning a bool — in short, it answers a yes/no question about an object. 
+
+  ```csharp
+   Predicate<int> isEven = n => n % 2 == 0;
+   bool result = isEven(4); // true
+
+   ```
+
 ## How many types of constructor we can add in c# class?
 
 In C#, you can have several types of constructors in a class:

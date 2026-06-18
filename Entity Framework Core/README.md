@@ -114,6 +114,215 @@ Here’s a handy list of the **Entity Framework Core migration commands** you’
 
 ---
 
+## How to set 1 to many and many to many relationship in entity framework core? 
+
+In Entity Framework Core, you can set up **one-to-many** and **many-to-many** relationships using navigation properties and the Fluent API or data annotations. Here’s how to do both:
+
+### One-to-Many Relationship
+
+A one-to-many relationship means that one entity can be related to many instances of another entity. For example, a `Blog` can have many `Posts`.
+
+#### 1. **Define the Entities**
+
+```csharp
+public class Blog
+{
+    public int BlogId { get; set; }
+    public string Name { get; set; }
+
+    // Navigation property
+    public ICollection<Post> Posts { get; set; }
+}
+
+public class Post
+{
+    public int PostId { get; set; }
+    public string Title { get; set; }
+
+    // Foreign key
+    public int BlogId { get; set; }
+
+    // Navigation property
+    public Blog Blog { get; set; }
+}
+```
+
+#### 2. **Configure the Relationship using Fluent API**
+
+In your `DbContext`, override the `OnModelCreating` method to configure the relationship:
+
+```csharp
+public class MyDbContext : DbContext
+{
+    public DbSet<Blog> Blogs { get; set; }
+    public DbSet<Post> Posts { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Blog>()
+            .HasMany(b => b.Posts)
+            .WithOne(p => p.Blog)
+            .HasForeignKey(p => p.BlogId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+```
+
+### Many-to-Many Relationship
+
+In a many-to-many relationship, multiple instances of one entity can be related to multiple instances of another entity. For example, `Students` and `Courses` can have many-to-many relationships.
+
+#### 1. **Define the Entities**
+
+In EF Core 5.0 and later, you can use a simpler way to define many-to-many relationships without needing a separate join entity.
+
+```csharp
+public class Student
+{
+    public int StudentId { get; set; }
+    public string Name { get; set; }
+
+    // Navigation property
+    public ICollection<Course> Courses { get; set; }
+}
+
+public class Course
+{
+    public int CourseId { get; set; }
+    public string Title { get; set; }
+
+    // Navigation property
+    public ICollection<Student> Students { get; set; }
+}
+```
+
+#### 2. **Configure the Relationship using Fluent API**
+
+In your `DbContext`, configure the many-to-many relationship:
+
+```csharp
+public class MyDbContext : DbContext
+{
+    public DbSet<Student> Students { get; set; }
+    public DbSet<Course> Courses { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Student>()
+            .HasMany(s => s.Courses)
+            .WithMany(c => c.Students)
+            .UsingEntity(j => j.ToTable("StudentCourses")); // Optional: specify the join table name
+    }
+}
+```
+
+### Summary
+
+* **One-to-Many**: Use a foreign key in the child entity and configure the relationship using navigation properties and Fluent API.
+* **Many-to-Many**: Use navigation properties in both entities and configure the relationship using Fluent API. In EF Core 5.0 and later, you can directly define many-to-many relationships without a separate join entity.
+
+These configurations allow Entity Framework Core to manage the relationships and ensure that the appropriate data is saved to and retrieved from the database.
+
+## How to Call Stored Procedure Using Entity Framework Core
+
+In Entity Framework Core, we can call a stored procedure in two common ways:
+
+* Use `FromSqlRaw()` when the stored procedure returns data.
+* Use `ExecuteSqlRaw()` when the stored procedure does insert, update, or delete work.
+
+### 1. Stored Procedure That Returns Data
+
+Suppose we have this stored procedure in SQL Server:
+
+```sql
+CREATE PROCEDURE GetEmployees
+AS
+BEGIN
+    SELECT Id, Name, Email, Salary
+    FROM Employees
+END
+```
+
+We can call it from EF Core like this:
+
+```csharp
+var employees = _context.Employees
+    .FromSqlRaw("EXEC GetEmployees")
+    .ToList();
+```
+
+Here, `Employees` is a `DbSet` in the `DbContext`.
+
+```csharp
+public DbSet<Employee> Employees { get; set; }
+```
+
+The stored procedure result columns should match the `Employee` class properties.
+
+### 2. Stored Procedure With Parameter
+
+Suppose we have this stored procedure:
+
+```sql
+CREATE PROCEDURE GetEmployeeById
+    @Id INT
+AS
+BEGIN
+    SELECT Id, Name, Email, Salary
+    FROM Employees
+    WHERE Id = @Id
+END
+```
+
+We can call it like this:
+
+```csharp
+int employeeId = 1;
+
+var employee = _context.Employees
+    .FromSqlRaw("EXEC GetEmployeeById @p0", employeeId)
+    .FirstOrDefault();
+```
+
+`@p0` is replaced by the value of `employeeId`.
+
+### 3. Stored Procedure for Insert, Update, or Delete
+
+If the stored procedure does not return data, use `ExecuteSqlRaw()`.
+
+Example stored procedure:
+
+```sql
+CREATE PROCEDURE UpdateEmployeeSalary
+    @Id INT,
+    @Salary DECIMAL(18, 2)
+AS
+BEGIN
+    UPDATE Employees
+    SET Salary = @Salary
+    WHERE Id = @Id
+END
+```
+
+Call it from EF Core:
+
+```csharp
+int employeeId = 1;
+decimal newSalary = 60000;
+
+_context.Database.ExecuteSqlRaw(
+    "EXEC UpdateEmployeeSalary @p0, @p1",
+    employeeId,
+    newSalary);
+```
+
+### Simple Summary
+
+* If stored procedure returns rows, use `FromSqlRaw()`.
+* If stored procedure changes data, use `ExecuteSqlRaw()`.
+* Use parameters instead of joining values into SQL strings.
+* This helps avoid SQL injection.
+
 
 ## Explain  Lazy Loading and eager Loading in .net core 6 
 
@@ -231,115 +440,6 @@ In Entity Framework Core, **entity states** represent the status of an entity as
 
 Understanding these states helps developers effectively manage data changes and interactions with the database in Entity Framework Core applications.
 
-## How to set 1 to many and many to many relationship in entity framework core? 
-
-In Entity Framework Core, you can set up **one-to-many** and **many-to-many** relationships using navigation properties and the Fluent API or data annotations. Here’s how to do both:
-
-### One-to-Many Relationship
-
-A one-to-many relationship means that one entity can be related to many instances of another entity. For example, a `Blog` can have many `Posts`.
-
-#### 1. **Define the Entities**
-
-```csharp
-public class Blog
-{
-    public int BlogId { get; set; }
-    public string Name { get; set; }
-
-    // Navigation property
-    public ICollection<Post> Posts { get; set; }
-}
-
-public class Post
-{
-    public int PostId { get; set; }
-    public string Title { get; set; }
-
-    // Foreign key
-    public int BlogId { get; set; }
-
-    // Navigation property
-    public Blog Blog { get; set; }
-}
-```
-
-#### 2. **Configure the Relationship using Fluent API**
-
-In your `DbContext`, override the `OnModelCreating` method to configure the relationship:
-
-```csharp
-public class MyDbContext : DbContext
-{
-    public DbSet<Blog> Blogs { get; set; }
-    public DbSet<Post> Posts { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Blog>()
-            .HasMany(b => b.Posts)
-            .WithOne(p => p.Blog)
-            .HasForeignKey(p => p.BlogId)
-            .OnDelete(DeleteBehavior.Cascade);
-    }
-}
-```
-
-### Many-to-Many Relationship
-
-In a many-to-many relationship, multiple instances of one entity can be related to multiple instances of another entity. For example, `Students` and `Courses` can have many-to-many relationships.
-
-#### 1. **Define the Entities**
-
-In EF Core 5.0 and later, you can use a simpler way to define many-to-many relationships without needing a separate join entity.
-
-```csharp
-public class Student
-{
-    public int StudentId { get; set; }
-    public string Name { get; set; }
-
-    // Navigation property
-    public ICollection<Course> Courses { get; set; }
-}
-
-public class Course
-{
-    public int CourseId { get; set; }
-    public string Title { get; set; }
-
-    // Navigation property
-    public ICollection<Student> Students { get; set; }
-}
-```
-
-#### 2. **Configure the Relationship using Fluent API**
-
-In your `DbContext`, configure the many-to-many relationship:
-
-```csharp
-public class MyDbContext : DbContext
-{
-    public DbSet<Student> Students { get; set; }
-    public DbSet<Course> Courses { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Student>()
-            .HasMany(s => s.Courses)
-            .WithMany(c => c.Students)
-            .UsingEntity(j => j.ToTable("StudentCourses")); // Optional: specify the join table name
-    }
-}
-```
-
-### Summary
-
-* **One-to-Many**: Use a foreign key in the child entity and configure the relationship using navigation properties and Fluent API.
-* **Many-to-Many**: Use navigation properties in both entities and configure the relationship using Fluent API. In EF Core 5.0 and later, you can directly define many-to-many relationships without a separate join entity.
-
-These configurations allow Entity Framework Core to manage the relationships and ensure that the appropriate data is saved to and retrieved from the database.
-
 ## What is difference between Entity Framework core and Dapper? 
 
 Entity Framework Core (EF Core) and Dapper are both popular data access technologies in .NET, but they serve different purposes and have distinct characteristics. Here’s a comparison of the two:
@@ -456,109 +556,6 @@ using (var transaction = await _context.Database.BeginTransactionAsync())
 ```
 
 Here, both `Students` and `Courses` additions are part of the same transaction. If one fails, the transaction is rolled back, ensuring data consistency.
-
-
-
-
-## How to Call Stored Procedure Using Entity Framework Core
-
-In Entity Framework Core, we can call a stored procedure in two common ways:
-
-* Use `FromSqlRaw()` when the stored procedure returns data.
-* Use `ExecuteSqlRaw()` when the stored procedure does insert, update, or delete work.
-
-### 1. Stored Procedure That Returns Data
-
-Suppose we have this stored procedure in SQL Server:
-
-```sql
-CREATE PROCEDURE GetEmployees
-AS
-BEGIN
-    SELECT Id, Name, Email, Salary
-    FROM Employees
-END
-```
-
-We can call it from EF Core like this:
-
-```csharp
-var employees = _context.Employees
-    .FromSqlRaw("EXEC GetEmployees")
-    .ToList();
-```
-
-Here, `Employees` is a `DbSet` in the `DbContext`.
-
-```csharp
-public DbSet<Employee> Employees { get; set; }
-```
-
-The stored procedure result columns should match the `Employee` class properties.
-
-### 2. Stored Procedure With Parameter
-
-Suppose we have this stored procedure:
-
-```sql
-CREATE PROCEDURE GetEmployeeById
-    @Id INT
-AS
-BEGIN
-    SELECT Id, Name, Email, Salary
-    FROM Employees
-    WHERE Id = @Id
-END
-```
-
-We can call it like this:
-
-```csharp
-int employeeId = 1;
-
-var employee = _context.Employees
-    .FromSqlRaw("EXEC GetEmployeeById @p0", employeeId)
-    .FirstOrDefault();
-```
-
-`@p0` is replaced by the value of `employeeId`.
-
-### 3. Stored Procedure for Insert, Update, or Delete
-
-If the stored procedure does not return data, use `ExecuteSqlRaw()`.
-
-Example stored procedure:
-
-```sql
-CREATE PROCEDURE UpdateEmployeeSalary
-    @Id INT,
-    @Salary DECIMAL(18, 2)
-AS
-BEGIN
-    UPDATE Employees
-    SET Salary = @Salary
-    WHERE Id = @Id
-END
-```
-
-Call it from EF Core:
-
-```csharp
-int employeeId = 1;
-decimal newSalary = 60000;
-
-_context.Database.ExecuteSqlRaw(
-    "EXEC UpdateEmployeeSalary @p0, @p1",
-    employeeId,
-    newSalary);
-```
-
-### Simple Summary
-
-* If stored procedure returns rows, use `FromSqlRaw()`.
-* If stored procedure changes data, use `ExecuteSqlRaw()`.
-* Use parameters instead of joining values into SQL strings.
-* This helps avoid SQL injection.
 
 ## AddDbContext VS AddDbContextPool in EF Core
 

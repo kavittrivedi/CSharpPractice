@@ -705,7 +705,9 @@ In simple terms, Dependency Injection helps keep your code cleaner, easier to te
 
 ## What is CQRS pattern? 
 
-The CQRS (Command Query Responsibility Segregation) pattern is a software architectural pattern that separates read operations (queries) from write operations (commands). The main goal of CQRS is to optimize and scale applications by treating reads and writes as distinct concerns. Key Concepts:
+The CQRS (Command Query Responsibility Segregation) pattern is a software architectural pattern that separates read operations (queries) from write operations (commands). The main goal of CQRS is to optimize and scale applications by treating reads and writes as distinct concerns. 
+
+Key Concepts:
 
 Command:
 

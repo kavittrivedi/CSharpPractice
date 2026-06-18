@@ -504,26 +504,3 @@ class Program
 ### Summary
 
 The Singleton Design Pattern is a simple yet effective way to ensure that a class has only one instance while providing a global access point. It's particularly useful for managing shared resources, but care should be taken to avoid potential drawbacks related to global state and testing.
-
-## Interview Question: What is aggregation?
-
-**Aggregation** in object-oriented programming is a relationship between two classes where one class (the whole) contains or is composed of objects of another class (the parts). It represents a "has-a" relationship, where the lifecycle of the "part" can be independent of the "whole."
-
-### Example:
-
-A `Car` class can have an aggregation relationship with the `Engine` class:
-
-```csharp
-class Car
-{
-    public Engine Engine { get; set; }
-}
-
-class Engine
-{
-    // Engine properties
-}
-```
-
-Here, the `Car` contains an `Engine`, but the `Engine` can exist without the `Car`.
-

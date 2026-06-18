@@ -660,7 +660,7 @@ In ASP.NET Core 6 API, data binding can be done in several ways to handle incomi
 
 These binding methods provide flexibility in how you can receive and work with data in your ASP.NET Core 6 APIs, allowing you to handle different types of input based on your application's requirements.
 
-## What action attributes comes in these "Authorization, Resource Action, Exception, Result" action filter types?
+## What action attributes comes in these "Authorization, Resource, Action, Exception, Result" action filter types?
 
 In ASP.NET Core, action filters are a way to run code before and after an action method executes. The action filter types you mentioned can include various action attributes that correspond to their functionality. Here’s a breakdown of each type and the common action attributes associated with them:
 

@@ -56,6 +56,65 @@ For a basic EF Core setup with SQL Server, the most commonly used packages are:
 * `Microsoft.EntityFrameworkCore.Tools`
 * `Microsoft.EntityFrameworkCore.Design`
 
+## EF Core Migration Commands
+
+Here’s a handy list of the **Entity Framework Core migration commands** you’ll often use — both the `dotnet ef` CLI style and the **Package Manager Console (PMC)** style (`add-migration`, `update-database`, etc.):
+
+---
+
+### ⚙️ Using .NET CLI (VS Code / Terminal)
+- **Add a migration**  
+  ```bash
+  dotnet ef migrations add InitialCreate
+  ```
+- **Update database with latest migration**  
+  ```bash
+  dotnet ef database update
+  ```
+- **Remove last migration (if not applied)**  
+  ```bash
+  dotnet ef migrations remove
+  ```
+- **List all migrations**  
+  ```bash
+  dotnet ef migrations list
+  ```
+- **Generate SQL script for migrations**  
+  ```bash
+  dotnet ef migrations script
+  ```
+
+---
+
+### ⚙️ Using Package Manager Console (Visual Studio)
+- **Add a migration**  
+  ```powershell
+  Add-Migration InitialCreate
+  ```
+- **Update database**  
+  ```powershell
+  Update-Database
+  ```
+- **Remove last migration**  
+  ```powershell
+  Remove-Migration
+  ```
+- **Script migrations to SQL**  
+  ```powershell
+  Script-Migration
+  ```
+
+---
+
+💡 **Quick workflow memory tip:**  
+1. **Add-Migration** → creates migration file.  
+2. **Update-Database** → applies migration to DB.  
+3. **Remove-Migration** → undo if needed.  
+4. **Script-Migration** → generate SQL script.  
+
+---
+
+
 ## Explain  Lazy Loading and eager Loading in .net core 6 
 
 **Lazy Loading** and **Eager Loading** are two strategies for loading related data in Entity Framework Core. They help manage how data is retrieved from the database, particularly when working with relationships between entities.

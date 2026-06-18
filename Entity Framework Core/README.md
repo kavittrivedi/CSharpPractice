@@ -323,8 +323,118 @@ _context.Database.ExecuteSqlRaw(
 * Use parameters instead of joining values into SQL strings.
 * This helps avoid SQL injection.
 
+### How many ways we can add master data using migration?
 
-## Explain  Lazy Loading and eager Loading in .net core 6 
+### Ways to add master (reference) data using EF Core migrations
+
+Below are the common approaches, with short code examples, pros/cons, and practical tips.
+
+---
+
+#### 1. **Model seeding with `HasData` (convention + migrations)**
+**What:** Define seed data in `OnModelCreating` using `modelBuilder.Entity<T>().HasData(...)`. When you add a migration, EF generates `InsertData`/`UpdateData` calls in the migration.
+
+**Example**
+```csharp
+protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    modelBuilder.Entity<Country>().HasData(
+        new Country { CountryId = 1, Code = "IN", Name = "India" },
+        new Country { CountryId = 2, Code = "US", Name = "United States" }
+    );
+}
+```
+
+**Pros:** Simple; migrations auto-generate; works well for small, static master data.  
+**Cons:** Requires stable primary keys; not ideal for large datasets or environment-specific data.
+
+---
+
+#### 2. **Manual `InsertData` / `UpdateData` in migration `Up`/`Down`**
+**What:** Edit the generated migration (or create one) and use `migrationBuilder.InsertData`, `UpdateData`, `DeleteData` explicitly.
+
+**Example**
+```csharp
+public partial class SeedCountries : Migration
+{
+    protected override void Up(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.InsertData(
+            table: "Countries",
+            columns: new[] { "CountryId", "Code", "Name" },
+            values: new object[,]
+            {
+                { 1, "IN", "India" },
+                { 2, "US", "United States" }
+            });
+    }
+
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DeleteData(table: "Countries", keyColumn: "CountryId", keyValue: 1);
+        migrationBuilder.DeleteData(table: "Countries", keyColumn: "CountryId", keyValue: 2);
+    }
+}
+```
+
+**Pros:** Full control; explicit and versioned; easy to update/remove.  
+**Cons:** Manual work for many rows; must manage keys and idempotency.
+
+---
+
+#### 3. **Raw SQL in migration (`migrationBuilder.Sql`)**
+**What:** Execute raw SQL statements inside `Up`/`Down`. Useful for complex inserts, conditional logic, or bulk inserts.
+
+**Example**
+```csharp
+migrationBuilder.Sql(@"
+IF NOT EXISTS (SELECT 1 FROM Countries WHERE Code = 'IN')
+    INSERT INTO Countries (Code, Name) VALUES ('IN', 'India');
+");
+```
+
+**Pros:** Flexible; can write idempotent SQL; good for large/bulk inserts or DB-specific features.  
+**Cons:** Less portable; harder to maintain than structured `InsertData`.
+
+---
+
+#### 4. **Use an explicit join/seed table or CSV + migration script**
+**What:** Keep master data in a file (CSV/JSON) and have the migration run a SQL script that loads it (e.g., `BULK INSERT` or multiple `INSERT`s).
+
+**Pros:** Keeps large datasets out of code; easier to update data files.  
+**Cons:** More setup; provider-specific; migration must include script execution.
+
+---
+
+#### 5. **Call a seeding method from migration (discouraged but possible)**
+**What:** Instantiate a `DbContext` inside the migration and run code to seed. This is possible but generally discouraged because migrations should be deterministic and not depend on DI or runtime services.
+
+**Example (not recommended)**
+```csharp
+using (var context = new MyDbContext(...))
+{
+    if (!context.Countries.Any())
+    {
+        context.Countries.Add(new Country { Code="IN", Name="India" });
+        context.SaveChanges();
+    }
+}
+```
+
+**Pros:** Can reuse application seeding logic.  
+**Cons:** Can break in different environments; harder to guarantee idempotency and determinism.
+
+---
+
+#### 6. **Generate SQL script and run separately (`dotnet ef migrations script`)**
+**What:** Create a SQL script from migrations and run it manually or via deployment pipeline; you can append custom seed SQL to the script.
+
+**Pros:** Good for DBAs and controlled deployments; can include environment-specific logic.  
+**Cons:** Manual step unless automated in CI/CD.
+
+---
+
+## Explain  Lazy Loading and eager Loading in .net core 6
 
 **Lazy Loading** and **Eager Loading** are two strategies for loading related data in Entity Framework Core. They help manage how data is retrieved from the database, particularly when working with relationships between entities.
 

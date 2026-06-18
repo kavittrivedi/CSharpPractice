@@ -399,10 +399,9 @@ How to do it: Use a connection pool (most ORM frameworks like Entity Framework s
 
 By applying these strategies, you can improve the speed, scalability, and reliability of your API, ensuring that it can handle more requests efficiently and provide a better experience for users.
 
-## Explain HTTP verbs & status codes in simple language to give answer during interview
+## Explain HTTP verbs & status codes
 
 Here is a short, clear, interview-ready explanation 👇  
-*(Simple language + easy to remember)*
 
 ### HTTP Verbs (What action you want to do)
 

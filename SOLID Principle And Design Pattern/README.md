@@ -153,6 +153,10 @@ class Penguin : Bird
     }
 }
 ```
+### Conclude with impact
+
+Following LSP ensures our inheritance hierarchy is logical, predictable, and safe. It prevents surprises when substituting subclasses and makes code more robust and maintainable.
+
 
 ### Interface Segregation Principle (ISP)
 

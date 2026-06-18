@@ -788,3 +788,132 @@ This can be risky with pooling because the same `DbContext` object may be reused
 * `AddDbContextPool` can improve performance.
 * Be careful with custom state when using `AddDbContextPool`.
 
+### Can we create multiple DBContext class?
+
+### Short answer
+**Yes. You can create multiple `DbContext` classes in an EF Core application.** It’s a common and recommended approach for separation of concerns, bounded contexts, testing, and managing migrations. Below are practical patterns, code examples, migration commands, and tradeoffs.
+
+---
+
+### Why use multiple DbContext
+- **Separation of concerns** — isolate different areas of the domain (e.g., `SalesContext`, `IdentityContext`).  
+- **Bounded contexts** — map each microservice or domain boundary to its own context.  
+- **Smaller models** — faster model building and fewer entity types per context.  
+- **Independent migrations** — each context can have its own migration history and lifecycle.  
+- **Different databases or schemas** — contexts can target different connection strings or schemas.
+
+---
+
+### Common patterns and examples
+
+#### 1. Multiple contexts against the same database
+- Use when you want logical separation but a single physical DB.
+- **Tip:** Use different schemas or table name prefixes to avoid collisions.
+
+```csharp
+public class SalesContext : DbContext
+{
+    public SalesContext(DbContextOptions<SalesContext> options) : base(options) { }
+    public DbSet<Order> Orders { get; set; }
+}
+
+public class CatalogContext : DbContext
+{
+    public CatalogContext(DbContextOptions<CatalogContext> options) : base(options) { }
+    public DbSet<Product> Products { get; set; }
+}
+```
+
+Register in `Program.cs`:
+```csharp
+builder.Services.AddDbContext<SalesContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDbContext<CatalogContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+```
+
+#### 2. Multiple contexts against different databases
+- Use when data must be physically separated (security, scaling, ownership).
+
+```csharp
+builder.Services.AddDbContext<IdentityContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityDb")));
+
+builder.Services.AddDbContext<AppContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("AppDb")));
+```
+
+#### 3. Context per module or microservice
+- Each microservice owns its context and migrations; ideal for microservice architecture.
+
+---
+
+### Migrations with multiple contexts
+- **Add migration for a specific context**
+```bash
+dotnet ef migrations add InitialCreate --context SalesContext
+```
+- **Specify project and startup project**
+```bash
+dotnet ef migrations add InitialCreate --context SalesContext --project MyApp.Infrastructure --startup-project MyApp.Api
+```
+- **Update database for a specific context**
+```bash
+dotnet ef database update --context SalesContext
+```
+- **Set migrations assembly** if you want migrations in a separate project
+```csharp
+options.UseSqlServer(connString, b => b.MigrationsAssembly("MyApp.Migrations"));
+```
+
+**Tip:** Keep migrations for each context in its own assembly or folder to avoid confusion.
+
+---
+
+### Transactions across multiple contexts
+- **Same database connection:** you can share a `DbConnection` and enlist contexts in the same transaction.
+- **Different databases:** use `TransactionScope` or a distributed transaction coordinator; this adds complexity and operational cost.
+
+Example sharing connection:
+```csharp
+using var connection = new SqlConnection(connString);
+connection.Open();
+
+var salesOptions = new DbContextOptionsBuilder<SalesContext>()
+    .UseSqlServer(connection)
+    .Options;
+
+var catalogOptions = new DbContextOptionsBuilder<CatalogContext>()
+    .UseSqlServer(connection)
+    .Options;
+
+using var sales = new SalesContext(salesOptions);
+using var catalog = new CatalogContext(catalogOptions);
+
+using var transaction = connection.BeginTransaction();
+sales.Database.UseTransaction(transaction);
+catalog.Database.UseTransaction(transaction);
+
+// perform operations and commit
+transaction.Commit();
+```
+
+---
+
+### Best practices and pitfalls
+- **Design for bounded contexts** — map contexts to domain boundaries, not arbitrary technical layers.  
+- **Avoid duplicate entity mappings** across contexts unless intentional; duplicate mappings can lead to schema drift.  
+- **Name migrations clearly** and keep migration files organized per context.  
+- **Be explicit about delete behaviors and FK constraints** to avoid surprises when contexts touch the same tables.  
+- **Testing:** register in-memory or SQLite contexts separately for unit/integration tests.  
+- **Performance:** smaller models build faster; avoid a single giant `DbContext` with hundreds of entities.  
+- **Cross-context queries:** avoid frequent cross-context joins; prefer domain-level integration or data replication.
+
+---
+
+### When not to use multiple contexts
+- **If entities are tightly coupled and always used together**, splitting contexts may add unnecessary complexity.  
+- **If you need frequent cross-entity transactions across different DBs**, consider consolidating or designing an explicit integration strategy.
+
+---

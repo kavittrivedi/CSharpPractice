@@ -2,11 +2,17 @@
 
 ## How many types of design patterns are there?
 
+Design patterns fall into three categories. Creational patterns focus on how objects are created. Structural patterns focus on how objects are organized and connected. Behavioral patterns focus on how objects communicate and share responsibilities. A simple way to remember is: Create, Connect, Communicate. 
+
 Design patterns are generally categorized into three main types, each serving different purposes in software design:
+
+Create (Creational) → Connect (Structural) → Communicate (Behavioral).
 
 ### 1. **Creational Patterns**:
 
 These patterns deal with object creation mechanisms, allowing for greater flexibility and reuse of existing code. They help manage the process of creating objects in a manner suitable to the situation.
+
+Creational Patterns → “Creational patterns focus on how objects are created.”
 
 **Common Creational Patterns**:
 
@@ -20,6 +26,8 @@ These patterns deal with object creation mechanisms, allowing for greater flexib
 
 These patterns focus on how classes and objects are composed to form larger structures. They help ensure that if one part of a system changes, the entire system doesn't need to change.
 
+Structural Patterns → “Structural patterns focus on how objects are organized and combined.”
+
 **Common Structural Patterns**:
 
 * **Adapter**: Allows incompatible interfaces to work together by converting the interface of a class into another interface clients expect.
@@ -31,6 +39,10 @@ These patterns focus on how classes and objects are composed to form larger stru
 ### 3. **Behavioral Patterns**:
 
 These patterns are concerned with algorithms and the assignment of responsibilities between objects. They help improve communication between objects.
+
+"Behavioral patterns focus on how objects talk to each other and share responsibilities."
+
+Just think “Behavioral = communication + responsibility.”
 
 **Common Behavioral Patterns**:
 

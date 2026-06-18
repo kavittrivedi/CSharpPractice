@@ -251,48 +251,6 @@ Workspace Desk 2 booked.
 Workspace Meeting Room booked.
 ```
 
-## How is the security related to scaling?
-
-Security and scaling are interconnected. As systems scale, ensuring security becomes more challenging due to the increased number of users, devices, and potential attack vectors. To maintain security at scale, strategies like **load balancing**, **distributed firewalls**, **rate limiting**, **encryption**, and **securing APIs** are essential. Moreover, scaling can sometimes expose weaknesses or vulnerabilities, so continuous monitoring, authentication, and implementing strong access controls are critical to protect larger and more complex systems.
-
-
-
-## Why Cannot We Create an Instance of a Static Class in C#?
-
-We cannot create an instance of a static class in C# because static classes are designed to hold static members only, and they are meant to be accessed directly by the class name without creating an instance. Here's why:
-
-### Key Reasons
-
-- **No Instance Members:**  
-  A static class can only have static members (methods, fields, properties, etc.). Static members belong to the class itself, not to any object or instance. Since a static class doesn't have instance members, there is no need to create an instance of the class.
-
-- **Single Copy in Memory:**  
-  A static class is loaded into memory only once, and all static members are shared across the entire application. Creating an instance would contradict the concept of having only one copy of its members.
-
-- **Design Purpose:**  
-  Static classes are intended for utility or helper methods (like Math functions or Configuration settings), where you don't need multiple copies of the class or any state management (like instance variables).
-
-- **Compiler Restriction:**  
-  The C# compiler does not allow instantiation of a static class. If you try to create an instance of a static class, the compiler will throw an error.
-
-**Example:**
-```csharp
-public static class MathHelper
-{
-    public static int Add(int a, int b)
-    {
-        return a + b;
-    }
-}
-
-// Access the static method without creating an instance
-int sum = MathHelper.Add(5, 3);
-```
-
-In this example, you access the Add method directly using the class name (`MathHelper.Add`), and there's no need to create an object of MathHelper.
-
-**Summary:**  
-Static classes can only contain static members, and they are designed to be accessed without creating an instance. Allowing instantiation would go against their purpose and design, which is why you can't create an instance of them.
 
 ## Inversion of Control (IoC)
 

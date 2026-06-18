@@ -279,7 +279,8 @@ public class MyDbContext : DbContext
         modelBuilder.Entity<Blog>()
             .HasMany(b => b.Posts)
             .WithOne(p => p.Blog)
-            .HasForeignKey(p => p.BlogId);
+            .HasForeignKey(p => p.BlogId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 ```

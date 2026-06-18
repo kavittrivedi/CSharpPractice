@@ -366,12 +366,18 @@ Purpose: This method is used to register services that your application will use
 
 Where it's used: It's called first, during the application startup, to configure and add services to the DI (Dependency Injection) container.
 
-What it does: It prepares the services that will be available throughout the application (e.g., controllers, middleware, etc.). Example: public void ConfigureServices(IServiceCollection services)
+What it does: It prepares the services that will be available throughout the application (e.g., controllers, middleware, etc.). 
+Example: 
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
 {
     // Registering a service (e.g., adding a database context, MVC, etc.)
     services.AddDbContext<MyDbContext>(options => options.UseSqlServer("YourConnectionString"));
     services.AddControllersWithViews();
-} What happens here: We register services like DbContext for database access and ControllersWithViews for MVC support.
+} 
+```
+What happens here: We register services like DbContext for database access and ControllersWithViews for MVC support.
 
 2. Configure:
 

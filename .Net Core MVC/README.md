@@ -970,3 +970,21 @@ Important point:
 * `ViewBag` internally uses `ViewData`.
 * For large or strongly typed data, using a model or view model is better than `ViewBag`, `ViewData` or `TempData`.
 
+### Important Points about TempData Keep and Peek
+TempData persists across one subsequent request and is removed when read. Use Peek to read without consuming and Keep to preserve a value after it’s read.
+
+```csharp
+var notice = TempData.Peek("Notice") as string;
+// notice contains the value but TempData still retains it for the next request
+```
+
+```csharp
+var notice = TempData["Notice"] as string; // reads and would normally remove
+TempData.Keep("Notice");                   // preserves it for the next request
+```
+
+Or keep all keys
+
+```csharp
+TempData.Keep();
+```

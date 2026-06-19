@@ -751,3 +751,405 @@ Angular microfrontend architecture means splitting a large Angular frontend into
 In Angular, the common implementation is Webpack Module Federation. Each remote exposes a module or routes through `remoteEntry.js`, and the shell lazy loads it at runtime when the user navigates to that feature. Angular packages like `@angular/core`, `@angular/router`, and `rxjs` are usually shared as singletons.
 
 The main benefit is independent team ownership and independent deployment. The tradeoff is extra complexity around shared dependencies, routing contracts, communication, styling consistency, testing, and handling remote loading failures. I would use it for large enterprise apps with multiple teams, but for a small app I would prefer a modular Angular monolith with lazy-loaded feature modules.
+
+# Top 20 Angular Interview Questions and Answers
+
+## 1. What Is Angular?
+
+Angular is a TypeScript-based frontend framework used to build single-page applications. It provides a complete platform with components, templates, routing, dependency injection, forms, HTTP communication, testing support, and build tooling.
+
+Interview answer:
+
+> Angular is a full-featured frontend framework for building scalable single-page applications. It uses TypeScript, component-based architecture, dependency injection, routing, forms, and services to organize frontend code in a maintainable way.
+
+## 2. What Are Components in Angular?
+
+A component is the basic building block of an Angular UI.
+
+It contains:
+
+- TypeScript class for logic
+- HTML template for view
+- CSS/SCSS for styling
+- Metadata using `@Component`
+
+Example:
+
+```ts
+@Component({
+  selector: 'app-user',
+  templateUrl: './user.component.html',
+  styleUrls: ['./user.component.css']
+})
+export class UserComponent {
+  name = 'John';
+}
+```
+
+Interview answer:
+
+> A component controls a part of the screen. It combines template, logic, styles, and metadata. Angular applications are built as a tree of components.
+
+## 3. What Is the Difference Between Component and Directive?
+
+| Component | Directive |
+|---|---|
+| Has a template | Usually does not have a template |
+| Controls a UI section | Changes behavior or appearance of an element |
+| Uses `@Component` | Uses `@Directive` |
+| Example: user profile card | Example: highlight text |
+
+Interview answer:
+
+> A component is a directive with a template. Directives are mainly used to change DOM behavior or appearance, while components create actual UI views.
+
+## 4. What Are Angular Directives?
+
+Directives are classes that add behavior to elements in the DOM.
+
+Types:
+
+- **Component directive**: directive with template
+- **Structural directive**: changes DOM layout, like `*ngIf`, `*ngFor`
+- **Attribute directive**: changes appearance or behavior, like `ngClass`, `ngStyle`
+
+Interview answer:
+
+> Directives allow Angular to attach behavior to DOM elements. Structural directives add or remove elements, while attribute directives modify the behavior or appearance of existing elements.
+
+## 5. What Is Data Binding in Angular?
+
+Data binding connects the component class and template.
+
+Types:
+
+| Binding | Syntax | Purpose |
+|---|---|---|
+| Interpolation | `{{ value }}` | Component to template text |
+| Property binding | `[src]="imageUrl"` | Component to DOM property |
+| Event binding | `(click)="save()"` | Template event to component method |
+| Two-way binding | `[(ngModel)]="name"` | Sync both directions |
+
+Interview answer:
+
+> Data binding is how Angular synchronizes data between the component and the template. Angular supports interpolation, property binding, event binding, and two-way binding.
+
+## 6. What Is Dependency Injection in Angular?
+
+Dependency Injection is a design pattern where Angular provides required dependencies to a class instead of the class creating them manually.
+
+Example:
+
+```ts
+constructor(private userService: UserService) {}
+```
+
+Benefits:
+
+- Loose coupling
+- Easier testing
+- Reusable services
+- Centralized object creation
+
+Interview answer:
+
+> Dependency Injection lets Angular inject services or dependencies into components and other services. This improves testability, reusability, and loose coupling.
+
+## 7. What Are Services in Angular?
+
+Services are classes used to share business logic, data, API calls, or reusable functionality across components.
+
+Example:
+
+```ts
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  getUsers() {
+    return this.http.get('/api/users');
+  }
+}
+```
+
+Interview answer:
+
+> Services are used for reusable logic that should not live inside components, such as API calls, shared state, logging, or business rules.
+
+## 8. What Is `providedIn: 'root'`?
+
+`providedIn: 'root'` registers a service at the application root level.
+
+This means:
+
+- One singleton instance is created.
+- The service is available throughout the app.
+- Angular can tree-shake unused services.
+
+Interview answer:
+
+> `providedIn: 'root'` makes a service available application-wide as a singleton and also supports tree shaking if the service is not used.
+
+## 9. What Is Angular Module?
+
+An Angular module, or `NgModule`, groups related components, directives, pipes, and services.
+
+Common modules:
+
+- `AppModule`
+- Feature modules
+- Shared modules
+- Core modules
+
+Example:
+
+```ts
+@NgModule({
+  declarations: [UserComponent],
+  imports: [CommonModule],
+  exports: [UserComponent]
+})
+export class UserModule {}
+```
+
+Interview answer:
+
+> An Angular module is a container for related features. It helps organize components, directives, pipes, and imported dependencies.
+
+Note:
+
+> In modern Angular, standalone components can reduce the need for NgModules, but many enterprise projects still use modules.
+
+## 10. What Are Standalone Components?
+
+Standalone components are Angular components that do not need to be declared inside an `NgModule`.
+
+Example:
+
+```ts
+@Component({
+  selector: 'app-user',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './user.component.html'
+})
+export class UserComponent {}
+```
+
+Interview answer:
+
+> Standalone components simplify Angular architecture by allowing components, directives, and pipes to be used without declaring them in an NgModule.
+
+## 11. What Is Angular Routing?
+
+Angular routing allows navigation between different views without reloading the full page.
+
+Example:
+
+```ts
+const routes: Routes = [
+  { path: 'users', component: UsersComponent },
+  { path: 'orders', component: OrdersComponent },
+  { path: '', redirectTo: 'users', pathMatch: 'full' }
+];
+```
+
+Interview answer:
+
+> Angular Router maps URL paths to components. It enables single-page application navigation, lazy loading, route guards, child routes, and route parameters.
+
+## 12. What Is Lazy Loading?
+
+Lazy loading means loading a feature only when it is needed.
+
+Example:
+
+```ts
+const routes: Routes = [
+  {
+    path: 'admin',
+    loadChildren: () =>
+      import('./admin/admin.module').then(m => m.AdminModule)
+  }
+];
+```
+
+Benefits:
+
+- Smaller initial bundle
+- Faster first load
+- Better performance for large apps
+
+Interview answer:
+
+> Lazy loading improves performance by loading feature modules or routes only when the user navigates to them, instead of loading the entire application upfront.
+
+## 13. What Are Route Guards?
+
+Route guards control whether navigation is allowed.
+
+Common guards:
+
+| Guard | Purpose |
+|---|---|
+| `CanActivate` | Can user enter route? |
+| `CanActivateChild` | Can user enter child route? |
+| `CanDeactivate` | Can user leave route? |
+| `Resolve` | Load data before route opens |
+| `CanMatch` | Can route be matched/lazy loaded? |
+
+Interview answer:
+
+> Route guards protect routes and control navigation. They are commonly used for authentication, authorization, unsaved form checks, and preloading route data.
+
+## 14. What Is Observable in Angular?
+
+An Observable represents a stream of asynchronous data over time. Angular uses Observables heavily with `HttpClient`, forms, router events, and RxJS.
+
+Example:
+
+```ts
+this.userService.getUsers().subscribe(users => {
+  this.users = users;
+});
+```
+
+Interview answer:
+
+> Observables are used to handle asynchronous streams of data. Unlike Promises, they can emit multiple values over time and provide powerful operators through RxJS.
+
+## 15. Observable vs Promise
+
+| Observable | Promise |
+|---|---|
+| Can emit multiple values | Emits one value |
+| Lazy by default | Eager |
+| Can be cancelled by unsubscribe | Cannot be cancelled directly |
+| Has RxJS operators | Limited chaining |
+| Used heavily in Angular | Used in general async JS |
+
+Interview answer:
+
+> A Promise handles a single future value, while an Observable can handle multiple values over time. Observables are lazy, cancellable, and support RxJS operators.
+
+## 16. What Is RxJS?
+
+RxJS is a library for reactive programming using Observables.
+
+Common operators:
+
+| Operator | Use |
+|---|---|
+| `map` | Transform data |
+| `filter` | Filter values |
+| `switchMap` | Cancel previous request and switch to new one |
+| `mergeMap` | Run inner streams in parallel |
+| `concatMap` | Run inner streams sequentially |
+| `debounceTime` | Wait before emitting, useful for search |
+| `catchError` | Handle errors |
+
+Interview answer:
+
+> RxJS helps manage asynchronous streams in Angular. It is useful for HTTP calls, search boxes, route changes, form changes, and event streams.
+
+## 17. What Is `switchMap` and Why Is It Useful?
+
+`switchMap` maps a value to a new Observable and cancels the previous inner Observable when a new value arrives.
+
+Best example:
+
+```ts
+this.searchControl.valueChanges.pipe(
+  debounceTime(300),
+  switchMap(searchText => this.userService.searchUsers(searchText))
+);
+```
+
+Interview answer:
+
+> `switchMap` is useful when only the latest request matters, like search autocomplete. It cancels previous pending requests and switches to the latest Observable.
+
+## 18. What Is Change Detection in Angular?
+
+Change detection is Angular's process of checking whether component data changed and updating the DOM.
+
+Angular usually runs change detection after:
+
+- Events
+- HTTP responses
+- Timers
+- Promise resolution
+- Observable emissions used with async pipe
+
+Interview answer:
+
+> Change detection keeps the template in sync with component data. Angular checks components and updates the DOM when data changes.
+
+## 19. What Is `OnPush` Change Detection?
+
+`OnPush` tells Angular to check a component only in specific cases.
+
+Angular checks an `OnPush` component when:
+
+- An `@Input` reference changes
+- An event occurs inside the component
+- An Observable used with `async` pipe emits
+- Change detection is manually triggered
+
+Example:
+
+```ts
+@Component({
+  selector: 'app-user-list',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  templateUrl: './user-list.component.html'
+})
+export class UserListComponent {}
+```
+
+Interview answer:
+
+> `OnPush` improves performance by reducing unnecessary checks. It works best with immutable data and Observables with the async pipe.
+
+## 20. What Is the `async` Pipe?
+
+The `async` pipe subscribes to an Observable or Promise in the template and automatically unsubscribes when the component is destroyed.
+
+Example:
+
+```html
+<div *ngFor="let user of users$ | async">
+  {{ user.name }}
+</div>
+```
+
+Benefits:
+
+- Cleaner code
+- Automatic subscription handling
+- Works well with `OnPush`
+- Reduces memory leak risk
+
+Interview answer:
+
+> The `async` pipe is used to bind Observables or Promises directly in the template. It automatically subscribes, updates the view, and unsubscribes when the component is destroyed.
+
+## Quick Revision: Angular Must-Remember Points
+
+```text
+Component = UI block
+Directive = changes DOM behavior
+Service = reusable logic
+DI = Angular provides dependencies
+Routing = URL to component
+Lazy loading = load feature only when needed
+Guard = control navigation
+Observable = async data stream
+RxJS = operators for async streams
+OnPush = optimized change detection
+Async pipe = auto subscribe/unsubscribe
+```
+
+## Final Angular Interview Summary
+
+Angular is a complete frontend framework based on TypeScript and component architecture. Components build the UI, services hold reusable logic, dependency injection provides services, routing handles navigation, lazy loading improves performance, guards protect routes, and RxJS Observables manage asynchronous data. For performance, Angular provides features like `OnPush` change detection, lazy loading, trackBy, pure pipes, and the `async` pipe.

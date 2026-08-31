@@ -1825,6 +1825,16 @@ class Program
 }
 ```
 
+**`ConfigureAwait(true)`**
+
+- After `await`, the code tries to continue on the original context, such as the UI thread.
+- This is the default behavior, so `await task` and `await task.ConfigureAwait(true)` are usually equivalent.
+
+**`ConfigureAwait(false)`**
+
+- After `await`, the code does not need to return to the original context; any suitable thread can continue.
+- Use it when the following code does not need the UI thread, especially in library code.
+
 ### 5. Exception Handling in Async
 
 ```csharp

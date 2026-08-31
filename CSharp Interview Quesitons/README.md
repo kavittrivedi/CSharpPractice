@@ -514,7 +514,7 @@ if (finishedTask == timeoutTask) {
 
 ```
 
-## In this case, `Task.Run()` executes both tasks concurrently, potentially using multiple threads for CPU-bound work.
+In this case, `Task.Run()` executes both tasks concurrently, potentially using multiple threads for CPU-bound work.
 
 **When to use:**  
 Ideal for CPU-bound operations (e.g., performing calculations, data processing).  

@@ -536,10 +536,6 @@ You can parallelize work to make the best use of multi-core processors.
 
 ## Heap vs Stack Memory
 
-Heap vs stack memory.  
-
-### Heap vs Stack Memory: A Simple Comparison
-
 #### 1. Stack Memory
 
 **What is it?**  

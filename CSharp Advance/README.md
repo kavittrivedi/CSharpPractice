@@ -341,3 +341,440 @@ One limitation is that `required` is compile-time protection. It does not automa
 ## Short Combined Interview Answer
 
 Modern C# features reduce boilerplate and make code safer. Records are useful for data models because they provide value equality and support copying with `with`. Pattern matching makes checks on ranges, properties, and collections concise. Primary constructors reduce constructor code. Collection expressions provide a common `[1, 2, 3]` syntax, while `..` adds items from another collection. Finally, `required` ensures important properties are supplied, and `init` prevents them from being changed after initialization.
+
+## 1. `Task` vs. `ValueTask`
+
+Both represent an operation that may finish now or later.
+
+### `Task`
+
+`Task` is a reference type. A method returning a result usually returns `Task<T>`:
+
+```csharp
+public async Task<int> GetCountAsync()
+{
+    await Task.Delay(100);
+    return 10;
+}
+```
+
+A `Task` object may require a heap allocation. It is easy and safe to use, so it should normally be the default choice.
+
+### `ValueTask`
+
+`ValueTask<T>` is a value type. It can return a result directly when the operation completes synchronously:
+
+```csharp
+public ValueTask<string> GetNameAsync(int id)
+{
+    if (id == 1)
+    {
+        return ValueTask.FromResult("Kavita");
+    }
+
+    return new ValueTask<string>(LoadNameFromDatabaseAsync(id));
+}
+```
+
+If the value is already cached, no separate `Task<string>` may need to be created. This can reduce heap allocations in frequently called, performance-sensitive code.
+
+Use `ValueTask<T>` when:
+
+- The method is called very frequently.
+- It usually completes synchronously.
+- Measurements show that `Task` allocations are a real performance problem.
+
+Use `Task<T>` for normal application code because it is simpler and less error-prone.
+
+### Do not await a `ValueTask` multiple times
+
+A `Task` can safely be awaited more than once:
+
+```csharp
+Task<int> task = GetCountAsync();
+
+int first = await task;
+int second = await task;
+```
+
+A `ValueTask` should normally be awaited only once:
+
+```csharp
+ValueTask<int> valueTask = GetCountValueAsync();
+
+int result = await valueTask;
+```
+
+This can be unsafe:
+
+```csharp
+int first = await valueTask;
+int second = await valueTask; // Do not rely on this
+```
+
+Some `ValueTask` objects are backed by reusable asynchronous sources that allow only one consumption. Awaiting them more than once can produce incorrect results or exceptions.
+
+If multiple awaits are necessary, convert it to a `Task` once:
+
+```csharp
+Task<int> task = valueTask.AsTask();
+
+int first = await task;
+int second = await task;
+```
+
+### Interview answer
+
+`Task` is the normal and safer choice for asynchronous methods. `ValueTask` can reduce allocations when an operation frequently completes synchronously, such as returning cached data. However, it adds complexity and should normally be awaited only once. I use it only after measuring a real performance benefit.
+
+---
+
+## 2. Async Internals and `SynchronizationContext`
+
+### How `async` and `await` work internally
+
+An `async` method does not keep a thread blocked while waiting.
+
+The compiler converts the method into a state machine. The state machine remembers:
+
+- Where execution stopped
+- Local variable values
+- What operation is being awaited
+- Where execution should continue
+
+Consider this method:
+
+```csharp
+public async Task<string> GetDataAsync()
+{
+    var data = await LoadDataAsync();
+    return data.ToUpper();
+}
+```
+
+Its simplified behavior is:
+
+1. Start executing `GetDataAsync`.
+2. Call `LoadDataAsync`.
+3. If the operation is incomplete, save the current state.
+4. Return a `Task` to the caller.
+5. Do not block the current thread.
+6. When loading finishes, resume from after the `await`.
+7. Complete the returned `Task`.
+
+If the awaited operation is already complete, execution can continue immediately without suspending the method.
+
+`async` does not automatically create a new thread. It allows the current thread to perform other work while an I/O operation is in progress.
+
+### What is `SynchronizationContext`?
+
+A `SynchronizationContext` represents an environment to which asynchronous code may need to return.
+
+For example, in a desktop UI application, controls must be updated from the UI thread:
+
+```csharp
+private async void Button_Click(object sender, EventArgs e)
+{
+    var data = await LoadDataAsync();
+
+    ResultLabel.Text = data; // Continues on the UI thread
+}
+```
+
+By default, `await` may capture the current context and continue on it afterward.
+
+### What does `ConfigureAwait(false)` do?
+
+`ConfigureAwait(false)` tells the awaiter that the continuation does not need to return to the captured context:
+
+```csharp
+var data = await LoadDataAsync().ConfigureAwait(false);
+```
+
+The code after `await` may continue on any appropriate thread-pool thread.
+
+Possible benefits include:
+
+- Avoiding unnecessary context-switching overhead
+- Reducing certain deadlock risks in older application models
+- Making reusable library code independent of the caller’s context
+
+### Where is it necessary?
+
+It is most useful in:
+
+- Reusable class libraries
+- Older ASP.NET applications
+- WinForms, WPF, or similar UI applications when the continuation does not access UI controls
+- Code that may run under a custom `SynchronizationContext`
+
+In ASP.NET Core, there is normally no custom `SynchronizationContext`, so `ConfigureAwait(false)` usually makes little practical difference.
+
+Do not use it before code that must return to the UI thread:
+
+```csharp
+var data = await LoadDataAsync().ConfigureAwait(false);
+
+// Unsafe in UI applications because this may not run on the UI thread
+ResultLabel.Text = data;
+```
+
+Also, avoid blocking async code with `.Result` or `.Wait()`:
+
+```csharp
+var result = GetDataAsync().Result; // Can block or cause deadlocks
+```
+
+Prefer:
+
+```csharp
+var result = await GetDataAsync();
+```
+
+### Interview answer
+
+The compiler converts an async method into a state machine. When an incomplete operation is awaited, the method saves its state and returns control without blocking the thread. When the operation finishes, execution resumes. `ConfigureAwait(false)` says that execution does not need to return to the original context. It is useful mainly in libraries, UI-related code, and older ASP.NET applications; it is generally unnecessary in ASP.NET Core.
+
+---
+
+## 3. Thread-Safe Primitives
+
+These tools protect shared data when multiple threads or requests may access it simultaneously.
+
+### `lock`
+
+A `lock` allows only one thread at a time to execute a section of synchronous code:
+
+```csharp
+private readonly object _sync = new();
+private int _count;
+
+public void Increment()
+{
+    lock (_sync)
+    {
+        _count++;
+    }
+}
+```
+
+Use `lock` when:
+
+- Protecting a small section of synchronous code
+- Several related operations must happen together
+- Only one thread should enter at a time
+
+Do not use `await` inside a `lock`:
+
+```csharp
+lock (_sync)
+{
+    await SaveAsync(); // Compilation error
+}
+```
+
+A thread waiting for a `lock` is blocked.
+
+Also, lock on a private object, not on `this`, strings, or publicly accessible objects:
+
+```csharp
+private readonly object _sync = new();
+```
+
+### `SemaphoreSlim`
+
+`SemaphoreSlim` controls how many operations can enter a section at the same time. It supports asynchronous waiting:
+
+```csharp
+private readonly SemaphoreSlim _semaphore = new(1, 1);
+
+public async Task UpdateAsync()
+{
+    await _semaphore.WaitAsync();
+
+    try
+    {
+        await SaveChangesAsync();
+    }
+    finally
+    {
+        _semaphore.Release();
+    }
+}
+```
+
+A semaphore with a maximum count of one behaves like an asynchronous lock.
+
+Use `SemaphoreSlim` when:
+
+- The protected operation uses `await`.
+- Waiting should not block a thread.
+- You want to limit concurrency.
+
+For example, allow only three concurrent operations:
+
+```csharp
+private readonly SemaphoreSlim _semaphore = new(3, 3);
+```
+
+Always call `Release()` in a `finally` block.
+
+### `Interlocked`
+
+`Interlocked` performs simple atomic operations without a traditional lock:
+
+```csharp
+private int _count;
+
+public void Increment()
+{
+    Interlocked.Increment(ref _count);
+}
+```
+
+Other operations include:
+
+```csharp
+Interlocked.Decrement(ref _count);
+Interlocked.Exchange(ref _count, 0);
+Interlocked.CompareExchange(ref _count, newValue, expectedValue);
+```
+
+Use `Interlocked` for simple operations on individual values, such as:
+
+- Incrementing a counter
+- Replacing a reference
+- Setting a flag
+- Comparing and replacing a value
+
+It is usually faster than a lock for these small operations, but it is not suitable for complicated logic involving several values.
+
+### Comparison
+
+| Tool | Best use | Blocks a thread? | Supports `await`? |
+|---|---|---:|---:|
+| `lock` | Protect synchronous multi-step logic | Yes, while waiting | No |
+| `SemaphoreSlim` | Protect or limit asynchronous operations | No with `WaitAsync` | Yes |
+| `Interlocked` | Simple atomic operations | No traditional blocking | Not needed |
+
+### Interview answer
+
+I use `lock` to protect a short synchronous critical section, `SemaphoreSlim` when the protected work is asynchronous or concurrency must be limited, and `Interlocked` for simple atomic operations such as incrementing a counter. I never place `await` inside a `lock`.
+
+---
+
+## 4. `CancellationToken`
+
+A `CancellationToken` allows the caller to request that an operation stop.
+
+Cancellation is cooperative. It does not forcibly terminate the operation. The method must observe the token and stop safely.
+
+### Accept and pass the token
+
+A service method should accept a token:
+
+```csharp
+public async Task<Order> GetOrderAsync(
+    int orderId,
+    CancellationToken cancellationToken)
+{
+    return await _repository.GetOrderAsync(
+        orderId,
+        cancellationToken);
+}
+```
+
+Pass the same token through every service layer:
+
+```csharp
+Controller
+    -> Service
+        -> Repository
+            -> Database or HTTP call
+```
+
+Example controller:
+
+```csharp
+[HttpGet("{id}")]
+public async Task<IActionResult> Get(
+    int id,
+    CancellationToken cancellationToken)
+{
+    var order = await _service.GetOrderAsync(
+        id,
+        cancellationToken);
+
+    return Ok(order);
+}
+```
+
+In ASP.NET Core, this token is connected to the HTTP request. It is cancelled when the client disconnects or cancels the request.
+
+### Pass it to supported async methods
+
+```csharp
+await dbContext.SaveChangesAsync(cancellationToken);
+
+await httpClient.GetAsync(url, cancellationToken);
+
+await Task.Delay(1000, cancellationToken);
+
+await semaphore.WaitAsync(cancellationToken);
+```
+
+For custom or CPU-bound work, check it periodically:
+
+```csharp
+foreach (var item in items)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    Process(item);
+}
+```
+
+### Handling `OperationCanceledException`
+
+`ThrowIfCancellationRequested()` and many framework methods throw `OperationCanceledException` when cancellation is requested.
+
+Usually, do not treat expected cancellation as a normal application error:
+
+```csharp
+try
+{
+    await ProcessAsync(cancellationToken);
+}
+catch (OperationCanceledException)
+    when (cancellationToken.IsCancellationRequested)
+{
+    // Optional cleanup or logging
+    throw;
+}
+```
+
+After cleanup, rethrow the exception so the caller knows that the operation was cancelled.
+
+Do not swallow cancellation and return a successful result:
+
+```csharp
+catch (OperationCanceledException)
+{
+    return new Result { Success = true }; // Misleading
+}
+```
+
+Also, avoid passing `CancellationToken.None` when the caller already supplied a token:
+
+```csharp
+await repository.SaveAsync(CancellationToken.None); // Breaks propagation
+```
+
+Once an important operation must complete for data consistency, cancellation may need careful handling. For example, do not stop halfway through a critical multi-step update unless a database transaction can roll it back safely.
+
+### Interview answer
+
+A cancellation token lets the caller request cancellation, but the operation must cooperate. I accept the token at the API or service boundary and pass it through services, repositories, database calls, HTTP calls, delays, and semaphore waits. For custom work, I check it with `ThrowIfCancellationRequested()`. I treat `OperationCanceledException` as expected cancellation, perform cleanup if needed, and normally rethrow it instead of reporting success.
+
+## Short Combined Interview Answer
+
+`Task` is the normal choice for asynchronous work, while `ValueTask` can reduce allocations when operations usually complete synchronously, but it should normally be awaited only once. The compiler implements async methods as state machines, and `ConfigureAwait(false)` prevents returning to a captured context when that context is unnecessary. For synchronization, I use `lock` for synchronous critical sections, `SemaphoreSlim` for asynchronous synchronization, and `Interlocked` for simple atomic updates. I propagate `CancellationToken` through every layer and treat `OperationCanceledException` as expected cancellation rather than an application failure.

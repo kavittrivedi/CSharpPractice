@@ -670,10 +670,6 @@ Used when you want the method to modify the original variable. This is typically
 
 ## Throw vs throw ex
 
-Explain Throw vs throw ex.  
-
-### Throw vs throw ex
-
 #### 1. throw
 
 **What it is:**  

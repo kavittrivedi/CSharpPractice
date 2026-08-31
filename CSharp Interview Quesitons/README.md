@@ -213,7 +213,7 @@ Ideal for working with large datasets where filtering should happen on the serve
 **Deferred Execution:**  
 When you want to construct a query dynamically and execute it later.
 
-### When to Use IEnumerator
+## When to Use IEnumerator
 
 **Working with Databases:**  
 

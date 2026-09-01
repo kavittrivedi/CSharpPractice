@@ -1,7 +1,3 @@
-Absolutely. For a **Technical Architect / Senior .NET Developer** interview, Microservices questions usually move from **fundamentals → architecture → design patterns → distributed systems → .NET → Azure/Kubernetes → scenario-based questions**.
-
-Below is a comprehensive interview bank with **short, interview-ready answers**.
-
 # Microservices Interview Questions & Answers
 
 ## 1. Microservices Fundamentals

@@ -108,6 +108,289 @@ Azure Storage is a scalable cloud storage solution offering various services for
 
 Azure Storage ensures durability, high availability, and security, making it suitable for diverse applications.
 
+Use the current Azure SDK packages—one package for each storage service:
+
+```powershell
+dotnet add package Azure.Storage.Blobs
+dotnet add package Azure.Storage.Queues
+dotnet add package Azure.Data.Tables
+dotnet add package Azure.Storage.Files.Shares
+dotnet add package Azure.Identity
+```
+
+`Azure.Identity` is recommended for passwordless authentication in production. Microsoft documents these clients as `BlobServiceClient`, `QueueServiceClient`, `TableServiceClient`, and `ShareServiceClient`. [Blob documentation](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-dotnet-get-started), [Queue documentation](https://learn.microsoft.com/en-us/azure/storage/queues/storage-quickstart-queues-dotnet), [File documentation](https://learn.microsoft.com/en-us/azure/storage/files/storage-dotnet-how-to-use-files)
+
+## Option 1: Connection string
+
+For local development, put the Azure Storage connection string in user secrets or an environment variable—never commit it to source control.
+
+```powershell
+dotnet user-secrets init
+dotnet user-secrets set "AzureStorage:ConnectionString" "<your-connection-string>"
+```
+
+In `appsettings.json`, keep only resource names:
+
+```json
+{
+  "AzureStorage": {
+    "BlobContainer": "documents",
+    "Queue": "orders",
+    "Table": "customers",
+    "FileShare": "shared-files"
+  }
+}
+```
+
+### Register the clients in ASP.NET Core
+
+```csharp
+using Azure.Data.Tables;
+using Azure.Storage.Blobs;
+using Azure.Storage.Files.Shares;
+using Azure.Storage.Queues;
+
+var builder = WebApplication.CreateBuilder(args);
+
+string connectionString =
+    builder.Configuration["AzureStorage:ConnectionString"]
+    ?? throw new InvalidOperationException(
+        "Azure Storage connection string is missing.");
+
+builder.Services.AddSingleton(
+    new BlobServiceClient(connectionString));
+
+builder.Services.AddSingleton(
+    new QueueServiceClient(connectionString));
+
+builder.Services.AddSingleton(
+    new TableServiceClient(connectionString));
+
+builder.Services.AddSingleton(
+    new ShareServiceClient(connectionString));
+
+var app = builder.Build();
+app.Run();
+```
+
+The same storage-account connection string can connect to Blob, Queue, Table, and File services.
+
+## Blob Storage
+
+```csharp
+using Azure.Storage.Blobs;
+
+public sealed class BlobStorageService
+{
+    private readonly BlobContainerClient _container;
+
+    public BlobStorageService(BlobServiceClient serviceClient)
+    {
+        _container = serviceClient.GetBlobContainerClient("documents");
+    }
+
+    public async Task UploadAsync(
+        string blobName,
+        Stream content,
+        CancellationToken cancellationToken = default)
+    {
+        await _container.CreateIfNotExistsAsync(
+            cancellationToken: cancellationToken);
+
+        BlobClient blob = _container.GetBlobClient(blobName);
+
+        await blob.UploadAsync(
+            content,
+            overwrite: true,
+            cancellationToken);
+    }
+
+    public async Task<Stream> DownloadAsync(
+        string blobName,
+        CancellationToken cancellationToken = default)
+    {
+        BlobClient blob = _container.GetBlobClient(blobName);
+        return await blob.OpenReadAsync(cancellationToken: cancellationToken);
+    }
+}
+```
+
+## Queue Storage
+
+```csharp
+using Azure.Storage.Queues;
+
+public sealed class QueueStorageService
+{
+    private readonly QueueClient _queue;
+
+    public QueueStorageService(QueueServiceClient serviceClient)
+    {
+        _queue = serviceClient.GetQueueClient("orders");
+    }
+
+    public async Task SendAsync(
+        string message,
+        CancellationToken cancellationToken = default)
+    {
+        await _queue.CreateIfNotExistsAsync(
+            cancellationToken: cancellationToken);
+
+        await _queue.SendMessageAsync(message, cancellationToken);
+    }
+
+    public async Task<string?> ReceiveAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _queue.ReceiveMessageAsync(
+            cancellationToken: cancellationToken);
+
+        var message = response.Value;
+
+        if (message is null)
+            return null;
+
+        await _queue.DeleteMessageAsync(
+            message.MessageId,
+            message.PopReceipt,
+            cancellationToken);
+
+        return message.MessageText;
+    }
+}
+```
+
+Only delete a queue message after it has been processed successfully.
+
+## Table Storage
+
+```csharp
+using Azure.Data.Tables;
+
+public sealed class CustomerEntity : ITableEntity
+{
+    public string PartitionKey { get; set; } = default!;
+    public string RowKey { get; set; } = default!;
+
+    public string Name { get; set; } = default!;
+    public string Email { get; set; } = default!;
+
+    public DateTimeOffset? Timestamp { get; set; }
+    public Azure.ETag ETag { get; set; }
+}
+
+public sealed class TableStorageService
+{
+    private readonly TableClient _table;
+
+    public TableStorageService(TableServiceClient serviceClient)
+    {
+        _table = serviceClient.GetTableClient("customers");
+    }
+
+    public async Task SaveAsync(
+        CustomerEntity customer,
+        CancellationToken cancellationToken = default)
+    {
+        await _table.CreateIfNotExistsAsync(cancellationToken);
+
+        await _table.UpsertEntityAsync(
+            customer,
+            TableUpdateMode.Replace,
+            cancellationToken);
+    }
+
+    public async Task<CustomerEntity> GetAsync(
+        string partitionKey,
+        string rowKey,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _table.GetEntityAsync<CustomerEntity>(
+            partitionKey,
+            rowKey,
+            cancellationToken: cancellationToken);
+
+        return response.Value;
+    }
+}
+```
+
+## Azure File Storage
+
+```csharp
+using Azure.Storage.Files.Shares;
+
+public sealed class FileShareStorageService
+{
+    private readonly ShareClient _share;
+
+    public FileShareStorageService(ShareServiceClient serviceClient)
+    {
+        _share = serviceClient.GetShareClient("shared-files");
+    }
+
+    public async Task UploadAsync(
+        string fileName,
+        Stream content,
+        CancellationToken cancellationToken = default)
+    {
+        await _share.CreateIfNotExistsAsync(
+            cancellationToken: cancellationToken);
+
+        ShareDirectoryClient root = _share.GetRootDirectoryClient();
+        ShareFileClient file = root.GetFileClient(fileName);
+
+        await file.UploadAsync(content, cancellationToken);
+    }
+
+    public async Task<Stream> DownloadAsync(
+        string fileName,
+        CancellationToken cancellationToken = default)
+    {
+        ShareFileClient file = _share
+            .GetRootDirectoryClient()
+            .GetFileClient(fileName);
+
+        return await file.OpenReadAsync(cancellationToken: cancellationToken);
+    }
+}
+```
+
+## Recommended production authentication
+
+For applications hosted in Azure, prefer Managed Identity with `DefaultAzureCredential` instead of storing account keys:
+
+```csharp
+using Azure.Identity;
+using Azure.Storage.Blobs;
+using Azure.Storage.Queues;
+using Azure.Data.Tables;
+
+var credential = new DefaultAzureCredential();
+const string accountName = "mystorageaccount";
+
+var blobClient = new BlobServiceClient(
+    new Uri($"https://{accountName}.blob.core.windows.net"),
+    credential);
+
+var queueClient = new QueueServiceClient(
+    new Uri($"https://{accountName}.queue.core.windows.net"),
+    credential);
+
+var tableClient = new TableServiceClient(
+    new Uri($"https://{accountName}.table.core.windows.net"),
+    credential);
+```
+
+The application’s managed identity must receive the corresponding roles, such as:
+
+- `Storage Blob Data Contributor`
+- `Storage Queue Data Contributor`
+- `Storage Table Data Contributor`
+- `Storage File Data SMB Share Contributor` or the appropriate Azure Files data-plane role
+
+Azure Files identity-based access has additional authorization requirements, so connection-string authentication is often simpler for an initial Azure Files implementation.
+
 ## Explain Serverless in Azure
 
 Serverless computing in Azure allows developers to build and run applications without managing servers. With services like Azure Functions and Azure Logic Apps, you can focus on writing code while Azure automatically handles infrastructure scaling and resource allocation. This model charges you only for the compute resources you use, making it cost-effective for event-driven applications and microservices. It enables rapid development and deployment, allowing you to respond quickly to changing business needs.

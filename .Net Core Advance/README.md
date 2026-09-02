@@ -465,6 +465,58 @@ Scoped    → Singleton ✅
 Scoped    → Transient ✅
 ```
 
+In ASP.NET Core, **a Singleton should not directly depend on a Scoped service**.
+
+### What happens?
+
+If you try:
+
+```csharp
+builder.Services.AddSingleton<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+```
+
+and:
+
+```csharp
+public OrderService(IOrderRepository repository)
+{
+    // ...
+}
+```
+
+ASP.NET Core's DI container will generally throw an exception when validating/resolving the service:
+
+> **Cannot consume scoped service 'IOrderRepository' from singleton 'IOrderService'.**
+
+### Why?
+
+Because:
+
+```text
+Singleton → lives for entire application
+Scoped    → lives for one request
+```
+
+The Singleton would potentially hold a reference to a Scoped object **after that scope/request has ended**, which is unsafe and breaks the intended lifetime.
+
+### Interview answer 🎯
+
+> **"A Singleton cannot directly depend on a Scoped service because their lifetimes are incompatible. The Singleton lives for the application's lifetime, while the Scoped service is created per request. ASP.NET Core's DI container detects this captive dependency and throws an exception."**
+
+**Rule to remember:**
+
+```text
+Singleton → Singleton ✅
+Singleton → Transient ✅ (with caution)
+Singleton → Scoped ❌
+
+Scoped → Singleton ✅
+Scoped → Scoped ✅
+Scoped → Transient ✅
+```
+
+
 ---
 
 ### 3. DbContext lifetime

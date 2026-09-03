@@ -95,7 +95,42 @@ The main advantage is **loose coupling**. The `Ticket` doesn't need to know the 
 **Easy way to remember:**
 **Publisher → Event happens → Notify all Subscribers.**
 
-For an interview,  **realistic project scenario** 
+
+Yes. A **workspace booking system** gives you a very natural Observer Pattern scenario. Just present it as a representative implementation only if it matches what your system actually did.
+
+For example, you can use **booking cancellation → notify interested components**.
+
+Yes, I used the Observer Pattern in a workspace booking system.
+
+For example, when a user cancelled a workspace booking, multiple actions needed to happen. We needed to notify the user, update workspace availability, and potentially notify other interested components.
+
+Instead of putting all this logic directly inside the booking component, we raised a booking cancellation event. Different handlers subscribed to that event and performed their respective actions.
+
+This kept the booking logic loosely coupled from notification and other downstream functionality, and it also made it easier to add new handlers later without changing the core booking logic.
+
+If the interviewer asks **“What were the Subject and Observers?”**, you can explain:
+
+```text
+Booking Service / Booking
+        │
+        │ BookingCancelled Event
+        ↓
+ ┌──────────────┬──────────────────┬─────────────────┐
+ ↓              ↓                  ↓
+Email Handler   Availability       Audit Handler
+                Handler
+```
+
+So:
+
+**Subject/Publisher:** Booking component
+**Event:** `BookingCancelled`
+**Observers:** Email notification, availability update, audit logging, etc.
+
+One thing I'd avoid saying is **“we used Observer Pattern”** if the actual implementation was purely Azure Service Bus messaging. In that case, say **“we used a publish/subscribe approach based on the same observer-style principle.”** That distinction can matter in a design-pattern interview.
+
+
+Extra Content -> For an interview,  **realistic project scenario** 
 
 Based on your .NET experience, you can answer like this:
 
@@ -129,3 +164,5 @@ So the interview connection is:
 **Observer Pattern → Publisher/Subscriber → C# events & delegates → multiple handlers react to a change.**
 
 One important distinction: if you mention **Azure Service Bus**, say it uses a similar **publish/subscribe idea**, but don't say Service Bus itself *is* the GoF Observer Pattern. Observer is typically an in-process object design pattern, while Service Bus provides distributed messaging.
+
+

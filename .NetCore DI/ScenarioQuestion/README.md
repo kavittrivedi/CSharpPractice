@@ -460,3 +460,64 @@ Scoped → Scoped ✅
 Scoped → Transient ✅
 ```
 ---
+
+### 3. DbContext lifetime
+
+**Question:**
+You are developing an ASP.NET Core Web API using Entity Framework Core. What lifetime would you choose for `DbContext` and why?
+
+**Answer:**
+
+> “I would normally use **Scoped** lifetime for `DbContext`. A scoped `DbContext` gives us one context per HTTP request, which fits the unit-of-work pattern and avoids sharing the same context across concurrent requests.”
+
+```csharp
+builder.Services.AddDbContext<AppDbContext>();
+```
+
+`AddDbContext()` registers it as **Scoped by default**.
+
+---
+
+### 4. Service needs a different dependency based on configuration
+
+**Question:**
+Your application can use either Azure Blob Storage or AWS S3 depending on configuration. How would you implement this using DI?
+
+**Answer:**
+
+> “I would create an abstraction such as `IFileStorageService` and have separate implementations for Azure Blob and AWS S3. I would register the implementations through DI and select the appropriate implementation based on configuration. This keeps the business logic independent of the storage provider.”
+
+```text
+IFileStorageService
+       |
+       +-- AzureBlobStorageService
+       |
+       +-- S3StorageService
+```
+
+This is a good example of **Dependency Inversion + DI**.
+
+---
+
+### 5. Transient service maintains state unexpectedly
+
+**Question:**
+You registered a service as `Transient`, but you notice that its state is not maintained between calls. Why?
+
+**Answer:**
+
+> “That's expected. A Transient service creates a **new instance every time it is requested**. If I need the same instance throughout an HTTP request, I would use Scoped. If I need one instance for the application's lifetime, I would use Singleton.”
+
+```text
+Transient → New instance every time
+Scoped    → One instance per request/scope
+Singleton → One instance for application lifetime
+```
+
+### ⭐ Interview shortcut
+
+If the interviewer asks **"How do you decide the DI lifetime?"**, remember:
+
+> **Transient = lightweight/stateless**
+> **Scoped = request-specific / DbContext**
+> **Singleton = shared, thread-safe, application-wide state**

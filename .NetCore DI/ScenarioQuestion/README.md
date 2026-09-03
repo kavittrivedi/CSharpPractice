@@ -521,3 +521,204 @@ If the interviewer asks **"How do you decide the DI lifetime?"**, remember:
 > **Transient = lightweight/stateless**
 > **Scoped = request-specific / DbContext**
 > **Singleton = shared, thread-safe, application-wide state**
+
+### 6. What happens if a Singleton service depends on a Scoped service?  
+
+In ASP.NET Core, **a Singleton should not directly depend on a Scoped service**.
+
+### What happens?
+
+If you try:
+
+```csharp
+builder.Services.AddSingleton<IOrderService, OrderService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+```
+
+and:
+
+```csharp
+public OrderService(IOrderRepository repository)
+{
+    // ...
+}
+```
+
+ASP.NET Core's DI container will generally throw an exception when validating/resolving the service:
+
+> **Cannot consume scoped service 'IOrderRepository' from singleton 'IOrderService'.**
+
+### Why?
+
+Because:
+
+```text
+Singleton → lives for entire application
+Scoped    → lives for one request
+```
+
+The Singleton would potentially hold a reference to a Scoped object **after that scope/request has ended**, which is unsafe and breaks the intended lifetime.
+
+### Interview answer 🎯
+
+> **"A Singleton cannot directly depend on a Scoped service because their lifetimes are incompatible. The Singleton lives for the application's lifetime, while the Scoped service is created per request. ASP.NET Core's DI container detects this captive dependency and throws an exception."**
+
+**Rule to remember:**
+
+```text
+Singleton → Singleton ✅
+Singleton → Transient ✅ (with caution)
+Singleton → Scoped ❌
+
+Scoped → Singleton ✅
+Scoped → Scoped ✅
+Scoped → Transient ✅
+```
+> Note: In a plain Console App, the DI container doesn't automatically validate everything unless you enable validation. We'll enable it so you can clearly see the error.
+
+### 1. Create the project
+
+```bash
+dotnet new console -n DependencyLifetimeDemo
+cd DependencyLifetimeDemo
+dotnet add package Microsoft.Extensions.DependencyInjection
+```
+
+### 2. Replace `Program.cs`
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+
+// Create DI container
+var services = new ServiceCollection();
+
+// Register services
+services.AddSingleton<IOrderService, OrderService>();
+services.AddScoped<IOrderRepository, OrderRepository>();
+
+// Enable DI validation
+var serviceProvider = services.BuildServiceProvider(
+    new ServiceProviderOptions
+    {
+        ValidateScopes = true,
+        ValidateOnBuild = true
+    });
+
+Console.WriteLine("Application started.");
+```
+
+### 3. Add the interfaces/classes
+
+You can put these in the same `Program.cs` for testing:
+
+```csharp
+public interface IOrderService
+{
+    void ProcessOrder();
+}
+
+public interface IOrderRepository
+{
+    void Save();
+}
+
+public class OrderService : IOrderService
+{
+    private readonly IOrderRepository _repository;
+
+    public OrderService(IOrderRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public void ProcessOrder()
+    {
+        _repository.Save();
+    }
+}
+
+public class OrderRepository : IOrderRepository
+{
+    public void Save()
+    {
+        Console.WriteLine("Order saved.");
+    }
+}
+```
+
+### What happens when you run it?
+
+Run:
+
+```bash
+dotnet run
+```
+
+You should get an exception similar to:
+
+```text
+System.AggregateException:
+Some services are not able to be constructed
+
+Cannot consume scoped service
+'IOrderRepository'
+from singleton
+'IOrderService'.
+```
+
+### Why?
+
+Your dependency chain is:
+
+```text
+IOrderService
+    ↓
+Singleton
+    ↓
+IOrderRepository
+    ↓
+Scoped ❌
+```
+
+The problem is that the Singleton lives for the **entire application lifetime**, while the Scoped service is supposed to live only within a **scope**.
+
+---
+
+## How to fix it
+
+Make `OrderService` scoped:
+
+```csharp
+services.AddScoped<IOrderService, OrderService>();
+services.AddScoped<IOrderRepository, OrderRepository>();
+```
+
+Now:
+
+```text
+IOrderService
+    ↓
+Scoped
+    ↓
+IOrderRepository
+    ↓
+Scoped
+```
+
+This is valid. ✅
+
+### Interview point
+
+Remember this rule:
+
+```text
+Singleton → Scoped       ❌
+Singleton → Transient    ⚠️
+Singleton → Singleton    ✅
+
+Scoped → Singleton       ✅
+Scoped → Scoped          ✅
+Scoped → Transient       ✅
+```
+
+The important interview term here is **"captive dependency"** — when a longer-lived service holds a shorter-lived dependency.

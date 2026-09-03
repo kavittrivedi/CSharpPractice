@@ -50,12 +50,3 @@ Better:
 > ✅ **“.NET 6, 8 and 10 are different releases of the modern unified .NET platform.”**
 
 And if the interviewer asks specifically about **.NET Framework vs .NET 6/8/10**, that's a different and very important question. You should be ready for that distinction too.
-
-
-Here are **5 common scenario-based Dependency Injection questions** you can expect in a .NET Core interview, with interview-ready answers.
-
-
-
-
-
-

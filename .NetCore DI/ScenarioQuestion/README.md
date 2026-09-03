@@ -722,3 +722,25 @@ Scoped → Transient       ✅
 ```
 
 The important interview term here is **"captive dependency"** — when a longer-lived service holds a shorter-lived dependency.
+
+
+### 7. You Injected a Scoped Service into a Singleton and It Works in Development but Corrupts Data in Production. What Happened?
+
+A **singleton** service is created only once and shared by all requests for the lifetime of the application. A **scoped** service is normally created once for each request.
+
+When a singleton captures a scoped service, that same scoped instance may be kept and shared across many requests. In production, many users make requests at the same time, so they can incorrectly share request-specific state.
+
+For example, Entity Framework's `DbContext` is scoped and is not thread-safe. If a singleton holds one `DbContext`, concurrent requests may track or update each other's data. This can cause incorrect updates, mixed user data, concurrency errors, or disposed-object errors.
+
+It may seem fine in development because there are fewer requests and usually only one person testing. There is not enough concurrent traffic to expose the lifetime problem.
+
+### How to Fix It
+
+- Do not inject a scoped service directly into a singleton.
+- If possible, make the singleton a scoped service too.
+- If it must remain a singleton, create a new dependency injection scope for each operation and resolve the scoped service from that scope.
+- For Entity Framework background work, consider `IDbContextFactory<TContext>` so that each operation receives a new `DbContext`.
+
+### Simple Interview Answer
+
+The singleton lived for the whole application and held a service that was meant to live for only one request. Production requests therefore shared request-specific state. When those requests ran at the same time, the shared state caused data corruption. It worked in development only because there was not enough traffic to reveal the problem. The fix is to use compatible service lifetimes or create a fresh scope or `DbContext` for each operation.

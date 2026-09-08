@@ -93,3 +93,48 @@ Simple idea:
 2. **If data is not found, return 404 Not Found**
 3. **If validation fails, return 400 Bad Request**
 4. **For unknown errors, return 500 Internal Server Error**
+
+## What is good global exception handling or separate exception handling?
+
+### Global Exception Handling
+
+**Purpose:** Handles all exceptions in one centralized place.
+
+**When to Use:**
+
+- When you want to log and manage all unhandled exceptions in a consistent way.
+- Best for capturing unexpected errors or application-wide policies.
+
+**Advantages:**
+
+- Reduces repetitive code.
+- Ensures consistent logging and error responses.
+
+**Example:** Use middleware or UseExceptionHandler in ASP.NET Core to handle all exceptions globally.
+
+### Separate Exception Handling
+
+**Purpose:** Handles exceptions at specific places, like in individual methods or classes.
+
+**When to Use:**
+
+- When exceptions are domain-specific or need special handling for particular operations.
+- Useful for cases where you need to recover from certain exceptions or provide custom error messages.
+
+**Advantages:**
+
+- Gives precise control over how each exception is managed.
+- Makes handling specific scenarios easier.
+
+### Comparison:
+
+| Aspect              | Global Exception Handling   | Separate Exception Handling          |
+| ------------------- | --------------------------- | ------------------------------------ |
+| **Scope**           | Application-wide            | Method or class-specific             |
+| **Code Repetition** | Minimal                     | More repetitive                      |
+| **Custom Handling** | Generalized                 | Fine-tuned for specific exceptions   |
+| **Use Case**        | Unexpected/unhandled errors | Known scenarios needing special care |
+
+### Best Practice:
+
+Use global exception handling for general errors and combine it with separate exception handling for domain-specific or critical operations. This provides a balance of consistency and precision.

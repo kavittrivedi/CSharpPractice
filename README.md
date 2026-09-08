@@ -1,5 +1,19 @@
 # CSharpPractice
 
+## Topics
+
+- [C#](docs/csharp/)
+- [.NET](docs/dotnet/)
+- [Architecture](docs/architecture/)
+- [Cloud](docs/cloud/)
+- [AI](docs/ai/)
+- [Frontend](docs/frontend/)
+- [Interview preparation](docs/interviews/)
+- [Security](docs/security/)
+- [SQL](docs/sql/)
+- [Practice exercises](exercises/)
+- [Projects](projects/)
+
 ## How foreach Loop Works
 
 how foreach loop works. explain technically. The foreach loop in C# works by leveraging the IEnumerable and IEnumerator interfaces. Here's a technical explanation of how it functions:

@@ -198,80 +198,82 @@ Logs can be written to files, sent to centralized services like cloud logging, o
 
 For production systems, it's important to have structured logs and use centralized or cloud-based logging to manage and analyze the logs effectively.
 
-## Explain Configure vs ConfigureService in .Net Core. 
 
-In .NET Core, Configure and ConfigureServices are two important methods used in the Startup class to set up your application’s services and request processing pipeline. They are part of the configuration process for your app.
+## Service Registration vs HTTP Request Pipeline in Modern ASP.NET Core
 
-Here’s a simple explanation:
+> In current ASP.NET Core projects (.NET 6+ including .NET 10), application
+> startup is usually configured in `Program.cs`. The older `Startup` class,
+> `ConfigureServices`, and `Configure` methods are still supported, but are
+> mainly seen in older projects.
 
-1. ConfigureServices:
+### 1. Registering services: `builder.Services`
 
-Purpose: This method is used to register services that your application will use, such as database connections, dependency injection, authentication, logging, etc.
+**Purpose:** Register application services in the Dependency Injection (DI)
+container before the application is built.
 
-Where it's used: It's called first, during the application startup, to configure and add services to the DI (Dependency Injection) container.
-
-What it does: It prepares the services that will be available throughout the application (e.g., controllers, middleware, etc.). 
-Example: 
+**Examples:** Controllers, database contexts, authentication, authorization,
+caching, logging, and custom services.
 
 ```csharp
-public void ConfigureServices(IServiceCollection services)
-{
-    // Registering a service (e.g., adding a database context, MVC, etc.)
-    services.AddDbContext<MyDbContext>(options => options.UseSqlServer("YourConnectionString"));
-    services.AddControllersWithViews();
-} 
+var builder = WebApplication.CreateBuilder(args);
+
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<MyDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<IOrderService, OrderService>();
 ```
-What happens here: We register services like DbContext for database access and ControllersWithViews for MVC support.
 
-2. Configure:
+After `builder.Build()`, these services can be requested through constructor
+injection in controllers, endpoints, middleware, and other services.
 
-Purpose: This method is used to define how the HTTP request pipeline should be configured.
+### 2. Configuring the request pipeline: `app.Use...` and `app.Map...`
 
-Where it's used: It’s called after ConfigureServices and defines how the application handles HTTP requests.
+**Purpose:** Define how each incoming HTTP request is handled.
 
-What it does: This is where you configure things like middleware (e.g., routing, authentication, authorization, static files, etc.) and how requests should be processed. 
+- `app.Use...` adds middleware to the pipeline.
+- `app.Map...` maps endpoints, such as controller routes or minimal API routes.
 
-Example: 
 ```csharp
-public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
 {
-    if (env.IsDevelopment())
-    {
-        app.UseDeveloperExceptionPage();  // Show detailed error page in development
-    }
-    else
-    {
-        app.UseExceptionHandler("/Home/Error");  // Show generic error page in production
-        app.UseHsts();  // HTTP Strict Transport Security
-    }
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
 
-    app.UseHttpsRedirection();  // Redirect HTTP to HTTPS
-    app.UseStaticFiles();  // Serve static files (e.g., CSS, JavaScript)
-    app.UseRouting();  // Set up routing for your controllers
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 
-    app.UseEndpoints(endpoints =>
-    {
-        endpoints.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Home}/{action=Index}/{id?}");
-    });
-} 
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
 ```
-What happens here: We configure middleware for exception handling, static files, HTTPS redirection, and routing. This determines how incoming requests will be processed.
 
-In Summary:
+Middleware order matters. For example, `UseAuthentication()` must come before
+`UseAuthorization()`.
 
-ConfigureServices: Register services (like database access, authentication, MVC, etc.) that the app will need.
+### Summary
 
-Configure: Set up the request pipeline (middleware) to handle HTTP requests, manage routing, and apply other configurations like error handling and static files.
+| Responsibility | Modern ASP.NET Core | Older Startup pattern |
+|---|---|---|
+| Register services | `builder.Services.Add...` | `ConfigureServices(IServiceCollection services)` |
+| Configure middleware and routes | `app.Use...`, `app.Map...` | `Configure(IApplicationBuilder app, ...)` |
 
-How They Work Together:
+In short: **register what the application needs before `builder.Build()`; define
+how requests are handled after `builder.Build()`.**
 
-ConfigureServices is used to add services that your app will need throughout its lifecycle.
-
-Configure defines how requests will be processed using those services.
-
-In short, ConfigureServices is for service registration, and Configure is for defining how HTTP requests are handled in the pipeline.
+One correction to the old text: controllers are registered as services, but middleware is generally added to the pipeline—not registered in `ConfigureServices`. Also, `UseRouting()` and `UseEndpoints()` are often unnecessary with the modern `WebApplication` model; endpoint mapping such as `app.MapControllerRoute(...)` is the normal style. [Microsoft’s current `WebApplication` guidance](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/webapplication?view=aspnetcore-10.0)
 
 
 ## What is CQRS pattern? 

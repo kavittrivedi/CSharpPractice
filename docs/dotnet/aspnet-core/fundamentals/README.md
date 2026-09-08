@@ -273,8 +273,6 @@ Middleware order matters. For example, `UseAuthentication()` must come before
 In short: **register what the application needs before `builder.Build()`; define
 how requests are handled after `builder.Build()`.**
 
-One correction to the old text: controllers are registered as services, but middleware is generally added to the pipeline—not registered in `ConfigureServices`. Also, `UseRouting()` and `UseEndpoints()` are often unnecessary with the modern `WebApplication` model; endpoint mapping such as `app.MapControllerRoute(...)` is the normal style. [Microsoft’s current `WebApplication` guidance](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis/webapplication?view=aspnetcore-10.0)
-
 
 ## What is CQRS pattern? 
 

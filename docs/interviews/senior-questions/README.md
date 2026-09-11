@@ -56,138 +56,6 @@ Estimating features, user stories, and bugs is crucial for effective project man
 
 Estimation involves understanding the scope, breaking down tasks, choosing the right technique, considering team velocity, and involving the team. Regularly reviewing and adjusting estimates based on feedback helps improve accuracy over time.
 
-## Explain Branching strategy.  
-
-A **branching strategy** in version control systems (like Git) outlines how to create, manage, and merge branches in a code repository. It helps teams coordinate their work, manage features, and maintain code quality. Here are some common branching strategies:
-
-### 1. **Feature Branching**
-
-* **Description**: Each new feature or bug fix is developed in its own branch, typically created from the main branch (e.g., `main` or `develop`).
-* **Benefits**: Isolates changes, making it easier to manage features independently. When the feature is complete, it can be merged back into the main branch.
-
-### 2. **Git Flow**
-
-* **Description**: A structured branching model with specific branches for development, features, releases, and hotfixes.
-
-  * **Branches**:
-
-    * `master`: Production-ready code.
-    * `develop`: Integration branch for features.
-    * `feature/*`: Branches for individual features.
-    * `release/*`: Branches for preparing releases.
-    * `hotfix/*`: Branches for quick fixes in production.
-* **Benefits**: Clear structure helps manage complex projects with multiple features and releases.
-
-### 3. **GitHub Flow**
-
-* **Description**: A simplified workflow where developers create branches off the `main` branch for features or fixes and merge them back after review.
-* **Benefits**: Lightweight and promotes continuous deployment. Ideal for projects with frequent updates.
-
-### 4. **Trunk-Based Development**
-
-* **Description**: Developers work in short-lived branches that are merged back into the main branch (trunk) frequently, often multiple times a day.
-* **Benefits**: Encourages collaboration and reduces integration issues by minimizing the time spent in isolation.
-
-### 5. **Release Branching**
-
-* **Description**: A strategy where a branch is created for each release. Changes are made on the release branch while the main branch continues to receive new features.
-* **Benefits**: Allows for fixes and adjustments to be made to the release while development on the next version continues.
-
-### Best Practices for Branching Strategy
-
-* **Consistent Naming**: Use clear naming conventions for branches (e.g., `feature/login`, `bugfix/login-error`).
-* **Regular Merging**: Merge frequently to minimize conflicts and ensure branches stay updated with the main codebase.
-* **Pull Requests**: Use pull requests for code reviews before merging changes into the main branch, enhancing code quality.
-
-### Summary
-
-A branching strategy provides a framework for managing code changes in a collaborative environment. Choosing the right strategy depends on the project's size, team structure, and deployment frequency. Implementing a consistent strategy helps improve collaboration, code quality, and release management.
-
-## What is difference between .Net Framework and .Net Core? 
-
-Here are the key differences between **.NET Framework** and **.NET Core**:
-
-### 1. **Platform**
-
-* **.NET Framework**: Primarily designed for Windows applications. It runs only on Windows and is tightly integrated with the Windows operating system.
-* **.NET Core**: Cross-platform, allowing applications to run on Windows, macOS, and Linux. It is designed to support a broader range of applications.
-
-### 2. **Application Types**
-
-* **.NET Framework**: Suitable for Windows desktop applications (WPF, Windows Forms), ASP.NET web applications, and web services.
-* **.NET Core**: Supports console applications, ASP.NET Core web applications, microservices, cloud-based applications, and more.
-
-### 3. **Performance**
-
-* **.NET Framework**: Generally has more overhead due to its integration with Windows and older architectures.
-* **.NET Core**: Optimized for performance and has a smaller footprint, making it faster and more efficient, especially for server-side applications.
-
-### 4. **Deployment**
-
-* **.NET Framework**: Applications depend on the installed version of the framework on the machine. Upgrading the framework may affect existing applications.
-* **.NET Core**: Supports self-contained deployment, allowing applications to include the necessary runtime components, so they can run independently of the installed framework version.
-
-### 5. **Development Model**
-
-* **.NET Framework**: Uses the traditional Visual Studio IDE and has a more complex project structure.
-* **.NET Core**: Utilizes the .NET CLI (Command Line Interface) and supports modern development practices, including simplified project structures and support for open-source tools.
-
-### 6. **Library Support**
-
-* **.NET Framework**: Has a rich set of libraries that are specific to Windows.
-* **.NET Core**: Has a modular library structure and supports many of the same libraries as .NET Framework, but not all libraries are available. However, the .NET Standard allows for library compatibility across different .NET platforms.
-
-### 7. **Future Development**
-
-* **.NET Framework**: Not actively developed for new features. Maintenance updates are still provided, but it's largely considered legacy.
-* **.NET Core**: Actively developed and evolved into **.NET 5** and later versions, which unify the .NET ecosystem into a single platform.
-
-### Summary
-
-In summary, **.NET Framework** is suitable for Windows-specific applications, while **.NET Core** is a cross-platform, lightweight framework ideal for modern application development. The choice between them depends on the project's requirements, target platform, and future considerations.
-
-## What is difference between MVC - Webform? 
-
-Here are the key differences between **MVC (Model-View-Controller)** and **Web Forms** in ASP.NET:
-
-### 1. **Architecture**
-
-* **MVC**: Follows the MVC architectural pattern, which separates the application into three components:
-
-  * **Model**: Represents the data and business logic.
-  * **View**: Handles the presentation layer.
-  * **Controller**: Manages user input and interacts with the model to render the appropriate view.
-* **Web Forms**: Follows a page-based model where each web page is a self-contained unit, combining the presentation and logic in a single file (code-behind). It uses a more traditional event-driven model.
-
-### 2. **State Management**
-
-* **MVC**: Does not maintain state by default. Each request is treated independently, making it more stateless and suitable for RESTful applications.
-* **Web Forms**: Utilizes view state to preserve the state of controls across postbacks, which can lead to larger page sizes and potential performance issues.
-
-### 3. **URL Routing**
-
-* **MVC**: Uses a flexible routing mechanism that allows for clean and SEO-friendly URLs. URL patterns are defined in a centralized route configuration.
-* **Web Forms**: Typically uses file-based routing, where the URL corresponds to the physical file path of the .aspx page, which can lead to less readable URLs.
-
-### 4. **Testing and Maintainability**
-
-* **MVC**: Promotes separation of concerns, making it easier to write unit tests for individual components (models, controllers). The structure enhances maintainability and scalability.
-* **Web Forms**: Tends to mix presentation and logic, making unit testing more challenging and potentially leading to tightly coupled code.
-
-### 5. **Flexibility and Control**
-
-* **MVC**: Provides more control over HTML markup and allows developers to use any front-end framework (like Angular, React, etc.). Developers have more flexibility in designing the application's structure.
-* **Web Forms**: Abstracts much of the HTML generation and control rendering, which can limit customization and control over the generated markup.
-
-### 6. **Development Model**
-
-* **MVC**: Generally considered to be more modern and aligns with agile development practices. It allows for rapid iteration and deployment.
-* **Web Forms**: More suitable for developers familiar with traditional desktop application development paradigms and event-driven programming.
-
-### Summary
-
-In summary, **MVC** is more suited for modern web application development, emphasizing separation of concerns, testability, and flexibility, while **Web Forms** is an older framework that abstracts many complexities but may lead to issues with maintainability and scalability. The choice between the two often depends on the project requirements, team expertise, and future maintenance considerations.
-
 ## SQL Best Practice. 
 
 Here are some best practices for SQL development to ensure performance, security, and maintainability:
@@ -363,6 +231,140 @@ The Agile Manifesto, created in 2001, outlines four core values and twelve princ
 ### Summary
 
 Agile is a flexible and collaborative approach to project management that prioritizes customer needs, iterative progress, and team empowerment. By embracing change and fostering continuous improvement, Agile helps teams deliver high-quality products that meet market demands efficiently.
+
+
+## Explain Branching strategy.  
+
+A **branching strategy** in version control systems (like Git) outlines how to create, manage, and merge branches in a code repository. It helps teams coordinate their work, manage features, and maintain code quality. Here are some common branching strategies:
+
+### 1. **Feature Branching**
+
+* **Description**: Each new feature or bug fix is developed in its own branch, typically created from the main branch (e.g., `main` or `develop`).
+* **Benefits**: Isolates changes, making it easier to manage features independently. When the feature is complete, it can be merged back into the main branch.
+
+### 2. **Git Flow**
+
+* **Description**: A structured branching model with specific branches for development, features, releases, and hotfixes.
+
+  * **Branches**:
+
+    * `master`: Production-ready code.
+    * `develop`: Integration branch for features.
+    * `feature/*`: Branches for individual features.
+    * `release/*`: Branches for preparing releases.
+    * `hotfix/*`: Branches for quick fixes in production.
+* **Benefits**: Clear structure helps manage complex projects with multiple features and releases.
+
+### 3. **GitHub Flow**
+
+* **Description**: A simplified workflow where developers create branches off the `main` branch for features or fixes and merge them back after review.
+* **Benefits**: Lightweight and promotes continuous deployment. Ideal for projects with frequent updates.
+
+### 4. **Trunk-Based Development**
+
+* **Description**: Developers work in short-lived branches that are merged back into the main branch (trunk) frequently, often multiple times a day.
+* **Benefits**: Encourages collaboration and reduces integration issues by minimizing the time spent in isolation.
+
+### 5. **Release Branching**
+
+* **Description**: A strategy where a branch is created for each release. Changes are made on the release branch while the main branch continues to receive new features.
+* **Benefits**: Allows for fixes and adjustments to be made to the release while development on the next version continues.
+
+### Best Practices for Branching Strategy
+
+* **Consistent Naming**: Use clear naming conventions for branches (e.g., `feature/login`, `bugfix/login-error`).
+* **Regular Merging**: Merge frequently to minimize conflicts and ensure branches stay updated with the main codebase.
+* **Pull Requests**: Use pull requests for code reviews before merging changes into the main branch, enhancing code quality.
+
+### Summary
+
+A branching strategy provides a framework for managing code changes in a collaborative environment. Choosing the right strategy depends on the project's size, team structure, and deployment frequency. Implementing a consistent strategy helps improve collaboration, code quality, and release management.
+
+
+## What is difference between .Net Framework and .Net Core? 
+
+Here are the key differences between **.NET Framework** and **.NET Core**:
+
+### 1. **Platform**
+
+* **.NET Framework**: Primarily designed for Windows applications. It runs only on Windows and is tightly integrated with the Windows operating system.
+* **.NET Core**: Cross-platform, allowing applications to run on Windows, macOS, and Linux. It is designed to support a broader range of applications.
+
+### 2. **Application Types**
+
+* **.NET Framework**: Suitable for Windows desktop applications (WPF, Windows Forms), ASP.NET web applications, and web services.
+* **.NET Core**: Supports console applications, ASP.NET Core web applications, microservices, cloud-based applications, and more.
+
+### 3. **Performance**
+
+* **.NET Framework**: Generally has more overhead due to its integration with Windows and older architectures.
+* **.NET Core**: Optimized for performance and has a smaller footprint, making it faster and more efficient, especially for server-side applications.
+
+### 4. **Deployment**
+
+* **.NET Framework**: Applications depend on the installed version of the framework on the machine. Upgrading the framework may affect existing applications.
+* **.NET Core**: Supports self-contained deployment, allowing applications to include the necessary runtime components, so they can run independently of the installed framework version.
+
+### 5. **Development Model**
+
+* **.NET Framework**: Uses the traditional Visual Studio IDE and has a more complex project structure.
+* **.NET Core**: Utilizes the .NET CLI (Command Line Interface) and supports modern development practices, including simplified project structures and support for open-source tools.
+
+### 6. **Library Support**
+
+* **.NET Framework**: Has a rich set of libraries that are specific to Windows.
+* **.NET Core**: Has a modular library structure and supports many of the same libraries as .NET Framework, but not all libraries are available. However, the .NET Standard allows for library compatibility across different .NET platforms.
+
+### 7. **Future Development**
+
+* **.NET Framework**: Not actively developed for new features. Maintenance updates are still provided, but it's largely considered legacy.
+* **.NET Core**: Actively developed and evolved into **.NET 5** and later versions, which unify the .NET ecosystem into a single platform.
+
+### Summary
+
+In summary, **.NET Framework** is suitable for Windows-specific applications, while **.NET Core** is a cross-platform, lightweight framework ideal for modern application development. The choice between them depends on the project's requirements, target platform, and future considerations.
+
+## What is difference between MVC - Webform? 
+
+Here are the key differences between **MVC (Model-View-Controller)** and **Web Forms** in ASP.NET:
+
+### 1. **Architecture**
+
+* **MVC**: Follows the MVC architectural pattern, which separates the application into three components:
+
+  * **Model**: Represents the data and business logic.
+  * **View**: Handles the presentation layer.
+  * **Controller**: Manages user input and interacts with the model to render the appropriate view.
+* **Web Forms**: Follows a page-based model where each web page is a self-contained unit, combining the presentation and logic in a single file (code-behind). It uses a more traditional event-driven model.
+
+### 2. **State Management**
+
+* **MVC**: Does not maintain state by default. Each request is treated independently, making it more stateless and suitable for RESTful applications.
+* **Web Forms**: Utilizes view state to preserve the state of controls across postbacks, which can lead to larger page sizes and potential performance issues.
+
+### 3. **URL Routing**
+
+* **MVC**: Uses a flexible routing mechanism that allows for clean and SEO-friendly URLs. URL patterns are defined in a centralized route configuration.
+* **Web Forms**: Typically uses file-based routing, where the URL corresponds to the physical file path of the .aspx page, which can lead to less readable URLs.
+
+### 4. **Testing and Maintainability**
+
+* **MVC**: Promotes separation of concerns, making it easier to write unit tests for individual components (models, controllers). The structure enhances maintainability and scalability.
+* **Web Forms**: Tends to mix presentation and logic, making unit testing more challenging and potentially leading to tightly coupled code.
+
+### 5. **Flexibility and Control**
+
+* **MVC**: Provides more control over HTML markup and allows developers to use any front-end framework (like Angular, React, etc.). Developers have more flexibility in designing the application's structure.
+* **Web Forms**: Abstracts much of the HTML generation and control rendering, which can limit customization and control over the generated markup.
+
+### 6. **Development Model**
+
+* **MVC**: Generally considered to be more modern and aligns with agile development practices. It allows for rapid iteration and deployment.
+* **Web Forms**: More suitable for developers familiar with traditional desktop application development paradigms and event-driven programming.
+
+### Summary
+
+In summary, **MVC** is more suited for modern web application development, emphasizing separation of concerns, testability, and flexibility, while **Web Forms** is an older framework that abstracts many complexities but may lead to issues with maintainability and scalability. The choice between the two often depends on the project requirements, team expertise, and future maintenance considerations.
 
 ## We have a web application in asp.net webform. We want to migrate to .net core 8 MVC. How we can migrate?
 

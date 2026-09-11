@@ -789,16 +789,16 @@ app.UseRateLimiter();
 
 Important:
 
-Add `app.UseRateLimiter()` before mapping controllers.
+Add `app.UseRateLimiter()` before authorization controllers.
 
 Example:
 
 ```csharp
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
 app.UseRateLimiter();
+
+app.UseAuthorization();
 
 app.MapControllers();
 ```

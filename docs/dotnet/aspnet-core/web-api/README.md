@@ -1,6 +1,606 @@
 
 # .Net Core Api Interview Practice
 
+# Sample Program.cs
+
+Below are **two interview-friendly `Program.cs` templates**: one for a **.NET Core Web API** and one for **ASP.NET Core MVC**.
+
+I’ve included the commonly used registrations and middleware, with inline comments explaining **what each one does and when you would use it**. Some registrations are intentionally commented out because they require additional NuGet packages or application-specific classes.
+
+## 1. .NET Core Web API — `Program.cs`
+
+```csharp
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// ============================================================
+// 1. CONFIGURATION
+// ============================================================
+
+// Reads configuration from:
+// appsettings.json
+// appsettings.{Environment}.json
+// Environment Variables
+// User Secrets (Development)
+// Command-line arguments
+
+var configuration = builder.Configuration;
+
+
+// ============================================================
+// 2. LOGGING
+// ============================================================
+
+// Built-in logging providers.
+// Console is useful for local development/container logs.
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+// Example: Serilog would normally be configured here.
+// builder.Host.UseSerilog();
+
+
+// ============================================================
+// 3. CONTROLLERS
+// ============================================================
+
+// Registers API controllers.
+
+builder.Services.AddControllers();
+
+// Optional API behavior customization.
+// Example: automatically return 400 when ModelState is invalid.
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        return new BadRequestObjectResult(new
+        {
+            Message = "Validation failed.",
+            Errors = context.ModelState
+        });
+    };
+});
+
+
+// ============================================================
+// 4. API EXPLORER
+// ============================================================
+
+// Required by Swagger/OpenAPI to discover API endpoints.
+
+builder.Services.AddEndpointsApiExplorer();
+
+
+// ============================================================
+// 5. SWAGGER / OPENAPI
+// ============================================================
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "My API",
+        Version = "v1",
+        Description = "Sample ASP.NET Core Web API"
+    });
+
+    // --------------------------------------------------------
+    // JWT authentication support in Swagger
+    // --------------------------------------------------------
+
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter JWT token."
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+
+// ============================================================
+// 6. ENTITY FRAMEWORK CORE
+// ============================================================
+
+// Register DbContext for dependency injection.
+//
+// SQL Server example:
+//
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseSqlServer(
+//         configuration.GetConnectionString("DefaultConnection")));
+
+
+// ============================================================
+// 7. REPOSITORY / DATA ACCESS LAYER
+// ============================================================
+
+// Typical layered architecture:
+//
+// Controller
+//     ↓
+// Business/Service Layer
+//     ↓
+// Repository
+//     ↓
+// EF Core / Database
+
+// Example:
+//
+// builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+// builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
+
+// ============================================================
+// 8. DEPENDENCY INJECTION LIFETIMES
+// ============================================================
+
+// Transient:
+// New instance every time it is requested.
+//
+// builder.Services.AddTransient<IEmailService, EmailService>();
+
+// Scoped:
+// One instance per HTTP request.
+// Commonly used for DbContext and business services.
+//
+// builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
+// Singleton:
+// One instance for the entire application lifetime.
+//
+// builder.Services.AddSingleton<ICacheService, CacheService>();
+
+
+// ============================================================
+// 9. HTTP CLIENT
+// ============================================================
+
+// Recommended way to register HttpClient for calling
+// external APIs.
+
+builder.Services.AddHttpClient();
+
+// Typed HttpClient example:
+//
+// builder.Services.AddHttpClient<IPaymentService, PaymentService>(
+//     client =>
+//     {
+//         client.BaseAddress = new Uri("https://payment-api/");
+//         client.Timeout = TimeSpan.FromSeconds(30);
+//     });
+
+
+// ============================================================
+// 10. CORS
+// ============================================================
+
+// Required when browser frontend and API are hosted
+// on different origins.
+//
+// Example:
+// Angular -> http://localhost:4200
+// API     -> https://localhost:5001
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendPolicy", policy =>
+    {
+        policy
+            .WithOrigins("https://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+
+// ============================================================
+// 11. AUTHENTICATION - JWT
+// ============================================================
+
+// Authentication answers:
+// "Who are you?"
+//
+// Authorization answers:
+// "Are you allowed to perform this operation?"
+
+// JWT example:
+
+// builder.Services
+//     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(options =>
+//     {
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidateAudience = true,
+//             ValidateLifetime = true,
+//             ValidateIssuerSigningKey = true,
+//
+//             ValidIssuer = configuration["Jwt:Issuer"],
+//             ValidAudience = configuration["Jwt:Audience"],
+//
+//             IssuerSigningKey = new SymmetricSecurityKey(
+//                 Encoding.UTF8.GetBytes(
+//                     configuration["Jwt:Key"]!))
+//         };
+//     });
+
+
+// ============================================================
+// 12. AUTHORIZATION
+// ============================================================
+
+builder.Services.AddAuthorization();
+
+
+// ============================================================
+// 13. RATE LIMITING
+// ============================================================
+
+// Protects APIs from excessive requests.
+//
+// Example:
+// Maximum 100 requests per minute.
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("FixedPolicy", limiterOptions =>
+    {
+        limiterOptions.PermitLimit = 100;
+        limiterOptions.Window = TimeSpan.FromMinutes(1);
+        limiterOptions.QueueLimit = 0;
+    });
+});
+
+
+// ============================================================
+// 14. RESPONSE CACHING
+// ============================================================
+
+// Server-side response caching.
+//
+// builder.Services.AddResponseCaching();
+
+
+// ============================================================
+// 15. OUTPUT CACHING
+// ============================================================
+
+// Modern ASP.NET Core output caching.
+//
+// builder.Services.AddOutputCache();
+
+
+// ============================================================
+// 16. MEMORY CACHE
+// ============================================================
+
+// In-memory caching.
+//
+// builder.Services.AddMemoryCache();
+
+
+// ============================================================
+// 17. DISTRIBUTED CACHE
+// ============================================================
+
+// Useful when multiple application instances are running.
+//
+// Example Redis:
+//
+// builder.Services.AddStackExchangeRedisCache(options =>
+// {
+//     options.Configuration = configuration.GetConnectionString("Redis");
+// });
+
+
+// ============================================================
+// 18. SESSION
+// ============================================================
+
+// Normally more common in MVC applications than APIs.
+//
+// builder.Services.AddSession();
+
+
+// ============================================================
+// 19. AUTOMAPPER
+// ============================================================
+
+// Example:
+//
+// builder.Services.AddAutoMapper(typeof(Program));
+
+
+// ============================================================
+// 20. VALIDATION
+// ============================================================
+
+// DataAnnotations validation is included with MVC.
+//
+// For FluentValidation:
+//
+// builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+
+
+// ============================================================
+// 21. HEALTH CHECKS
+// ============================================================
+
+// Used by Kubernetes, Azure, load balancers, etc.
+// to determine whether application is healthy.
+
+builder.Services.AddHealthChecks();
+
+// Database health check example:
+//
+// builder.Services.AddHealthChecks()
+//     .AddSqlServer(
+//         configuration.GetConnectionString("DefaultConnection")!);
+
+
+// ============================================================
+// 22. HTTP CONTEXT ACCESSOR
+// ============================================================
+
+// Allows services to access current HttpContext.
+//
+// Use carefully; avoid coupling business logic to HttpContext.
+
+builder.Services.AddHttpContextAccessor();
+
+
+// ============================================================
+// 23. BACKGROUND SERVICES
+// ============================================================
+
+// Useful for background processing.
+//
+// builder.Services.AddHostedService<BackgroundWorker>();
+
+
+// ============================================================
+// 24. MESSAGE BUS / SERVICE BUS
+// ============================================================
+
+// Example Azure Service Bus registration.
+//
+// Requires Azure.Messaging.ServiceBus package.
+//
+// builder.Services.AddSingleton<ServiceBusClient>(sp =>
+//     new ServiceBusClient(
+//         configuration["ServiceBus:ConnectionString"]));
+
+
+// ============================================================
+// 25. OPTIONS PATTERN
+// ============================================================
+
+// Maps configuration section to strongly typed class.
+//
+// builder.Services.Configure<JwtSettings>(
+//     configuration.GetSection("Jwt"));
+
+
+// ============================================================
+// BUILD APPLICATION
+// ============================================================
+
+var app = builder.Build();
+
+
+// ============================================================
+// 26. EXCEPTION HANDLING MIDDLEWARE
+// ============================================================
+
+// Production:
+// Use centralized exception handling.
+//
+// Development:
+// Developer exception page gives detailed errors.
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/error");
+
+    // Adds HSTS header.
+    app.UseHsts();
+}
+
+
+// ============================================================
+// 27. HTTPS REDIRECTION
+// ============================================================
+
+// Redirects HTTP requests to HTTPS.
+
+app.UseHttpsRedirection();
+
+
+// ============================================================
+// 28. STATIC FILES
+// ============================================================
+
+// Usually not required for pure APIs.
+//
+// app.UseStaticFiles();
+
+
+// ============================================================
+// 29. ROUTING
+// ============================================================
+
+// Explicit routing middleware.
+//
+// With modern minimal hosting this is often optional,
+// but can be used when controlling middleware order.
+
+app.UseRouting();
+
+
+// ============================================================
+// 30. CORS
+// ============================================================
+
+// IMPORTANT:
+// CORS should be placed before authentication/authorization
+// when using endpoint routing.
+
+app.UseCors("FrontendPolicy");
+
+
+// ============================================================
+// 31. AUTHENTICATION
+// ============================================================
+
+// Must execute before Authorization.
+//
+// app.UseAuthentication();
+
+
+// ============================================================
+// 32. AUTHORIZATION
+// ============================================================
+
+app.UseAuthorization();
+
+
+// ============================================================
+// 33. RATE LIMITER
+// ============================================================
+
+app.UseRateLimiter();
+
+
+// ============================================================
+// 34. RESPONSE CACHING
+// ============================================================
+
+// app.UseResponseCaching();
+
+
+// ============================================================
+// 35. OUTPUT CACHING
+// ============================================================
+
+// app.UseOutputCache();
+
+
+// ============================================================
+// 36. SESSION
+// ============================================================
+
+// app.UseSession();
+
+
+// ============================================================
+// 37. SWAGGER
+// ============================================================
+
+// Usually enabled only in Development.
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+
+// ============================================================
+// 38. HEALTH CHECK
+// ============================================================
+
+app.MapHealthChecks("/health");
+
+
+// ============================================================
+// 39. CONTROLLER ENDPOINTS
+// ============================================================
+
+app.MapControllers();
+
+
+// ============================================================
+// START APPLICATION
+// ============================================================
+
+app.Run();
+```
+
+### Important API middleware order to remember
+
+For an interview, remember this simplified order:
+
+```text
+Exception Handling
+       ↓
+HTTPS
+       ↓
+Routing
+       ↓
+CORS
+       ↓
+Authentication
+       ↓
+Authorization
+       ↓
+Rate Limiting
+       ↓
+Endpoints
+```
+
+## The main difference
+
+| Web API                          | MVC                                 |
+| -------------------------------- | ----------------------------------- |
+| `AddControllers()`               | `AddControllersWithViews()`         |
+| `MapControllers()`               | `MapControllerRoute()`              |
+| Primarily returns JSON/data      | Primarily returns HTML/Razor Views  |
+| Swagger commonly used            | Swagger usually not required        |
+| JWT/Bearer commonly used         | Cookie authentication commonly used |
+| Static files usually unnecessary | `UseStaticFiles()` commonly used    |
+| Session usually avoided          | Session can be commonly used        |
+| Angular/React can be frontend    | Razor Views can be frontend         |
+
+### One important interview point
+
+You **should not register every service/middleware in every application**. The correct architecture is to register middleware **only when the application needs it**, and middleware order matters because each middleware can affect the request before the next one executes.
+
+
+
 ## How do You secure API requests? 
 
 Securing API requests is essential to protect sensitive data and ensure that only authorized users can access your API. Here are some common practices to secure API requests:

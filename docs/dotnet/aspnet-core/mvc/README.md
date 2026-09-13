@@ -1,5 +1,432 @@
 # .Net Core MVC Interview Practice
 
+# Sample Program.cs
+
+Below is **One interview-friendly `Program.cs` templates**: for **ASP.NET Core MVC**.
+
+I’ve included the commonly used registrations and middleware, with inline comments explaining **what each one does and when you would use it**. Some registrations are intentionally commented out because they require additional NuGet packages or application-specific classes.
+
+
+### Important API middleware order to remember
+
+For an interview, remember this simplified order:
+
+```text
+Exception Handling
+       ↓
+HTTPS
+       ↓
+Routing
+       ↓
+CORS
+       ↓
+Authentication
+       ↓
+Authorization
+       ↓
+Rate Limiting
+       ↓
+Endpoints
+```
+
+---
+
+# 2. ASP.NET Core MVC — `Program.cs`
+
+MVC has many of the same services, but the important difference is that it registers **Views/Razor** and usually serves **HTML pages**.
+
+```csharp
+using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+
+var builder = WebApplication.CreateBuilder(args);
+
+var configuration = builder.Configuration;
+
+
+// ============================================================
+// 1. LOGGING
+// ============================================================
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+// Example:
+// builder.Host.UseSerilog();
+
+
+// ============================================================
+// 2. MVC
+// ============================================================
+
+// Registers:
+// - Controllers
+// - Views
+// - Model binding
+// - Model validation
+// - Filters
+// - Razor View Engine
+
+builder.Services.AddControllersWithViews();
+
+
+// ============================================================
+// 3. RAZOR PAGES
+// ============================================================
+
+// Use this if the application also contains Razor Pages.
+//
+// builder.Services.AddRazorPages();
+
+
+// ============================================================
+// 4. ENTITY FRAMEWORK CORE
+// ============================================================
+
+// Example:
+//
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseSqlServer(
+//         configuration.GetConnectionString("DefaultConnection")));
+
+
+// ============================================================
+// 5. DEPENDENCY INJECTION
+// ============================================================
+
+// Repository:
+//
+// builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
+// Business service:
+//
+// builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
+// Email:
+//
+// builder.Services.AddTransient<IEmailService, EmailService>();
+
+// Cache:
+//
+// builder.Services.AddSingleton<ICacheService, CacheService>();
+
+
+// ============================================================
+// 6. HTTP CLIENT
+// ============================================================
+
+builder.Services.AddHttpClient();
+
+
+// ============================================================
+// 7. HTTP CONTEXT ACCESSOR
+// ============================================================
+
+builder.Services.AddHttpContextAccessor();
+
+
+// ============================================================
+// 8. MEMORY CACHE
+// ============================================================
+
+builder.Services.AddMemoryCache();
+
+
+// ============================================================
+// 9. SESSION
+// ============================================================
+
+// Session requires a distributed cache or in-memory cache.
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    // How long the session can remain idle.
+    options.IdleTimeout = TimeSpan.FromMinutes(20);
+
+    // Prevent client-side JavaScript from accessing
+    // the session cookie.
+    options.Cookie.HttpOnly = true;
+
+    // Helps protect against CSRF-related cookie attacks.
+    options.Cookie.SameSite = SameSiteMode.Lax;
+
+    // Send cookie only over HTTPS.
+    options.Cookie.SecurePolicy =
+        CookieSecurePolicy.Always;
+});
+
+
+// ============================================================
+// 10. AUTHENTICATION - COOKIE
+// ============================================================
+
+// Common authentication mechanism for MVC applications.
+//
+// Authentication:
+// "Who is the user?"
+
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+
+        // Prevent excessively long authentication sessions.
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+
+        // Renew cookie when appropriate.
+        options.SlidingExpiration = true;
+    });
+
+
+// ============================================================
+// 11. AUTHORIZATION
+// ============================================================
+
+// Authorization:
+// "Is this user allowed to access this resource?"
+
+builder.Services.AddAuthorization();
+
+
+// ============================================================
+// 12. CORS
+// ============================================================
+
+// Needed if MVC application calls APIs hosted on
+// another origin.
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ApiPolicy", policy =>
+    {
+        policy
+            .WithOrigins("https://localhost:5001")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+
+// ============================================================
+// 13. RATE LIMITING
+// ============================================================
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddFixedWindowLimiter("FixedPolicy", options =>
+    {
+        options.PermitLimit = 100;
+        options.Window = TimeSpan.FromMinutes(1);
+        options.QueueLimit = 0;
+    });
+});
+
+
+// ============================================================
+// 14. RESPONSE CACHING
+// ============================================================
+
+// builder.Services.AddResponseCaching();
+
+
+// ============================================================
+// 15. OUTPUT CACHING
+// ============================================================
+
+// builder.Services.AddOutputCache();
+
+
+// ============================================================
+// 16. HEALTH CHECKS
+// ============================================================
+
+builder.Services.AddHealthChecks();
+
+
+// ============================================================
+// 17. AUTOMAPPER
+// ============================================================
+
+// builder.Services.AddAutoMapper(typeof(Program));
+
+
+// ============================================================
+// 18. OPTIONS PATTERN
+// ============================================================
+
+// Example:
+//
+// builder.Services.Configure<EmailSettings>(
+//     configuration.GetSection("Email"));
+
+
+// ============================================================
+// 19. BACKGROUND SERVICES
+// ============================================================
+
+// Example:
+//
+// builder.Services.AddHostedService<NotificationWorker>();
+
+
+// ============================================================
+// BUILD APPLICATION
+// ============================================================
+
+var app = builder.Build();
+
+
+// ============================================================
+// 20. EXCEPTION HANDLING
+// ============================================================
+
+if (app.Environment.IsDevelopment())
+{
+    // Detailed developer exception page.
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    // Production exception handler.
+    app.UseExceptionHandler("/Home/Error");
+
+    // Adds Strict-Transport-Security header.
+    app.UseHsts();
+}
+
+
+// ============================================================
+// 21. HTTPS REDIRECTION
+// ============================================================
+
+app.UseHttpsRedirection();
+
+
+// ============================================================
+// 22. STATIC FILES
+// ============================================================
+
+// Enables files from wwwroot:
+//
+// CSS
+// JavaScript
+// Images
+// Fonts
+
+app.UseStaticFiles();
+
+
+// ============================================================
+// 23. ROUTING
+// ============================================================
+
+app.UseRouting();
+
+
+// ============================================================
+// 24. CORS
+// ============================================================
+
+// Use only when cross-origin requests are required.
+//
+// app.UseCors("ApiPolicy");
+
+
+// ============================================================
+// 25. SESSION
+// ============================================================
+
+// Must be before endpoints that access Session.
+
+app.UseSession();
+
+
+// ============================================================
+// 26. AUTHENTICATION
+// ============================================================
+
+app.UseAuthentication();
+
+
+// ============================================================
+// 27. AUTHORIZATION
+// ============================================================
+
+app.UseAuthorization();
+
+
+// ============================================================
+// 28. RATE LIMITING
+// ============================================================
+
+app.UseRateLimiter();
+
+
+// ============================================================
+// 29. MVC ROUTING
+// ============================================================
+
+// Conventional MVC routing:
+//
+// /Home/Index
+// /Employee/Details/10
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+// ============================================================
+// 30. RAZOR PAGES
+// ============================================================
+
+// Enable if Razor Pages are registered.
+//
+// app.MapRazorPages();
+
+
+// ============================================================
+// 31. HEALTH CHECK
+// ============================================================
+
+app.MapHealthChecks("/health");
+
+
+// ============================================================
+// START APPLICATION
+// ============================================================
+
+app.Run();
+```
+
+## The main difference
+
+| Web API                          | MVC                                 |
+| -------------------------------- | ----------------------------------- |
+| `AddControllers()`               | `AddControllersWithViews()`         |
+| `MapControllers()`               | `MapControllerRoute()`              |
+| Primarily returns JSON/data      | Primarily returns HTML/Razor Views  |
+| Swagger commonly used            | Swagger usually not required        |
+| JWT/Bearer commonly used         | Cookie authentication commonly used |
+| Static files usually unnecessary | `UseStaticFiles()` commonly used    |
+| Session usually avoided          | Session can be commonly used        |
+| Angular/React can be frontend    | Razor Views can be frontend         |
+
+### One important interview point
+
+You **should not register every service/middleware in every application**. The correct architecture is to register middleware **only when the application needs it**, and middleware order matters because each middleware can affect the request before the next one executes.
+
+
 ## Explain MVC Page Life Cycle
 
 The MVC (Model-View-Controller) page life cycle describes the flow of how a request is processed in an ASP.NET MVC application from start to finish. Here's a simple breakdown:

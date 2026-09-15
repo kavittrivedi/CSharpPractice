@@ -1153,3 +1153,48 @@ Async pipe = auto subscribe/unsubscribe
 ## Final Angular Interview Summary
 
 Angular is a complete frontend framework based on TypeScript and component architecture. Components build the UI, services hold reusable logic, dependency injection provides services, routing handles navigation, lazy loading improves performance, guards protect routes, and RxJS Observables manage asynchronous data. For performance, Angular provides features like `OnPush` change detection, lazy loading, trackBy, pure pipes, and the `async` pipe.
+
+### Local Storage vs Session Storage
+
+Both are **browser Web Storage APIs** used to store data as key-value pairs in the user's browser.
+
+| Feature                                | Local Storage                               | Session Storage                                |
+| -------------------------------------- | ------------------------------------------- | ---------------------------------------------- |
+| Lifetime                               | Remains until explicitly removed            | Remains until the browser tab/window is closed |
+| Shared between tabs?                   | Yes, for the same origin                    | No, generally specific to the tab              |
+| Capacity                               | Typically around 5–10 MB, browser-dependent | Typically around 5–10 MB, browser-dependent    |
+| Sent automatically with HTTP requests? | ❌ No                                        | ❌ No                                           |
+| Data format                            | String key-value pairs                      | String key-value pairs                         |
+
+### Angular/JavaScript Example
+
+**Local Storage:**
+
+```typescript
+localStorage.setItem('username', 'Kavit');
+
+const username = localStorage.getItem('username');
+
+localStorage.removeItem('username');
+```
+
+The value remains after closing and reopening the browser.
+
+**Session Storage:**
+
+```typescript
+sessionStorage.setItem('username', 'Kavit');
+
+const username = sessionStorage.getItem('username');
+
+sessionStorage.removeItem('username');
+```
+
+The value is normally removed when that **browser tab/window session ends**.
+
+### When to use?
+
+* **Local Storage:** Data that should persist across browser sessions, such as user preferences.
+* **Session Storage:** Temporary data needed only during the current tab session.
+
+**Important security point:** Don't store sensitive secrets such as passwords or long-lived authentication tokens in Web Storage if an XSS vulnerability could expose them. For authentication, **HttpOnly cookies** are generally safer against JavaScript-based token theft.

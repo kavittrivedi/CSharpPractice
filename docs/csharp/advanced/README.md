@@ -778,3 +778,79 @@ A cancellation token lets the caller request cancellation, but the operation mus
 ## Short Combined Interview Answer
 
 `Task` is the normal choice for asynchronous work, while `ValueTask` can reduce allocations when operations usually complete synchronously, but it should normally be awaited only once. The compiler implements async methods as state machines, and `ConfigureAwait(false)` prevents returning to a captured context when that context is unnecessary. For synchronization, I use `lock` for synchronous critical sections, `SemaphoreSlim` for asynchronous synchronization, and `Interlocked` for simple atomic updates. I propagate `CancellationToken` through every layer and treat `OperationCanceledException` as expected cancellation rather than an application failure.
+
+## What is shallow copy?
+A **shallow copy** creates a new object, but **nested objects are still shared by reference**.
+
+### C# Example
+
+```csharp
+public class Address
+{
+    public string City { get; set; }
+}
+
+public class Employee
+{
+    public string Name { get; set; }
+    public Address Address { get; set; }
+}
+
+var emp1 = new Employee
+{
+    Name = "Kavit",
+    Address = new Address { City = "Ahmedabad" }
+};
+
+var emp2 = (Employee)emp1.MemberwiseClone();
+
+emp2.Address.City = "Mumbai";
+
+Console.WriteLine(emp1.Address.City); // Mumbai
+```
+
+**Why?** `MemberwiseClone()` copies the `Employee` object, but both `emp1` and `emp2` refer to the **same `Address` object**.
+
+## What is deep Copy?
+
+A **deep copy** creates a new object **and also creates new copies of all nested/reference objects**, so the original and copied objects are completely independent.
+
+### C# Example
+
+```csharp
+public class Address
+{
+    public string City { get; set; }
+}
+
+public class Employee
+{
+    public string Name { get; set; }
+    public Address Address { get; set; }
+}
+
+var emp1 = new Employee
+{
+    Name = "Kavit",
+    Address = new Address { City = "Ahmedabad" }
+};
+
+var emp2 = new Employee
+{
+    Name = emp1.Name,
+    Address = new Address
+    {
+        City = emp1.Address.City
+    }
+};
+
+emp2.Address.City = "Mumbai";
+
+Console.WriteLine(emp1.Address.City); // Ahmedabad
+Console.WriteLine(emp2.Address.City); // Mumbai
+```
+
+**Key difference:**
+
+* **Shallow copy:** nested/reference objects are **shared**.
+* **Deep copy:** nested/reference objects are **also copied**, so changes to one do not affect the other.

@@ -266,3 +266,204 @@ EC2 gives you virtual servers to manage. Lambda runs code without server managem
 
 **One-Line Summary**
 AWS Lambda is AWS’s event-driven, serverless way to run code automatically without managing servers.
+
+## What is default timeout and maximum timeout of AWS lambda Function?
+
+For **AWS Lambda**:
+
+* **Default timeout:** **3 seconds**
+* **Maximum timeout:** **15 minutes (900 seconds)**
+
+You can configure the timeout from **1 second to 900 seconds**.
+
+### Interview answer
+
+> “AWS Lambda has a default timeout of 3 seconds, and the maximum execution timeout is 15 minutes. We configure the timeout based on the expected execution time of the function.”
+
+## If we want to process 1 million files to generate embedding and store into vectorDb how we can do it without timeout hit?
+
+For **1 million files**, you should **not process all files inside one Lambda invocation**. The key is to make the processing **asynchronous, distributed, and resumable**.
+
+### Recommended AWS architecture
+
+```text
+                ┌───────────────┐
+                │   S3 Bucket   │
+                │ 1M documents  │
+                └───────┬───────┘
+                        │
+                 S3 Event / Batch
+                        │
+                        ▼
+                ┌───────────────┐
+                │ SQS Queue     │
+                │ 1 message/file│
+                └───────┬───────┘
+                        │
+             ┌──────────┴──────────┐
+             ▼          ▼          ▼
+        ┌────────┐ ┌────────┐ ┌────────┐
+        │Lambda 1│ │Lambda 2│ │Lambda N│
+        └───┬────┘ └───┬────┘ └───┬────┘
+            │          │           │
+            └──────────┼───────────┘
+                       ▼
+                Extract / Chunk
+                       │
+                       ▼
+                Generate Embedding
+                       │
+                       ▼
+                 Vector DB
+```
+
+### How it avoids timeout
+
+Instead of:
+
+```text
+Lambda
+ └── Process 1,000,000 files ❌
+```
+
+you do:
+
+```text
+S3
+ └── SQS
+      ├── File 1  → Lambda
+      ├── File 2  → Lambda
+      ├── File 3  → Lambda
+      ├── ...
+      └── File 1M → Lambda
+```
+
+Each Lambda processes a **small unit of work**, for example one file or a small batch.
+
+If one Lambda invocation takes 30 seconds, that's fine because another invocation handles the next files.
+
+### Important considerations
+
+**1. SQS + Lambda concurrency**
+
+Lambda can process multiple SQS messages concurrently. You can configure **reserved/concurrency limits** so you don't overwhelm your embedding model or vector database.
+
+**2. Batch processing**
+
+You don't necessarily need one Lambda invocation per file.
+
+For example:
+
+```text
+SQS message
+   ↓
+Lambda
+   ↓
+Process 10 files
+   ↓
+Generate embeddings
+   ↓
+Bulk insert into Vector DB
+```
+
+This can reduce overhead.
+
+**3. Handle failures**
+
+Use:
+
+```text
+SQS
+ ├── Main Queue
+ │
+ └── Dead Letter Queue
+       ↓
+   Failed files
+```
+
+If a file fails repeatedly, it goes to the DLQ instead of stopping the entire ingestion process.
+
+**4. Make processing idempotent**
+
+Store something like:
+
+```text
+DocumentId
+FileName
+Version
+EmbeddingStatus
+ProcessedAt
+```
+
+Before processing, check whether that document/version has already been processed.
+
+This prevents duplicate embeddings if Lambda retries.
+
+### For very large workloads
+
+For **1 million+ files**, I'd consider:
+
+```text
+S3
+ ↓
+SQS
+ ↓
+Lambda / ECS / AWS Batch
+ ↓
+Embedding Model
+ ↓
+Vector DB
+```
+
+Use **Lambda** when individual processing is relatively short and event-driven.
+
+Use **ECS/Fargate or AWS Batch** when processing is long-running, CPU/GPU intensive, or you need more control over batching.
+
+### One important bottleneck
+
+The Lambda timeout isn't necessarily your biggest problem. Your **embedding API/model rate limit** and **Vector DB ingestion capacity** can become the bottlenecks.
+
+So the architecture should control:
+
+```text
+Lambda concurrency
+        ↓
+Embedding API rate
+        ↓
+Vector DB write throughput
+```
+
+For an interview, a strong short answer is:
+
+> **“For 1 million files, I wouldn't process them in a single Lambda because of the 15-minute timeout. I would use S3 + SQS to create independent work items and process them concurrently using multiple Lambda instances, with batching, retries, DLQ and idempotency. I would also control concurrency based on the embedding model's rate limits and vector database ingestion capacity.”**
+
+
+## What would be the rate limit of embedding model?
+
+There is **no single fixed rate limit for an embedding model**. It depends on the **provider, model, deployment type, and quota**.
+
+For example, if you're using **Amazon Bedrock**, the embedding model's throughput is governed by the Bedrock model's **requests-per-minute (RPM)** and/or **tokens-per-minute (TPM)** quotas, which can vary by model and AWS account/region.
+
+For your **1-million-file architecture**, don't hard-code a number. Design it like:
+
+```text
+S3
+ ↓
+SQS
+ ↓
+Lambda workers
+ ↓
+Rate Limiter
+ ↓
+Embedding Model
+ ↓
+Vector DB
+```
+
+For example, if your effective limit is **100 requests/sec**, you could configure your workers so they collectively stay below that rate rather than allowing unlimited Lambda concurrency.
+
+**Interview answer:**
+
+> “Embedding rate limits depend on the provider and model. I would check the model's RPM/TPM quota, then implement controlled concurrency, throttling, exponential backoff and retries so that scaling Lambda workers doesn't overwhelm the embedding service.”
+
+If you tell me whether you're using **AWS Bedrock Titan/Cohere** or **Azure OpenAI embeddings**, I can give you the **specific current limits and how to calculate the Lambda concurrency for 1 million files**.

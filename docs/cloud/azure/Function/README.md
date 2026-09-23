@@ -124,3 +124,135 @@ I'd introduce Durable Functions if you need things like:
 So for an interview, I'd answer:
 
 > **For 1 million files, I would use an asynchronous queue-based architecture with Azure Functions scaled horizontally. I'd process files in batches and apply rate limiting based on the embedding model's RPM/TPM limits. Durable Functions are optional and would be useful when I need reliable orchestration and tracking of the overall ingestion job.**
+
+
+## Here "For **1 million files → generate embeddings → store in vector DB**, I would typically use:  " you told Multiple Function instances. Means I need to create more than 1 azure function to do the same job?
+
+No. **You normally create only one Azure Function**, not one Function per instance.
+
+The important distinction is:
+
+* **Azure Function** = the code you deploy.
+* **Function instance** = a running copy of that Function created automatically by Azure when scaling out.
+
+For example, you deploy **one** function:
+
+```text
+ProcessDocumentFunction
+```
+
+Azure can automatically run it like this:
+
+```text
+                 Queue
+                   │
+        ┌──────────┼──────────┐
+        ▼          ▼          ▼
+    Instance 1  Instance 2  Instance 3
+        │          │          │
+       100        100        100
+      files      files      files
+```
+
+All three instances are running the **same Function code**.
+
+If the workload increases, Azure can scale out further:
+
+```text
+1 Function App
+      │
+      ├── Instance 1
+      ├── Instance 2
+      ├── Instance 3
+      ├── Instance 4
+      ├── ...
+      └── Instance N
+```
+
+### For your 1-million-file scenario
+
+You could have:
+
+```text
+Blob Storage
+     ↓
+Queue
+     ↓
+ProcessDocumentFunction    ← You create this ONCE
+     ↓
+Azure automatically scales instances
+     ↓
+Embedding API
+     ↓
+Azure AI Search / Vector DB
+```
+
+So **you don't manually create 100 Functions**.
+
+You create **one Function**, and Azure's hosting plan/runtime manages the number of running instances based on workload and scaling rules.
+
+One important caveat: **scaling out doesn't mean you can send unlimited embedding requests simultaneously**. The embedding model has rate/token limits, so you still need controlled concurrency/rate limiting.
+
+## So Azure function will create multiple instance. We don't have to do anything in azure? 
+
+Yes, **mostly correct**. You deploy one Azure Function, and Azure can automatically create multiple **instances** when the workload increases.
+
+However, you **do need to configure the hosting and scaling appropriately**.
+
+### Simple example
+
+You create:
+
+```text
+ProcessDocumentFunction
+```
+
+and deploy it to an Azure Function App.
+
+Then:
+
+```text
+              Queue
+                │
+                ▼
+      ProcessDocumentFunction
+                │
+        Azure scales out
+                │
+       ┌────────┼────────┐
+       ▼        ▼        ▼
+   Instance 1 Instance 2 Instance 3
+       │        │        │
+      100      100      100
+     files    files    files
+```
+
+You don't manually create Instance 1, 2, 3.
+
+### What do you configure?
+
+Typically:
+
+1. **Choose an appropriate hosting plan**
+
+   * Consumption/Flex Consumption
+   * Premium
+   * Dedicated
+
+2. **Configure your trigger**
+
+   * For your scenario, a **Queue Storage trigger** or **Service Bus trigger**.
+
+3. **Configure concurrency/scaling limits if required**
+
+   * This prevents Azure from creating too much parallel work and overwhelming your embedding API.
+
+4. **Configure embedding API rate limits**
+
+   * For example, if your embedding model allows only a certain number of tokens/requests per minute, don't let 100 Function instances exceed that limit.
+
+### Key concept for interview
+
+> **I deploy one Azure Function. Azure Functions manages horizontal scaling by creating multiple host instances based on workload. I don't create separate Functions for each instance. I mainly configure the hosting plan, trigger, concurrency/scaling limits, and downstream API throttling.**
+
+So **Azure handles the instance creation**, but **we are still responsible for configuring the application so that the automatic scaling is safe and efficient**.
